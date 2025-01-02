@@ -84,10 +84,10 @@ def save_plot(glitch_data, dataset_name, ifo, glitch_type, index, p_value, gps_t
     plt.subplots_adjust(left=0.1, right=0.9)
 
     ax[0].axis('off')
-    ax[0].text(0.5, 0.5, f'IFO = {ifo}\nGlitch Type = {glitch_type}\nIndex = {index}\nShapiro p-value = {p_value:.9f}\nGPS Time = {gps_time}', 
-               horizontalalignment='center', 
+    ax[0].text(-0.25, 0.5, f'IFO = {ifo}\nGlitch Type = {glitch_type}\nIndex = {index}\nShapiro p-value = {p_value:.9f}\nGPS Time = {gps_time}', 
+               horizontalalignment='left', 
                verticalalignment='center', 
-               fontsize=12, 
+               fontsize=14, 
                bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
     ax[1].plot(glitch_data)
     ax[1].set_ylabel('Amplitude')
