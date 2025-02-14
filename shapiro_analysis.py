@@ -71,16 +71,38 @@ def process_glitch_data(glitch, asd=None):
     ]
     return white_glitch_for_analysis - np.mean(white_glitch_for_analysis) # Let's make sure we have 0 mean
 
-def save_plot(glitch_data, dataset_name, ifo, glitch_type, index, p_value):
+def save_plot(glitch_data, dataset_name, ifo, glitch_type, index, p_value, gps_time):
     """
     Save a plot of the glitch data with Shapiro p-value annotated.
     """
     plotting_dir = os.path.join(PLOTS_PATH, dataset_name, ifo, glitch_type)
     os.makedirs(plotting_dir, exist_ok=True)
 
-    plt.figure()
-    plt.plot(glitch_data)
-    plt.title(f'{glitch_type}_{index}, Shapiro p-value = {p_value:.3f}')
+    glitch_timeseries = TimeSeries(glitch_data, sample_rate=SAMPLE_RATE)
+    fig, ax = plt.subplots(1, 3, width_ratios=[0.5 , 1, 1],  figsize=(20, 6), dpi=150)
+    fig.suptitle(f'{glitch_type}_{index}')
+    plt.subplots_adjust(left=0.1, right=0.9)
+
+    ax[0].axis('off')
+    ax[0].text(-0.25, 0.5, f'IFO = {ifo}\nGlitch Type = {glitch_type}\nIndex = {index}\nShapiro p-value = {p_value:.9f}\nGPS Time = {gps_time}', 
+               horizontalalignment='left', 
+               verticalalignment='center', 
+               fontsize=14, 
+               bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
+    ax[1].plot(glitch_data)
+    ax[1].set_ylabel('Amplitude')
+    ax[1].set_xlabel('Time (s)')
+    ax[2].imshow(
+        glitch_timeseries.q_transform(qrange=[4,64], frange=[10, 2048],
+        tres=0.002, fres=0.5, whiten=False)
+    )
+    ax[2].set_yscale('log', base=2)
+    ax[2].set_xscale('linear')
+    ax[2].set_ylabel('Frequency (Hz)')
+    ax[2].set_xlabel('Time (s)')
+    ax[2].images[0].set_clim(0, 25.5)
+    plt.subplots_adjust(wspace=0.4, hspace=0.4)
+    fig.colorbar(ax[2].images[0], ax=ax[2], label='Normalized energy', orientation='vertical', fraction=0.046, pad=0.04)
     plt.savefig(os.path.join(plotting_dir, f'glitch_type_{index}.png'))
     plt.close()
 
@@ -120,7 +142,7 @@ for dataset_name, dataset in datasets.items():
 
                 # Save plots if required
                 if PLOT_EXAMPLES:
-                    save_plot(centered_glitch, dataset_name, ifo, glitch_type, idx, shapiro_p_value)
+                    save_plot(centered_glitch, dataset_name, ifo, glitch_type, idx, shapiro_p_value, gps_time)
 
 # Save Shapiro p-values to a JSON file
 output_file = "shapiro_p_values.json"
