@@ -53,9 +53,15 @@ def fetch_glitch_data(data, srate=4096, tw=3, ifo='L1', begin=0, end=50):
         y = data.value[int(srate * 1.5):-int(srate * 1.5)]
         noise = noise[int(srate * 1.5):-int(srate * 1.5)]
 
-        data_readings.append((g_star,durations[i],noise,y,t,q_scan))
+        data_readings.append(
+            (g_star,durations[i],
+             noise,
+             y,
+             t,
+             q_scan,
+             _stats.shapiro(y).pvalue))
 
-    data_df = _pd.DataFrame(data_readings, columns=['GPStime', 'duration', 'noise', 'y', 't', 'q_transform'])
+    data_df = _pd.DataFrame(data_readings, columns=['GPStime', 'duration', 'noise', 'y', 't', 'q_transform', 'shapiro_pvalue'])
     
     return data_df
 
