@@ -7,6 +7,7 @@ from scipy import stats as _stats
 import matplotlib.pyplot as _plt
 from gwpy.timeseries import TimeSeries as _TimeSeries
 from matplotlib.ticker import ScalarFormatter
+from sklearn.preprocessing import MinMaxScaler as _MinMaxScaler
 
 _warnings.filterwarnings('ignore')
 
@@ -40,7 +41,13 @@ def generate_sample_statistics(noise: _TimeSeries) -> list:
     y = noise.value
 
     sw_statistic = _stats.shapiro(y)
-    ks_statistic = _stats.ks_1samp(y,_stats.norm.cdf)
+
+    # The Kolmogorov Smirnov statistic needs to be applied to a scaled
+    # version of our data to work properly since it is a distance-based
+    # metric
+    scaler = _MinMaxScaler(feature_range=(-4,4))
+    ks_statistic = _stats.ks_2samp(list(scaler.fit_transform(y.reshape(-1,1))[:,0]), _stats.norm.rvs(size=len(y), random_state=_np.random.default_rng()))
+
     ad_statistic = _stats.anderson(y, dist='norm')
     kurtosis = _stats.kurtosis(y, fisher=False)
     skew = _stats.skew(y)
