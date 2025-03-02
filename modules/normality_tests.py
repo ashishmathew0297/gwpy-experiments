@@ -39,7 +39,7 @@ def generate_sample_statistics(noise: _TimeSeries) -> list:
         - 'skew': Skew of the glitch amplitude values
     '''
 
-    np.random.seed(42)
+    _np.random.seed(42)
     
     y = noise.value
 
