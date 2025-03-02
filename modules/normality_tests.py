@@ -38,6 +38,9 @@ def generate_sample_statistics(noise: _TimeSeries) -> list:
         - 'kurtosis': Kurtosis of the glitch amplitude values
         - 'skew': Skew of the glitch amplitude values
     '''
+
+    np.random.seed(42)
+    
     y = noise.value
 
     sw_statistic = _stats.shapiro(y)
