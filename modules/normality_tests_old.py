@@ -11,25 +11,28 @@ from matplotlib.ticker import ScalarFormatter
 _warnings.filterwarnings('ignore')
 
 
-def generate_sample_statistics(noise: _TimeSeries) -> list:
+def fetch_glitch_data(data: _pd.DataFrame, srate: int=4096, tw: int=3, ifo: str='L1', begin: int=0, end: int=50) -> _pd.DataFrame:
     '''
-    This function uses the input glitch TimeSeries sample in pycbc form to calculate and return a list of the following
-
-    - Shapiro-Wilks statistic
-    - Shapiro-Wilks p-value
-    - Kolmogorov-Smirnov statistic
-    - Kolmogorov-Smirnov p-value
-    - Anderson-Darling statistic
-    - Anderson-Darling critical values
-    - Anderson-Darling significance levels
+    Fetches glitch samples from the TimeSeries API using a Pandas dataframe of the IFO runs dataset
 
     Inputs:
-    - `glitch_timeseries`: TimeSeries object of the glitch
+    - `data`: Pandas dataframe of glitch data
+    - `srate`: The sampling rate. Default= 4096
+    - `tw`: Time window to be taken into consideration around the glitch. The final sample returned will have 2.5 seconds removed from either side.
+            Default = 3 seconds 
+    - `ifo`: The interferometer being studied. Default=L1 (LIGO Livingston Observatory)
+    - `begin`: Starting index. Default=0
+    - `end`: End index. Default=50
 
     Output:
-    - **data_df**: a list containing the following
-        - 'shapiro_statistic': Shapiro-Wilks statistic of the sample amplitudes
-        - 'shapiro_pvalue': Shapiro-Wilks p-value of the sample amplitudes
+    - **data_df:** Dataframe containing the following
+        - 'GPStime': Global Positioning System Time of the glitch
+        - 'duration': Total duration of the glitch
+        - 'noise': pycbc data of the unwhitened glitch
+        - 'y': Amplitude values of the whitened glitch timeseries
+        - 't': Time values of the whitened glitch timeseries,
+        - 'q_transform': Q-transform of the whole glitch sample (1 second removed at either end to account for border effects)
+        - 'shapiro_pvalue': Shapiro p-value of the sample amplitudes
         - 'ks_pvalue': Kolmogorov-Smirnov p-value of the sample amplitudes
         - 'ad_statistic': Anderson-Darling statistic
         - 'ad_critical_values': Critical values for the Anderson Darling statistic
@@ -37,25 +40,59 @@ def generate_sample_statistics(noise: _TimeSeries) -> list:
         - 'kurtosis': Kurtosis of the glitch amplitude values
         - 'skew': Skew of the glitch amplitude values
     '''
-    y = noise.value
+    data = data[~data.duplicated(subset=['GPStime'], keep='first')]
 
-    sw_statistic = _stats.shapiro(y)
-    ks_statistic = _stats.ks_1samp(y,_stats.norm.cdf)
-    ad_statistic = _stats.anderson(y, dist='norm')
-    kurtosis = _stats.kurtosis(y, fisher=False)
-    skew = _stats.skew(y)
+    data_readings = []
 
-    return [
-        sw_statistic.statistic,
-        sw_statistic.pvalue,
-        ks_statistic.statistic,
-        ks_statistic.pvalue,
-        ad_statistic.statistic,
-        ad_statistic.critical_values,
-        ad_statistic.significance_level,
-        kurtosis,
-        skew
-        ]
+    # Select information based on begin and end indexes
+    g_stars = data['GPStime'].iloc[begin:end]
+    durations = data['duration'].iloc[begin:end].to_list()
+
+    for i, g_star in enumerate(g_stars):
+
+        # Fetch noise data from the LIGO GWOSC
+        noise = _TimeSeries.fetch_open_data(ifo, g_star - tw ,  g_star + tw, sample_rate=srate)
+        noise = noise.to_pycbc()
+
+        # whiten the noise data
+        white_noise, psd = noise.whiten(len(noise) / (2 * srate),
+                                        len(noise)/( 4 * srate),
+                                        remove_corrupted = False,
+                                        return_psd = True)
+        
+        # Crop 1s at each side to avoid border effects
+        white_noise = white_noise[int(srate * 1):-int(srate * 1)]
+        noise = noise[int(srate * 1):-int(srate * 1)]
+
+        # Creating q-transforms of the data for visualization
+        data = _TimeSeries(white_noise, sample_rate = srate)
+        q_scan = data.q_transform(qrange=[4,64], frange=[10, 2048],
+                                tres=0.002, fres=0.5, whiten=False)
+        
+        # Localizing the glitch into a 1s interval
+        t = data.times[int(srate * 1.5):-int(srate * 1.5)]
+        y = data.value[int(srate * 1.5):-int(srate * 1.5)]
+        noise = noise[int(srate * 1.5):-int(srate * 1.5)]
+
+        ad_statistic = _stats.anderson(y, dist='norm')
+        data_readings.append(
+            (g_star,durations[i],
+             noise,
+             y,
+             t,
+             q_scan,
+             _stats.shapiro(y).pvalue,
+             _stats.ks_1samp(y,_stats.norm.cdf).pvalue,
+             ad_statistic.statistic,
+             ad_statistic.critical_values,
+             ad_statistic.significance_level,
+             _stats.kurtosis(y, fisher=False),
+             _stats.skew(y)
+             ))
+
+    data_df = _pd.DataFrame(data_readings, columns=['GPStime', 'duration', 'noise', 'y', 't', 'q_transform', 'shapiro_pvalue', 'ks_pvalue', 'ad_statistic', 'ad_critical_values', 'ad_significance_level', 'kurtosis', 'skew'])
+    
+    return data_df
 
 def shapiro_pvalue_histogram(data_df: _pd.DataFrame) -> None:
     '''
@@ -97,12 +134,12 @@ def display_glitch_plots(data: _pd.DataFrame, glitch_index: int) -> None:
     ax[0].set_ylabel("Amplitude")
     ax[0].legend()
 
-    ax[1].plot(data['t'].iloc[glitch_index],data["glitch_timeseries"].iloc[glitch_index])
+    ax[1].plot(data['t'].iloc[glitch_index],data["noise"].iloc[glitch_index])
     ax[2].set_xlabel("Time (s)")
     ax[1].set_ylabel("Amplitude")
     ax[1].legend()
 
-    ax[2].imshow(data['q_scan'].iloc[glitch_index])
+    ax[2].imshow(data['q_transform'].iloc[glitch_index])
     ax[2].set_yscale('log', base=2)
     ax[2].set_xscale('linear')
     ax[2].set_ylabel('Frequency (Hz)')
@@ -125,7 +162,7 @@ def display_probability_plot(sample_glitch: _pd.DataFrame) -> None:
     fig,ax = _plt.subplots(1,2, figsize=(12,5))
     _stats.probplot(sample_glitch["y"], dist="norm", plot=ax[0])
     ax[1].axis("off")
-    ax[1].text(0.1, 0.5, f'Shapiro p-value = {sample_glitch["shapiro_pvalue"]}\nGPS Time = {sample_glitch["GPStime"]}', 
+    ax[1].text(0.1, 0.5, f'Shapiro p-value = {sample_glitch["shapiro_pvalue"]:.10f}\nGPS Time = {sample_glitch["GPStime"]}', 
                horizontalalignment='left', 
                verticalalignment='center', 
                fontsize=14, 
