@@ -8,6 +8,8 @@ import matplotlib.pyplot as _plt
 from gwpy.timeseries import TimeSeries as _TimeSeries
 from matplotlib.ticker import ScalarFormatter
 from sklearn.preprocessing import MinMaxScaler as _MinMaxScaler
+from sklearn import metrics
+from typing import Literal
 
 _warnings.filterwarnings('ignore')
 
@@ -58,8 +60,10 @@ def generate_sample_statistics(noise: _TimeSeries) -> list:
     return [
         sw_statistic.statistic,
         sw_statistic.pvalue,
+        1 if sw_statistic.pvalue <= 0.05 else 0,
         ks_statistic.statistic,
         ks_statistic.pvalue,
+        1 if ks_statistic.pvalue <= 0.05 else 0,
         ad_statistic.statistic,
         ad_statistic.critical_values,
         ad_statistic.significance_level,
@@ -142,7 +146,7 @@ def display_probability_plot(sample_glitch: _pd.DataFrame) -> None:
                bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
     _plt.show()
 
-def get_section_statistics(data: _pd.DataFrame, stat_test: str="Shapiro", section_size_seconds: float=1) -> list:
+def get_section_statistics(data: _pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", section_size_seconds: float=1) -> list:
     '''
     A function to calculate one of the following:
     - Shapiro-Wilks Test p-values
@@ -198,7 +202,7 @@ def get_section_statistics(data: _pd.DataFrame, stat_test: str="Shapiro", sectio
     return section_info
 
 
-def display_section_statistics(data: _pd.DataFrame, stat_test: str="Shapiro", section_size_seconds: float=1) -> None:
+def display_section_statistics(data: _pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", section_size_seconds: float=1) -> None:
     '''
     A funtion to display one of the following:
     - Shapiro-Wilks Test p-values
@@ -257,3 +261,31 @@ def display_section_statistics(data: _pd.DataFrame, stat_test: str="Shapiro", se
             verticalalignment='center', 
             fontsize=14, 
             bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
+    
+def generate_confusion_matrix(data: _pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro") -> None:
+    '''
+    Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
+    - Shapiro-Wilks Test
+    - Kolmogorov-Smirnov Test
+    - Anderson-Darling Test
+
+    Inputs:
+    - `data`: The dataset of IFO signal information being studied.
+    - `stat_test`: The statistical test being considered.
+
+    Display:
+    - Confusion matrix for the concerned statistic.
+    '''
+
+    cm = []
+
+    if stat_test == "Shapiro":
+        cm = metrics.confusion_matrix(_np.ones(len(data)),data["shapiro_prediction"],labels=[1,0])
+    if stat_test == "KS":
+        cm = metrics.confusion_matrix(_np.ones(len(data)),data["ks_prediction"],labels=[1,0])
+    # TODO: Decide on significance level for AD statistic
+    
+    disp = metrics.ConfusionMatrixDisplay(cm, display_labels=["Glitch Present", "Glitch Not Present"])
+    disp.plot()
+    _plt.grid(False)
+    _plt.show()
