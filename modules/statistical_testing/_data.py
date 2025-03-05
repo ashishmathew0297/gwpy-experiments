@@ -13,39 +13,44 @@ from sklearn import metrics
 from typing import Literal
 from dotenv import find_dotenv, load_dotenv
 from gwpy.table import GravitySpyTable
+from numpy.typing import NDArray
 
 warnings.filterwarnings('ignore')
 
 def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, end=50):
 
     '''
-    Fetches a set of glitch samples from the TimeSeries API with a given time window, whitens it and returns a 
+    Fetches the glitch TimeSeries samples from the TimeSeries API, performs the statistical tests on them retruns a datset with the relevant information appended 
 
     Inputs:
     - `data`: Pandas dataframe of glitch data
+    - `gpsTimeKey`: The key value for GPS time in the dataset
     - `srate`: The sampling rate. Default= 4096
-    - `tw`: Time window to be taken into consideration around the glitch. Thefinal sample returned will have 2.5 seconds removed from either side.
-            Default = 3 seconds 
+    - `tw`: Time window to be taken into consideration on either side of the glitch. Thefinal sample returned will have 2.5 seconds removed from either side.
+            Default = 5 seconds 
     - `ifo`: The interferometer being studied. Default=L1 (LIGO LivingstonObservatory)
     - `begin`: Starting index. Default=0
     - `end`: End index. Default=50
 
-    Output: The original input dataset with the following appended to the columns
+    Output: The original input dataset concatenated with the following
     - 'y': Amplitude values of the whitened glitch timeseries
     - 't': Time values of the whitened glitch timeseries,
     - 'q_transform': Q-transform of the whole glitch sample (1 second removed at either end to account for border effects)
-    - 'shapiro_statistic': Shapiro statistic of the sample amplitudes
-    - 'shapiro_pvalue': Shapiro p-value of the sample amplitudes
-    - 'ks_statistic': Kolmogorov-Smirnov statistic of the sample amplitudes
-    - 'ks_pvalue': Kolmogorov-Smirnov p-value of the sample amplitudes
-    - 'ad_statistic': Anderson-Darling statistic
-    - 'ad_critical_values': Critical values for the Anderson Darling statistic
-    - 'ad_significance_level': Significance level for the Anderson Darling statistic
-    - 'kurtosis': Kurtosis of the glitch amplitude values
-    - 'skew': Skew of the glitch amplitude values
+    - 'Shapiro-Wilk statistic': Shapiro statistic of the sample amplitudes
+    - 'Shapiro-Wilk p-value': Shapiro p-value of the sample amplitudes
+    - 'Shapiro-Wilk prediction': The prediction made based on the Shapiro-Wilks p-value of sample amplitudes
+    - 'Kolmogorov-Smirnov Statistic': Kolmogorov-Smirnov statistic of the sample amplitudes
+    - 'Kolmogorov-Smirnov p-value': Kolmogorov-Smirnov p-value of the sample amplitudes
+    - 'Kolmogorov-Smirnov prediction': The prediction made based on the Kolmogorov-Smirnov p-value of sample amplitudes
+    - 'Anderson-Darling statistic': Anderson-Darling statistic
+    - 'Anderson-Darling critical values': Critical values for the Anderson Darling statistic
+    - 'Anderson-Darling significance level': Significance level for the Anderson Darling statistic
+    - 'Kurtosis': Kurtosis of the glitch amplitude values
+    - 'Skew': Skew of the glitch amplitude values
     '''
 
-    data_readings = []
+    data_readings = {}
+    columns_to_append = ["glitch_timeseries","y","t","q_scan","shapiro_statistic", "shapiro_pvalue","shapiro_prediction","ks_statistic","ks_pvalue","ks_prediction","ad_statistic","ad_critical_values","ad_significance_level","kurtosis","skew"]
 
     # Select information based on begin and end indexes
     g_stars = data[gpsTimeKey].iloc[begin:end]
@@ -68,7 +73,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
         # Creating q-transforms of the data for visualization
         whitened_noise = TimeSeries(whitened_noise, sample_rate = srate)
 
-        # Try block was added because some of the glitches throw a
+        # Try block added because some glitches throw:
         # ValueError "Input signal contains non-numerical values"
         try:
             q_scan = whitened_noise.q_transform(qrange=[4,64], frange=[10, 2048], tres=0.002, fres=0.5, whiten=False)
@@ -79,19 +84,28 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
         # (this might need to be changed for different glitches)
         unwhitened_noise = unwhitened_noise[int(srate * 1.5):-int(srate * 1.5)]
         whitened_noise = whitened_noise[int(srate * 1.5):-int(srate * 1.5)]
-
-        glitch_statistics = generate_sample_statistic_list(whitened_noise)
+        
         t = whitened_noise.times
         y = whitened_noise.value
 
-        data_readings.append(
-            [unwhitened_noise,
-             y,
-             t,
-             q_scan
-             ] + glitch_statistics)
-    x = pd.DataFrame(data_readings, columns=["glitch_timeseries","y","t","q_scan","shapiro_statistic", "shapiro_pvalue","shapiro_prediction","ks_statistic","ks_pvalue","ks_prediction","ad_statistic","ad_critical_values","ad_significance_level","kurtosis","skew"])
-    data_df = pd.concat([data.iloc[begin:end].reset_index(drop=True), x], axis=1)
+        # Fetching relevant data to be appended to the input dataframe
+        supplemental_glitch_data = {
+            "glitch_timeseries": unwhitened_noise,
+            "y": y,
+            "t": t,
+            "q_scan": q_scan}
+        
+        supplemental_glitch_data.update(generate_sample_statistics(whitened_noise))
+
+        for key, value in supplemental_glitch_data.items():
+            if key in data_readings:
+                 data_readings[key].append(value)
+            else:
+                data_readings[key] = [value]
+
+    # Append generated statistics to current dataframe and return it        
+    dataframe_to_append = pd.DataFrame.from_dict(data_readings, orient='columns').reset_index(drop=True)
+    data_df = pd.concat([data.iloc[begin:end].reset_index(drop=True), dataframe_to_append], axis=1)
     
     return data_df
 
@@ -112,7 +126,7 @@ def fetch_gspy_glitch_data(glitchtype: str):
         ).to_pandas()
         glitch_data.to_csv(filepath, index=False)
 
-def generate_sample_statistic_list(noise: TimeSeries) -> list:
+def generate_sample_statistics(noise: TimeSeries) -> dict:
     '''
     This function uses the input glitch TimeSeries sample in pycbc form to calculate and return a list of the following
 
@@ -143,7 +157,11 @@ def generate_sample_statistic_list(noise: TimeSeries) -> list:
     
     y = noise.value
 
+    # =================== Shapiro-Wilks Test ===================
+
     sw_statistic = stats.shapiro(y)
+
+     # =================== Two-Sample Kolmogorov-Smirnov Test ===================
 
     # The Kolmogorov Smirnov statistic needs to be applied to a scaled
     # version of our data to work properly since it is a distance-based
@@ -151,23 +169,29 @@ def generate_sample_statistic_list(noise: TimeSeries) -> list:
     scaler = MinMaxScaler(feature_range=(-4,4))
     ks_statistic = stats.ks_2samp(list(scaler.fit_transform(y.reshape(-1,1))[:,0]), stats.norm.rvs(size=len(y), random_state=np.random.default_rng()))
 
+    # =================== Anderson-Darling Test ===================
+
     ad_statistic = stats.anderson(y, dist='norm')
+
+    # =================== Skew and Kurtosis ===================
+
     kurtosis = stats.kurtosis(y, fisher=False)
     skew = stats.skew(y)
 
-    return [
-        sw_statistic.statistic,
-        sw_statistic.pvalue,
-        1 if sw_statistic.pvalue <= 0.05 else 0,
-        ks_statistic.statistic,
-        ks_statistic.pvalue,
-        1 if ks_statistic.pvalue <= 0.05 else 0,
-        ad_statistic.statistic,
-        ad_statistic.critical_values,
-        ad_statistic.significance_level,
-        kurtosis,
-        skew
-        ]
+
+    return {
+        "shapiro_statistic": sw_statistic.statistic,
+        "shapiro_pvalue": sw_statistic.pvalue,
+        "shapiro_prediction": 1 if sw_statistic.pvalue <= 0.05 else 0,
+        "ks_statistic": ks_statistic.statistic,
+        "ks_pvalue": ks_statistic.pvalue,
+        "ks_prediction": 1 if ks_statistic.pvalue <= 0.05 else 0,
+        "ad_statistic": ad_statistic.statistic,
+        "ad_critical_values": ad_statistic.critical_values,
+        "ad_significance_level": ad_statistic.significance_level,
+        "kurtosis": kurtosis,
+        "skew": skew
+    }
 
 def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", section_size_seconds: float=1) -> list:
     '''
@@ -193,22 +217,29 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
     
     section_info = []
     section_statistic = {}
+    sample_length = len(data['y'])
 
+    # Section size (in seconds) rounded to 5 places 
     section_size_seconds = round(section_size_seconds, 5)
     
-    # Obtain sample timeframe in seconds and get section size
-    if section_size_seconds <= 1 and section_size_seconds > 0:
-        section_size = int(math.floor(len(data['y']) * section_size_seconds))
+    # Using the sample timeframe in seconds, get section size
+    # in terms of sampling rate
+    if section_size_seconds <= sample_length/4096 and section_size_seconds > 0:
+        section_size = int(math.floor(sample_length) * section_size_seconds)
     else:
-        section_size = len(data['y'])
-        
+        section_size = sample_length
+
 
     print(f"{stat_test} Statistics")
     print("====================")
 
+    # =================== Section-wise Statistics Calculation ===================
+
     for i in range(0, len(data['y']+1), section_size):
+
         y = data['y'][i:i+section_size]
         t = np.array(data['t'])[i:i+section_size]
+
         if len(y) > 0:
             if stat_test == "Shapiro":
                 section_statistic = stats.shapiro(y)._asdict()
@@ -224,3 +255,27 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
 
     return section_info
     
+def get_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro") -> NDArray:
+    '''
+    Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
+    - Shapiro-Wilks Test
+    - Kolmogorov-Smirnov Test
+    - Anderson-Darling Test
+
+    Inputs:
+    - `data`: The dataset of IFO signal information being studied.
+    - `stat_test`: The statistical test being considered.
+
+    Output:
+    - Confusion matrix for the concerned statistic.
+    '''
+
+    cm = []
+
+    if stat_test == "Shapiro":
+        cm = metrics.confusion_matrix(np.ones(len(data)),data["shapiro_prediction"],labels=[1,0])
+    if stat_test == "KS":
+        cm = metrics.confusion_matrix(np.ones(len(data)),data["ks_prediction"],labels=[1,0])
+    # TODO: Decide on significance level for AD statistic
+    
+    return cm
