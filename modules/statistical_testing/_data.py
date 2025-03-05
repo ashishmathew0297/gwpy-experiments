@@ -126,7 +126,7 @@ def fetch_gspy_glitch_data(glitchtype: str):
         ).to_pandas()
         glitch_data.to_csv(filepath, index=False)
 
-def generate_sample_statistics(noise: TimeSeries) -> dict:
+def generate_sample_statistics(sample_timeseries: TimeSeries) -> dict:
     '''
     This function uses the input glitch TimeSeries sample in pycbc form to calculate and return a list of the following
 
@@ -139,7 +139,7 @@ def generate_sample_statistics(noise: TimeSeries) -> dict:
     - Anderson-Darling significance levels
 
     Inputs:
-    - `glitchTimeSeries`: TimeSeries object of the glitch
+    - `glitch_timeseries`: TimeSeries object of the glitch
 
     Output:
     - **data_df**: a list containing the following
@@ -155,13 +155,13 @@ def generate_sample_statistics(noise: TimeSeries) -> dict:
 
     np.random.seed(42)
     
-    y = noise.value
+    y = sample_timeseries.value
 
     # =================== Shapiro-Wilks Test ===================
 
     sw_statistic = stats.shapiro(y)
 
-     # =================== Two-Sample Kolmogorov-Smirnov Test ===================
+    # =================== Two-Sample Kolmogorov-Smirnov Test ===================
 
     # The Kolmogorov Smirnov statistic needs to be applied to a scaled
     # version of our data to work properly since it is a distance-based
@@ -177,7 +177,6 @@ def generate_sample_statistics(noise: TimeSeries) -> dict:
 
     kurtosis = stats.kurtosis(y, fisher=False)
     skew = stats.skew(y)
-
 
     return {
         "shapiro_statistic": sw_statistic.statistic,
@@ -209,17 +208,17 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
 
     Display: A plot of
     - The glitch sample timeseries with sections highlighted to show the concerned statistics for each section.
-    - Q-Q of the whole sample
+    - A Q-Q plot of the whole sample
 
     Output:
       - **section_statistics:** A list of test results in relation to each of the sections of the dataset.
     '''
-    
+
     section_info = []
     section_statistic = {}
     sample_length = len(data['y'])
 
-    # Section size (in seconds) rounded to 5 places 
+    # Section size (in seconds) rounded to 5 places
     section_size_seconds = round(section_size_seconds, 5)
     
     # Using the sample timeframe in seconds, get section size
@@ -228,7 +227,6 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
         section_size = int(math.floor(sample_length) * section_size_seconds)
     else:
         section_size = sample_length
-
 
     print(f"{stat_test} Statistics")
     print("====================")
@@ -254,7 +252,7 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
                 section_info.append({"y":y, "t":t, "section_statistic":section_statistic})
 
     return section_info
-    
+
 def get_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro") -> NDArray:
     '''
     Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
