@@ -8,7 +8,7 @@ from ._data import (
 
 from ._visualizer import (
     display_statistic_pvalue_histogram,
-    display_glitch_plots,
+    display_sample_plots,
     display_probability_plot,
     display_section_statistics,
     display_confusion_matrix
@@ -20,7 +20,7 @@ __all__ = {
     generate_sample_statistics,
     get_section_statistics,
     display_statistic_pvalue_histogram,
-    display_glitch_plots,
+    display_sample_plots,
     display_probability_plot,
     display_section_statistics,
     get_confusion_matrix,
