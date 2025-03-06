@@ -3,7 +3,7 @@ from ._data import (
     fetch_gspy_glitch_data,
     generate_sample_statistics,
     get_section_statistics,
-    get_confusion_matrix
+    generate_confusion_matrix
 )
 
 from ._visualizer import (
@@ -23,6 +23,6 @@ __all__ = {
     display_sample_plots,
     display_probability_plot,
     display_section_statistics,
-    get_confusion_matrix,
+    generate_confusion_matrix,
     display_confusion_matrix
 }
