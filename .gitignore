@@ -162,5 +162,9 @@ cython_debug/
 #.idea/
 .DS_Store
 
-# Excluding any downloaded GravitySpy datasets
+# Excluding any downloaded GravitySpy/GWOSC datasets
 gspy_glitches/
+glitch_timeseries_data/
+
+# Excluding generated plots
+confusion_matrices/
