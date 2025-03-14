@@ -1,3 +1,4 @@
+import os
 import math as math
 import pycbc as pycbc
 import numpy as np
@@ -10,7 +11,7 @@ from sklearn import metrics
 from typing import Literal
 from numpy.typing import NDArray
 
-from ._data import get_section_statistics
+from ._data import get_section_statistics, generate_confusion_matrix
 
 def display_statistic_pvalue_histogram(pvalues: pd.DataFrame, stat_test: Literal["Shapiro-Wilk", "Kolmogorov-Smirnov"]="Shapiro-Wilk") -> None:
     '''
@@ -169,7 +170,7 @@ def display_section_statistics(data: pd.DataFrame, gpstimekey: str = "GPStime", 
             fontsize=14, 
             bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
 
-def display_confusion_matrix(confusion_matrix: NDArray) -> None:
+def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", per_glitch:bool=False,save_img: bool=False) -> None:
     '''
     Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
     - Shapiro-Wilks Test
@@ -183,7 +184,23 @@ def display_confusion_matrix(confusion_matrix: NDArray) -> None:
     - Confusion matrix for the concerned statistic.
     '''
 
-    disp = metrics.ConfusionMatrixDisplay(confusion_matrix, display_labels=["Glitch Present", "Glitch Not Present"])
+    if per_glitch:
+        title = f"Confusion Matrix of {stat_test} Test on {data.iloc[0]["label"]} Glitches"
+        filename = f"conf_matrix_{data.iloc[0]['label']}_{stat_test}.png"
+    else:
+        title = f"Confusion Matrix of {stat_test} Test"
+        filename = f"conf_matrix_{stat_test}.png"
+    
+    disp = metrics.ConfusionMatrixDisplay(generate_confusion_matrix(data,stat_test), display_labels=["Glitch Present", "Glitch Not Present"])
     disp.plot()
     plt.grid(False)
-    plt.show()
+    plt.title(title)
+    if save_img:
+        if not os.path.isdir("./confusion_matrices/"):
+            os.mkdir("./confusion_matrices/")
+        plt.savefig(f"./confusion_matrices/{filename}")
+        plt.close()
+    else:
+        plt.show()
+
+
