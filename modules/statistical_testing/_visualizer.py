@@ -11,7 +11,7 @@ from sklearn import metrics
 from typing import Literal
 from numpy.typing import NDArray
 
-from ._data import get_section_statistics, generate_confusion_matrix
+from ._statistics import get_section_statistics, generate_confusion_matrix
 
 def display_statistic_pvalue_histogram(pvalues: pd.DataFrame, stat_test: Literal["Shapiro-Wilk", "Kolmogorov-Smirnov"]="Shapiro-Wilk") -> None:
     '''
