@@ -240,8 +240,8 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
                 else:
                     unwhitened_sample = TimeSeries.read(filepath+filename)
                 unwhitened_sample = unwhitened_sample.to_pycbc()
-            except ValueError:
-                print(ValueError)
+            except ValueError as e:
+                print(e)
                 continue
         
             # Whitening the sample segment
@@ -252,9 +252,11 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
                     remove_corrupted=False,
                     return_psd=True
                 )
-            except ValueError:
-                print(f"Failed to whiten sample for {data.iloc[i]['start_time']}-{data.iloc[i]['end_time']}")
+            except ValueError as e:
+                # print(f"Failed to whiten sample for {data.iloc[i]['start_time']}-{data.iloc[i]['end_time']}")
+                data.iloc[i]["load_failed"] = 1
                 fail_count = fail_count + 1
+                print(e)
                 continue
 
             whitened_sample = TimeSeries(whitened_sample, sample_rate = sample_rate)
@@ -266,7 +268,7 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
                     
                     # Only accept samples that are of the exact segment size
                     if not i < segment_size:
-                        whitened_samples.append(whitened_sample[i:i + sample_rate])
+                        whitened_samples.append(whitened_sample[i:i + segment_size])
         
     print("Number of failed samples: ", fail_count)
     print("Number of whitened samples obtained: ", len(whitened_samples))
