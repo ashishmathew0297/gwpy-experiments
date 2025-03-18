@@ -57,25 +57,19 @@ def get_TimeSeries(gpstime: float, tw: int=5, srate=4096, ifo='L1') -> list:
     unwhitened_noise = unwhitened_noise.to_pycbc()
 
     # whiten the noise data
-    whitened_noise, psd = unwhitened_noise.whiten(len(unwhitened_noise) / (2 * srate),
-                                len(unwhitened_noise)/( 4 * srate),
-                                remove_corrupted = False,
-                                return_psd = True)
+    whitened_noise, psd = unwhitened_noise.whiten(
+        len(unwhitened_noise) / (2 * srate),
+        len(unwhitened_noise)/( 4 * srate),
+        remove_corrupted = False,
+        return_psd = True)
     
     # Crop times at each side to avoid border effects
-    whitened_noise = whitened_noise[int(srate * 3):-int(srate * 3)]
-    unwhitened_noise = unwhitened_noise[int(srate * 3):-int(srate * 3)]
+    whitened_noise = whitened_noise[int(srate * (tw - 2)):-int(srate * (tw - 2))]
+    unwhitened_noise = unwhitened_noise[int(srate * (tw - 2)):-int(srate * (tw - 2))]
 
     # Creating q-transforms of the data for visualization
     whitened_noise = TimeSeries(whitened_noise, sample_rate = srate)
-
-    # Stripping the sample down to a smaller window of central data
-    # (this might need to be changed for different glitches)
-    unwhitened_noise = unwhitened_noise[int(srate * 1.5):-int(srate * 1.5)]
-    whitened_noise = whitened_noise[int(srate * 1.5):-int(srate * 1.5)]
-
-    # print(f"Calculating q-transform for GPS time {gpstime} ...")
-
+    
     # Try block added because some glitches throw:
     # ValueError "Input signal contains non-numerical values"
     try:
@@ -83,10 +77,15 @@ def get_TimeSeries(gpstime: float, tw: int=5, srate=4096, ifo='L1') -> list:
     except ValueError:
         print(f"Failed to generate q-transform for {gpstime}")
 
+    # Stripping the sample down to a 1 second window of central data
+    # (this might need to be changed for different glitches)
+    unwhitened_noise = unwhitened_noise[int(srate * 1.5):-int(srate * 1.5)]
+    whitened_noise = whitened_noise[int(srate * 1.5):-int(srate * 1.5)]
+
     return unwhitened_noise, whitened_noise, q_scan, psd
         
 
-def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0):
+def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0)-> pd.DataFrame:
 
     '''
     Fetches the glitch TimeSeries samples from the TimeSeries API, performs the statistical tests on them retruns a datset with the relevant information appended 
@@ -191,7 +190,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
     
     return data_df
 
-def fetch_gspy_glitch_data(glitchtype: str):
+def fetch_gspy_glitch_data(glitchtype: str) -> None:
     filepath = f"./gspy_glitches/gspy_{glitchtype}.csv"
     load_dotenv(find_dotenv())
 
@@ -208,3 +207,69 @@ def fetch_gspy_glitch_data(glitchtype: str):
         ).to_pandas()
         glitch_data.to_csv(filepath, index=False)
 
+def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segment_duration_seconds: float = 1) -> pd.DataFrame:
+    ''''
+    Fetches Timeseries segments for all rows of the input DataFrame and returns a dataframe of whitened samples from it at a given segment size.
+    '''
+
+    filepath = "./clean_timeseries_data/"
+
+    if not os.path.isdir(filepath):
+        os.mkdir(filepath)
+
+    segment_size = sample_rate*segment_duration_seconds
+    fail_count = 0
+
+    whitened_samples = []
+    print("Input Length: ",len(data))
+    
+    for i in range(len(data)):
+        if data.iloc[i]['start_time'] and data.iloc[i]['end_time']:
+            
+            filename = f"clean_sample_{ifo}_{data.iloc[i]['start_time']}_{data.iloc[i]['end_time']}.h5"
+
+            # Fetching the whole GWOSC timeseries of the given segment
+            try:
+                if not os.path.isfile(filepath+filename):
+                    unwhitened_sample = TimeSeries.fetch_open_data(
+                        ifo,
+                        data.iloc[i]['start_time'],
+                        data.iloc[i]['end_time'],
+                        sample_rate=sample_rate)
+                    unwhitened_sample.write(filepath+filename)
+                else:
+                    unwhitened_sample = TimeSeries.read(filepath+filename)
+                unwhitened_sample = unwhitened_sample.to_pycbc()
+            except ValueError:
+                print(ValueError)
+                continue
+        
+            # Whitening the sample segment
+            try:
+                whitened_sample, psd = unwhitened_sample.whiten(
+                    len(unwhitened_sample) / (2 * sample_rate),
+                    len(unwhitened_sample) / (4 * sample_rate),
+                    remove_corrupted=False,
+                    return_psd=True
+                )
+            except ValueError:
+                print(f"Failed to whiten sample for {data.iloc[i]['start_time']}-{data.iloc[i]['end_time']}")
+                fail_count = fail_count + 1
+                continue
+
+            whitened_sample = TimeSeries(whitened_sample, sample_rate = sample_rate)
+
+            # Getting segments of the whitened sample equal to the input segment duration
+            # This will serve as the clean segments for the our statistical tests
+            if not len(whitened_sample) < segment_size:
+                for i in range(0, len(whitened_sample.times) + 1, segment_size):
+                    
+                    # Only accept samples that are of the exact segment size
+                    if not i < segment_size:
+                        whitened_samples.append(whitened_sample[i:i + sample_rate])
+        
+    print("Number of failed samples: ", fail_count)
+    print("Number of whitened samples obtained: ", len(whitened_samples))
+            
+    whitened_samples_df = pd.DataFrame(whitened_samples, columns=['whitened_sample_timeseries'])
+    return whitened_samples_df

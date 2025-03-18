@@ -8,7 +8,7 @@ ifo = 'L1'
 start = 1238166018 #O3a start
 end = 1253977218 #O3a end
 
-path_glitches = f'../GPStimes/{run}_allifo.csv' # FIXME
+path_glitches = f'../glitches/{run}_allifo.csv' # FIXME
 glitches = pd.read_csv(path_glitches)
 glitches = glitches[glitches['ifo'] == ifo]
 print(len(glitches))
@@ -26,4 +26,4 @@ mask = glitches.apply(lambda row: ((segments['start_time'] <= row['GPStime']) - 
 DQ_glitches = glitches[mask]
 print(len(DQ_glitches))
 
-DQ_glitches.to_csv(f'DQ_glitches_{run}.csv')
+DQ_glitches.to_csv(f'../glitches/DQ_glitches_{run}.csv')

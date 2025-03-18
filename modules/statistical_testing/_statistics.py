@@ -84,7 +84,7 @@ def calculate_sample_statistics(sample_timeseries: TimeSeries) -> dict:
         "skew": skew
     }
 
-def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", section_size_seconds: float=1) -> list:
+def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", section_duration_seconds: float=1) -> list:
     '''
     A function to calculate one of the following:
     - Shapiro-Wilks Test p-values
@@ -111,12 +111,17 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
     sample_length = len(data['y'])
 
     # Section size (in seconds) rounded to 5 places
-    section_size_seconds = round(section_size_seconds, 5)
+    section_duration_seconds = round(section_duration_seconds, 5)
     
     # Using the sample timeframe in seconds, get section size
     # in terms of sampling rate
-    if section_size_seconds <= sample_length/4096 and section_size_seconds > 0:
-        section_size = int(math.floor(sample_length) * section_size_seconds)
+    # Checks:
+    # 1. If section duration is less than or equal to the sample length in seconds
+    # 2. If section duration is greater than 0
+    # If both conditions are satisfied, calculate the section size
+    # else use the whole sample as the section
+    if section_duration_seconds <= sample_length/4096 and section_duration_seconds > 0:
+        section_size = int(math.floor(sample_length) * section_duration_seconds)
     else:
         section_size = sample_length
 

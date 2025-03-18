@@ -165,7 +165,6 @@ cython_debug/
 # Excluding any downloaded GravitySpy/GWOSC datasets
 gspy_glitches/
 glitch_timeseries_data/
-glitches/random_samples.csv
 
 # Excluding generated plots
 confusion_matrices/
