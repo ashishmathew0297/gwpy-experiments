@@ -39,14 +39,14 @@ def display_statistic_pvalue_histogram(pvalues: pd.DataFrame, stat_test: Literal
     print(f"Maximum p-value: {max(pvalues)}")
     print(f"Minimum p-value: {min(pvalues)}")
 
-def display_sample_plots(data: pd.DataFrame, sample_timeseries_column: str = "glitch_timeseries") -> None:
+def display_sample_plots(data: pd.DataFrame) -> None:
     '''
     A function to display a whitened sample glitch from the input dataframe along its original form and q-transform.
 
     Input:
     - `data`: A single row of the input dataframe. Must contain the following columns
         - 't': time values for the whitened glitch
-        - 'y': amplitude values of the whitened glitch
+        - 'whitened_y': amplitude values of the whitened glitch
         - 'glitch_timeseries': The TimeSeries object for the unwhitened glitch
         - 'q_transform': The q-scan values of the sample
     - `sample_timeseries_column`: The column name for the glitch TimeSeries object.
@@ -55,12 +55,12 @@ def display_sample_plots(data: pd.DataFrame, sample_timeseries_column: str = "gl
     A plot of the whitened glitch, the unwhitened glitch, and the q-transform of the glitch
     '''
     fig, ax = plt.subplots(1,3, figsize=(24, 6))
-    ax[0].plot(data['t'], data['y'])
+    ax[0].plot(data['t'], data['whitened_y'])
     ax[0].set_xlabel("Time (s)")
     ax[0].set_ylabel("Amplitude")
     ax[0].legend()
 
-    ax[1].plot(data['t'],data[sample_timeseries_column])
+    ax[1].plot(data['t'],data['unwhitened_y'])
     ax[2].set_xlabel("Time (s)")
     ax[1].set_ylabel("Amplitude")
     ax[1].legend()
@@ -83,13 +83,13 @@ def display_probability_plot(sample: pd.DataFrame) -> None:
     - shapiro_pvalue
 
     Input:
-    - `sample`: A **single row** of the input dataframe. Must contain ['GPStime', 'y', 'shapiro_pvalue'].
+    - `sample`: A **single row** of the input dataframe. Must contain ['GPStime', 'whitened_y', 'shapiro_pvalue'].
 
     Display:
     A plot of the glitch sample timeseries with sections highlighted to show the  
     '''
     fig,ax = plt.subplots(1,2, figsize=(12,5))
-    stats.probplot(sample["y"], dist="norm", plot=ax[0])
+    stats.probplot(sample["whitened_y"], dist="norm", plot=ax[0])
     ax[1].axis("off")
     ax[1].text(0.1, 0.5, f'Shapiro p-value = {sample["shapiro_pvalue"]}\nGPS Time = {sample["GPStime"]}', 
                horizontalalignment='left', 
@@ -111,7 +111,7 @@ def display_section_statistics(data: pd.DataFrame, gpstimekey: str = "GPStime", 
     - shapiro_pvalue
 
     Input:
-    - **data:** A **single row** of glitch information. Must contain ['t', 'y', 'shapiro_pvalue']
+    - **data:** A **single row** of glitch information. Must contain ['t', 'whitened_y', 'shapiro_pvalue']
     - **stat_test:** The test being performed on the sections (values=["Shapiro", "KS", "Anderson"]). Default="Shapiro".
     - **sections:** The number of sections being studied. Default=1.
 
@@ -130,11 +130,11 @@ def display_section_statistics(data: pd.DataFrame, gpstimekey: str = "GPStime", 
 
     fig, ax = plt.subplots(3, 1, figsize=(12,12))
     plt.suptitle(f"{stat_test} Test Statistics for section size={section_size_seconds}")
-    ax[0].plot(data['t'], data['y'])
+    ax[0].plot(data['t'], data['whitened_y'])
 
     for i, section in enumerate(sectionstats):
 
-        if len(section['y']) > 0:
+        if len(section['whitened_y']) > 0:
 
             if stat_test == "Shapiro" or stat_test == "KS":
                 text = f"p={section['section_statistic']['pvalue']:.3f}"
@@ -146,7 +146,7 @@ def display_section_statistics(data: pd.DataFrame, gpstimekey: str = "GPStime", 
                     print(f"Section {i+1}: \nAD Statistic= {section['section_statistic']['statistic']}\nCritical Values={section['section_statistic']['critical_values']}")
 
             if not np.isnan(section['section_statistic']['statistic']):
-                filled_area = ax[0].fill_between(section['t'], min(section['y']), max(section['y']), alpha=0.5)
+                filled_area = ax[0].fill_between(section['t'], min(section['whitened_y']), max(section['whitened_y']), alpha=0.5)
                 (x0, y0), (x1, y1) = filled_area.get_paths()[0].get_extents().get_points()
                 ax[0].text((x0 + x1) / 2, y1+8, f'{text}', ha='center', va='center', fontsize=8, color='black')
     
@@ -158,10 +158,10 @@ def display_section_statistics(data: pd.DataFrame, gpstimekey: str = "GPStime", 
         infotext = f'GPS Time = {data[gpstimekey]}\nDuration = {data["duration"]}\nKurtosis: {data['kurtosis']}\nSkew: {data['skew']}\nKS p-value = {data["ks_pvalue"]}'
 
     elif stat_test == "Anderson":
-        ad_stat = stats.anderson(data["y"], dist='norm')
+        ad_stat = stats.anderson(data["whitened_y"], dist='norm')
         infotext = f'GPS Time = {data[gpstimekey]}\nDuration = {data["duration"]}\nKurtosis: {data['kurtosis']}\nSkew: {data['skew']}\nAD Statistic = {data["ad_statistic"]}\nCritical Values={data["ad_critical_values"]}\nSignificance Level={data["ad_significance_level"]}'
     
-    stats.probplot(data["y"], dist="norm", plot=ax[1])
+    stats.probplot(data["whitened_y"], dist="norm", plot=ax[1])
 
     ax[2].axis('off')
     ax[2].text(0.35, 0.5, infotext, 

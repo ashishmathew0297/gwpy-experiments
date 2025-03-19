@@ -1,4 +1,5 @@
 from ._dataset_loader import (
+    calculate_q_transform,
     fetch_clean_segment_samples,
     fetch_glitch_data_from_csv,
     fetch_gspy_glitch_data,
@@ -21,6 +22,7 @@ from ._visualizer import (
 )
 
 __all__ = {
+    calculate_q_transform,
     calculate_sample_statistics,
     display_confusion_matrix,
     display_probability_plot,

@@ -18,7 +18,7 @@ from numpy.typing import NDArray
 
 warnings.filterwarnings('ignore')
 
-def calculate_sample_statistics(sample_timeseries: TimeSeries) -> dict:
+def calculate_sample_statistics(y_values: list) -> dict:
     '''
     This function uses the input glitch TimeSeries sample in pycbc form to calculate and return a list of the following
 
@@ -46,12 +46,10 @@ def calculate_sample_statistics(sample_timeseries: TimeSeries) -> dict:
     '''
 
     np.random.seed(42)
-    
-    y = sample_timeseries.value
 
     # =================== Shapiro-Wilks Test ===================
 
-    sw_statistic = stats.shapiro(y)
+    sw_statistic = stats.shapiro(y_values)
 
     # =================== Two-Sample Kolmogorov-Smirnov Test ===================
 
@@ -59,16 +57,16 @@ def calculate_sample_statistics(sample_timeseries: TimeSeries) -> dict:
     # version of our data to work properly since it is a distance-based
     # metric
     scaler = MinMaxScaler(feature_range=(-4,4))
-    ks_statistic = stats.ks_2samp(list(scaler.fit_transform(y.reshape(-1,1))[:,0]), stats.norm.rvs(size=len(y), random_state=np.random.default_rng()))
+    ks_statistic = stats.ks_2samp(list(scaler.fit_transform(y_values.reshape(-1,1))[:,0]), stats.norm.rvs(size=len(y_values), random_state=np.random.default_rng()))
 
     # =================== Anderson-Darling Test ===================
 
-    ad_statistic = stats.anderson(y, dist='norm')
+    ad_statistic = stats.anderson(y_values, dist='norm')
 
     # =================== Skew and Kurtosis ===================
 
-    kurtosis = stats.kurtosis(y, fisher=False)
-    skew = stats.skew(y)
+    kurtosis = stats.kurtosis(y_values, fisher=False)
+    skew = stats.skew(y_values)
 
     return {
         "shapiro_statistic": sw_statistic.statistic,
@@ -94,7 +92,7 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
     for sections of a sample glitch.
 
     Input:
-    - **data:** A **single row** of glitch information. Must contain ['t', 'y']
+    - **data:** A **single row** of glitch information. Must contain ['t', 'whitened_y']
     - **stat_test:** The test being performed on the sections (values=["Shapiro", "KS", "Anderson"]). Default="Shapiro".
     - **section_size_seconds:** The number of sections (in seconds) being studied. The accepted values range from 0 (exclusive) to 1 with a maximum precision of 4. Default=1 second.
 
@@ -108,7 +106,7 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
 
     section_info = []
     section_statistic = {}
-    sample_length = len(data['y'])
+    sample_length = len(data['whitened_y'])
 
     # Section size (in seconds) rounded to 5 places
     section_duration_seconds = round(section_duration_seconds, 5)
@@ -130,9 +128,9 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
 
     # =================== Section-wise Statistics Calculation ===================
 
-    for i in range(0, len(data['y']+1), section_size):
+    for i in range(0, len(data['whitened_y']+1), section_size):
 
-        y = data['y'][i:i+section_size]
+        y = data['whitened_y'][i:i+section_size]
         t = np.array(data['t'])[i:i+section_size]
 
         # Calculating the section statistics
@@ -146,7 +144,7 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
                 section_statistic = stats.anderson(y, dist='norm')._asdict()
 
             if not np.isnan(section_statistic['statistic']):
-                section_info.append({"y":y, "t":t, "section_statistic":section_statistic})
+                section_info.append({"whitened_y":y, "t":t, "section_statistic":section_statistic})
 
     return section_info
 
