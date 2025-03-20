@@ -9,7 +9,7 @@ from scipy.sparse import issparse
 import matplotlib.pyplot as plt
 from gwpy.timeseries import TimeSeries
 from matplotlib.ticker import ScalarFormatter
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn import metrics
 from typing import Literal
 from dotenv import find_dotenv, load_dotenv
@@ -46,18 +46,22 @@ def calculate_sample_statistics(y_values: list) -> dict:
     '''
 
     np.random.seed(42)
+    # scaler = MinMaxScaler(feature_range=(-4,4))
+    scaler = StandardScaler()
+
+    scaled_y_values = list(scaler.fit_transform(np.array(y_values).reshape(-1,1))[:,0])
 
     # =================== Shapiro-Wilks Test ===================
 
     sw_statistic = stats.shapiro(y_values)
+    scaled_sw_statistic = stats.shapiro(scaled_y_values)
 
     # =================== Two-Sample Kolmogorov-Smirnov Test ===================
 
     # The Kolmogorov Smirnov statistic needs to be applied to a scaled
     # version of our data to work properly since it is a distance-based
     # metric
-    scaler = MinMaxScaler(feature_range=(-4,4))
-    ks_statistic = stats.ks_2samp(list(scaler.fit_transform(y_values.reshape(-1,1))[:,0]), stats.norm.rvs(size=len(y_values), random_state=np.random.default_rng()))
+    ks_statistic = stats.ks_2samp(scaled_y_values, stats.norm.rvs(size=len(y_values)))
 
     # =================== Anderson-Darling Test ===================
 
@@ -72,6 +76,9 @@ def calculate_sample_statistics(y_values: list) -> dict:
         "shapiro_statistic": sw_statistic.statistic,
         "shapiro_pvalue": sw_statistic.pvalue,
         "shapiro_prediction": 1 if sw_statistic.pvalue <= 0.05 else 0,
+        "scaled_shapiro_statistic": scaled_sw_statistic.statistic,
+        "scaled_shapiro_pvalue": scaled_sw_statistic.pvalue,
+        "scaled_shapiro_prediction": 1 if scaled_sw_statistic.pvalue <= 0.05 else 0,
         "ks_statistic": ks_statistic.statistic,
         "ks_pvalue": ks_statistic.pvalue,
         "ks_prediction": 1 if ks_statistic.pvalue <= 0.05 else 0,
@@ -138,8 +145,9 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
             if stat_test == "Shapiro":
                 section_statistic = stats.shapiro(y)._asdict()
             elif stat_test == "KS":
-                scaler = MinMaxScaler(feature_range=(-4,4))
-                section_statistic = stats.ks_2samp(list(scaler.fit_transform(y.reshape(-1,1))[:,0]), stats.norm.rvs(size=len(y), random_state=np.random.default_rng()))._asdict()
+                # scaler = MinMaxScaler(feature_range=(-4,4))
+                scaler = StandardScaler()
+                section_statistic = stats.ks_2samp(list(scaler.fit_transform(y.reshape(-1,1))[:,0]), stats.norm.rvs(size=len(y)))._asdict()
             elif stat_test == "Anderson":
                 section_statistic = stats.anderson(y, dist='norm')._asdict()
 
@@ -148,7 +156,7 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
 
     return section_info
 
-def generate_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro") -> NDArray:
+def generate_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "Shapiro_scaled", "KS", "Anderson"]="Shapiro") -> NDArray:
     '''
     Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
     - Shapiro-Wilks Test
@@ -166,6 +174,8 @@ def generate_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", 
     cm = []
 
     if stat_test == "Shapiro":
+        cm = metrics.confusion_matrix(np.ones(len(data)),data["shapiro_prediction"],labels=[1,0])
+    if stat_test == "Shapiro_scaled":
         cm = metrics.confusion_matrix(np.ones(len(data)),data["shapiro_prediction"],labels=[1,0])
     if stat_test == "KS":
         cm = metrics.confusion_matrix(np.ones(len(data)),data["ks_prediction"],labels=[1,0])

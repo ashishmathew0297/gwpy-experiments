@@ -68,7 +68,20 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
     else:
         unwhitened_noise = TimeSeries.read(filepath+filename)
 
+    # Convwerting the unwhitened noise to pycbc for whitening
     unwhitened_noise = unwhitened_noise.to_pycbc()
+
+
+    #### TESTING ####
+    # print(len(unwhitened_noise))
+    # if gps_end_time:
+    #     unwhitened_noise = unwhitened_noise[:-1]
+    # whitened_noise, psd = unwhitened_noise.whiten(
+    #         len(unwhitened_noise) / (2 * srate),
+    #         len(unwhitened_noise)/( 4 * srate),
+    #         remove_corrupted = False,
+    #         return_psd = True)
+    #################
 
     # whitening the noise data
     try:
@@ -78,7 +91,8 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
             remove_corrupted = False,
             return_psd = True)
     except ValueError as e:
-        print(f"Failed to whiten sample for {gps_time}")
+        # In case of failuer retry with changed TimeSeries length
+        print(f"Failed to whiten sample for {gps_time}.")
         print(e)
         return [], [], {}, 0
     
@@ -93,6 +107,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
         whitened_noise = whitened_noise[int(srate * 1):-int(srate * 1)]
         unwhitened_noise = unwhitened_noise[int(srate * 1):-int(srate * 1)]
     
+    # Conversion to GWPY for q-transform calculation
     whitened_noise = TimeSeries(whitened_noise, sample_rate = srate)
     unwhitened_noise = TimeSeries(unwhitened_noise, sample_rate = srate)
 
@@ -205,6 +220,9 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
                 "shapiro_statistic": np.nan,
                 "shapiro_pvalue": np.nan,
                 "shapiro_prediction": np.nan,
+                "scaled_shapiro_statistic": np.nan,
+                "scaled_shapiro_pvalue": np.nan,
+                "scaled_shapiro_prediction": np.nan,
                 "ks_statistic": np.nan,
                 "ks_pvalue": np.nan,
                 "ks_prediction": np.nan,
@@ -269,11 +287,17 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
     print("Input Length: ",len(data))
     
     for i in range(len(data)):
-
-        unwhitened_sample, whitened_sample, q_scan, psd = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo)
+        
+        try:
+            unwhitened_sample, whitened_sample, q_scan, psd = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo)
+        except ValueError as e:
+            print(f"Failed to load data for segment {data.iloc[i]['start_time']} - {data.iloc[i]['end_time']}.")
+            print(e)
+            fail_count += 1
+            continue
 
         # Skip in the case of errors loading whitened data
-        if not whitened_sample:
+        if not len(whitened_sample):
             continue
 
         # Getting segments of the whitened sample equal to the input segment duration
@@ -282,15 +306,24 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
             for i in range(0, len(whitened_sample.times) + 1, segment_size):
     
                 # Only accept samples that are of the exact segment size
-                if not i < segment_size:
-                    whitened_samples.append(whitened_sample[i:i + segment_size])
+                if not i < segment_size: #FIXME
+                    sample = whitened_sample[i:i + segment_size]
+
+                    segment_data = {
+                        "y": sample.value,
+                        "t": sample.times,
+                    }
+
+                    segment_data.update(calculate_sample_statistics(segment_data['y']))
+                    whitened_samples.append(segment_data)
         
 
-    whitened_samples_df = pd.DataFrame(columns=['unwhitened_sample_timeseries', 'unwhitened_sample_timeseries'])
+    # whitened_samples_df = pd.DataFrame(columns=['unwhitened_sample_timeseries', 'unwhitened_sample_timeseries'])
 
+    # Randomly select n_samples from the generated whitened samples
     np.random.seed(42)  # For reproducibility
     selected_indices = np.random.choice(len(whitened_samples), size=n_samples, replace=False)
-    whitened_samples_df["whitened_sample_timeseries"] = [whitened_samples[i] for i in selected_indices]
+    whitened_samples_df = pd.DataFrame([whitened_samples[i] for i in selected_indices])
 
     print("Number of failed samples: ", fail_count)
     print("Number of whitened samples obtained: ", len(whitened_samples_df))

@@ -170,7 +170,7 @@ def display_section_statistics(data: pd.DataFrame, gpstimekey: str = "GPStime", 
             fontsize=14, 
             bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
 
-def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", per_glitch:bool=False,save_img: bool=False) -> None:
+def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", is_glitch: bool=True, per_glitch:bool=False,save_img: bool=False) -> None:
     '''
     Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
     - Shapiro-Wilks Test
