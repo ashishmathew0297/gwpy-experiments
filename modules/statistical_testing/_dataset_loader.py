@@ -72,6 +72,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
     unwhitened_noise = unwhitened_noise.to_pycbc()
 
 
+    unwhitened_noise = unwhitened_noise[:-1]
     #### TESTING ####
     # print(len(unwhitened_noise))
     # if gps_end_time:
@@ -95,6 +96,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
         print(f"Failed to whiten sample for {gps_time}.")
         print(e)
         return [], [], {}, 0
+        
     
     # Cropping the data to remove border effects
     # If end_time is not provided, we crop it down to 2 seconds on either side for q_scan calculations
@@ -220,9 +222,6 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
                 "shapiro_statistic": np.nan,
                 "shapiro_pvalue": np.nan,
                 "shapiro_prediction": np.nan,
-                "scaled_shapiro_statistic": np.nan,
-                "scaled_shapiro_pvalue": np.nan,
-                "scaled_shapiro_prediction": np.nan,
                 "ks_statistic": np.nan,
                 "ks_pvalue": np.nan,
                 "ks_prediction": np.nan,
