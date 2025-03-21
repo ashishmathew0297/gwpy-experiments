@@ -28,7 +28,7 @@ def get_TimeSeries_data(gps_start_time: float, gps_end_time: float, srate=4096, 
     # Convwerting the unwhitened noise to pycbc for whitening
     unwhitened_noise = unwhitened_noise.to_pycbc()
 
-    ####FIXME: The piece of code that was misbehaving
+    ####FIXME: The piece of code that was supposed to be a fix but still fails
     unwhitened_noise = unwhitened_noise[:-1]
 
     # whitening the noise data
@@ -55,13 +55,12 @@ for i in range(len(clean_gpstimes)):
     try:
         whitened_noise, unwhitened_noise, psd = get_TimeSeries_data(gps_start_time=gps_start_time, gps_end_time=gps_end_time)
         # Print to file
-        with open('output.txt', 'a') as f:
-            f.write(f"Unwhitened noise: {unwhitened_noise}, Whitened noise: {whitened_noise}, PSD: {psd}\n")
-    except Exception as e:
         # with open('output.txt', 'a') as f:
-        #     f.write(f"Failed to fetch data for {gps_start_time} to {gps_end_time}.\n")
+        #     f.write(f"Unwhitened noise: {unwhitened_noise}, Whitened noise: {whitened_noise}, PSD: {psd}\n")
+    except Exception as e:
         print(e)
-        continue
+        print(f"Failed to fetch data for {gps_start_time} to {gps_end_time}.")
+        break
     print(f"Successfully fetched data for {gps_start_time} to {gps_end_time}.")
     
     # Print return values
