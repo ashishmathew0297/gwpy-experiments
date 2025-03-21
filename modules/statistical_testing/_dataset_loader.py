@@ -68,35 +68,31 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
     else:
         unwhitened_noise = TimeSeries.read(filepath+filename)
 
-    # Convwerting the unwhitened noise to pycbc for whitening
-    unwhitened_noise = unwhitened_noise.to_pycbc()
-
-
-    # unwhitened_noise = unwhitened_noise[:-1]
-    #### TESTING ####
-    # print(len(unwhitened_noise))
-    # if gps_end_time:
-    #     unwhitened_noise = unwhitened_noise[:-1]
-    # whitened_noise, psd = unwhitened_noise.whiten(
+    # whitening the noise data
+    # try:
+    #     whitened_noise, psd = unwhitened_noise.whiten(
     #         len(unwhitened_noise) / (2 * srate),
     #         len(unwhitened_noise)/( 4 * srate),
     #         remove_corrupted = False,
     #         return_psd = True)
-    #################
+    # except ValueError as e:
+    #     # In case of failuer retry with changed TimeSeries length
+    #     print(f"Failed to whiten sample for {gps_time}.")
+    #     print(e)
+    #     return [], [], {}, 0
+    
+    # Converting the unwhitened noise to pycbc for whitening
+    unwhitened_noise = unwhitened_noise.to_pycbc()
 
-    # whitening the noise data
-    try:
-        whitened_noise, psd = unwhitened_noise.whiten(
-            len(unwhitened_noise) / (2 * srate),
-            len(unwhitened_noise)/( 4 * srate),
-            remove_corrupted = False,
-            return_psd = True)
-    except ValueError as e:
-        # In case of failuer retry with changed TimeSeries length
-        print(f"Failed to whiten sample for {gps_time}.")
-        print(e)
-        return [], [], {}, 0
-        
+    # Computing the PSD with Welch's method. I start at 8Hz
+    psd = unwhitened_noise.filter_psd(unwhitened_noise.duration, unwhitened_noise.delta_f, flow=8)
+    # According to me this smoothes the PSD to be able to whiten
+    psd = pycbc.psd.estimate.inverse_spectrum_truncation(psd,
+                   max_filter_len= int(1*srate),
+                   trunc_method='hann', low_frequency_cutoff=None,)
+    # We whiten the data
+    whitened_noise = (unwhitened_noise.to_frequencyseries() / psd ** 0.5).to_timeseries()
+
     
     # Cropping the data to remove border effects
     # If end_time is not provided, we crop it down to 2 seconds on either side for q_scan calculations
@@ -169,6 +165,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
     - 'Anderson-Darling statistic': Anderson-Darling statistic
     - 'Anderson-Darling critical values': Critical values for the Anderson Darling statistic
     - 'Anderson-Darling significance level': Significance level for the Anderson Darling statistic
+    - 'Anderson-Darling prediction': The prediction made based on the Anderson-Darling statistic
     - 'Kurtosis': Kurtosis of the glitch amplitude values
     - 'Skew': Skew of the glitch amplitude values
     '''
@@ -228,6 +225,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
                 "ad_statistic": np.nan,
                 "ad_critical_values": np.nan,
                 "ad_significance_level": np.nan,
+                "ad_prediction": np.nan,
                 "kurtosis": np.nan,
                 "skew": np.nan
             }
@@ -249,7 +247,8 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
     else:
         data_df = pd.concat([data.reset_index(drop=True), dataframe_to_append], axis=1)
 
-    
+    data_df["glitch_present"] = 1
+
     return data_df
 
 def fetch_gspy_glitch_data(glitchtype: str) -> None:
@@ -326,5 +325,7 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
 
     print("Number of failed samples: ", fail_count)
     print("Number of whitened samples obtained: ", len(whitened_samples_df))
+
+    whitened_samples_df["glitch_present"] = 0
 
     return whitened_samples_df

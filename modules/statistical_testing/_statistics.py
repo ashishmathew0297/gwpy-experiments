@@ -63,7 +63,7 @@ def calculate_sample_statistics(y_values: list) -> dict:
     ks_statistic = stats.ks_2samp(scaled_y_values, stats.norm.rvs(size=len(y_values)))
 
     # =================== Anderson-Darling Test ===================
-
+    # for our use case we consider a significance level of 5%
     ad_statistic = stats.anderson(y_values, dist='norm')
 
     # =================== Skew and Kurtosis ===================
@@ -81,6 +81,7 @@ def calculate_sample_statistics(y_values: list) -> dict:
         "ad_statistic": ad_statistic.statistic,
         "ad_critical_values": ad_statistic.critical_values,
         "ad_significance_level": ad_statistic.significance_level,
+        "ad_prediction": 1 if ad_statistic.statistic > ad_statistic.critical_values[2] else 0,
         "kurtosis": kurtosis,
         "skew": skew
     }
@@ -173,7 +174,8 @@ def generate_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", 
         cm = metrics.confusion_matrix(data["glitch_present"],data["shapiro_prediction"],labels=[1,0])
     if stat_test == "KS":
         cm = metrics.confusion_matrix(data["glitch_present"],data["ks_prediction"],labels=[1,0])
-    # TODO: Decide on significance level for AD statistic
+    if stat_test == "Anderson":
+        cm = metrics.confusion_matrix(data["glitch_present"],data["ad_prediction"],labels=[1,0])
     
     return cm
 
