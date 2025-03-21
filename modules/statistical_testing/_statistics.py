@@ -168,11 +168,11 @@ def generate_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", 
     '''
 
     cm = []
-
+    
     if stat_test == "Shapiro":
-        cm = metrics.confusion_matrix(np.ones(len(data)),data["shapiro_prediction"],labels=[1,0])
+        cm = metrics.confusion_matrix(data["glitch_present"],data["shapiro_prediction"],labels=[1,0])
     if stat_test == "KS":
-        cm = metrics.confusion_matrix(np.ones(len(data)),data["ks_prediction"],labels=[1,0])
+        cm = metrics.confusion_matrix(data["glitch_present"],data["ks_prediction"],labels=[1,0])
     # TODO: Decide on significance level for AD statistic
     
     return cm

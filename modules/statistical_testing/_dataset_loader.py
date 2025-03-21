@@ -72,7 +72,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
     unwhitened_noise = unwhitened_noise.to_pycbc()
 
 
-    unwhitened_noise = unwhitened_noise[:-1]
+    # unwhitened_noise = unwhitened_noise[:-1]
     #### TESTING ####
     # print(len(unwhitened_noise))
     # if gps_end_time:
