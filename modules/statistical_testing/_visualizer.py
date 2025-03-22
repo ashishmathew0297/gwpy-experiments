@@ -49,7 +49,6 @@ def display_sample_plots(data: pd.DataFrame) -> None:
         - 'whitened_y': amplitude values of the whitened glitch
         - 'glitch_timeseries': The TimeSeries object for the unwhitened glitch
         - 'q_transform': The q-scan values of the sample
-    - `sample_timeseries_column`: The column name for the glitch TimeSeries object.
 
     Display:
     A plot of the whitened glitch, the unwhitened glitch, and the q-transform of the glitch

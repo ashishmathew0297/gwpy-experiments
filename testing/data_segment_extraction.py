@@ -15,19 +15,19 @@ def get_TimeSeries_data(gps_start_time: float, gps_end_time: float, srate=4096, 
         os.mkdir(filepath)
     
 
-    # print(f"Fetching sample data from {gps_start_time} to {gps_end_time} ...")
-    # if not os.path.isfile(filepath+filename):
-    #     unwhitened_noise = TimeSeries.fetch_open_data(
-    #         ifo,
-    #         gps_start_time,
-    #         gps_end_time,
-    #         sample_rate=srate)
+    print(f"Fetching sample data from {gps_start_time} to {gps_end_time} ...")
+    if not os.path.isfile(filepath+filename):
+        unwhitened_noise = TimeSeries.fetch_open_data(
+            ifo,
+            gps_start_time,
+            gps_end_time,
+            sample_rate=srate)
 
-    #     unwhitened_noise.write(filepath+filename)
-    # else:
-    #     unwhitened_noise = TimeSeries.read(filepath+filename)
+        unwhitened_noise.write(filepath+filename)
+    else:
+        unwhitened_noise = TimeSeries.read(filepath+filename)
     
-    unwhitened_noise = TimeSeries.fetch_open_data(ifo, gps_start_time, gps_end_time, sample_rate=srate)
+    # unwhitened_noise = TimeSeries.fetch_open_data(ifo, gps_start_time, gps_end_time, sample_rate=srate)
     print('duration', unwhitened_noise.duration, len(unwhitened_noise.times), len(unwhitened_noise.value))
     # Convwerting the unwhitened noise to pycbc for whitening
     unwhitened_noise = unwhitened_noise.to_pycbc()
