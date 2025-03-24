@@ -4,6 +4,9 @@ import pandas as pd
 from gwpy.timeseries import TimeSeries
 import matplotlib.pyplot as plt
 import pycbc
+from pycbc.filter import resample_to_delta_t, highpass
+from pycbc.psd import interpolate, inverse_spectrum_truncation, welch
+
 
 def get_TimeSeries_data(gps_start_time: float, gps_end_time: float, srate=4096, ifo='L1') -> list:
 
@@ -19,8 +22,8 @@ def get_TimeSeries_data(gps_start_time: float, gps_end_time: float, srate=4096, 
     if not os.path.isfile(filepath+filename):
         unwhitened_noise = TimeSeries.fetch_open_data(
             ifo,
-            gps_start_time,
-            gps_end_time,
+            gps_start_time - 5,
+            gps_end_time + 5,
             sample_rate=srate)
 
         unwhitened_noise.write(filepath+filename)
@@ -28,22 +31,18 @@ def get_TimeSeries_data(gps_start_time: float, gps_end_time: float, srate=4096, 
         unwhitened_noise = TimeSeries.read(filepath+filename)
     
     # unwhitened_noise = TimeSeries.fetch_open_data(ifo, gps_start_time, gps_end_time, sample_rate=srate)
-    print('duration', unwhitened_noise.duration, len(unwhitened_noise.times), len(unwhitened_noise.value))
-    # Convwerting the unwhitened noise to pycbc for whitening
-    unwhitened_noise = unwhitened_noise.to_pycbc()
-   
-    # Computing the PSD with Welch's method. I start at 8Hz
-    psd = unwhitened_noise.filter_psd(unwhitened_noise.duration, unwhitened_noise.delta_f, flow=8)
-    # According to me this smoothes the PSD to be able to whiten
-    psd = pycbc.psd.estimate.inverse_spectrum_truncation(psd,
-                   max_filter_len= int(1*srate),
-                   trunc_method='hann', low_frequency_cutoff=None,)
-    # We whiten the data
-    whitened_noise = (unwhitened_noise.to_frequencyseries() / psd ** 0.5).to_timeseries()
+    print('duration', unwhitened_noise.duration, len(unwhitened_noise.times), len(unwhitened_noise.value), unwhitened_noise.sample_rate)
+    # # Convwerting the unwhitened noise to pycbc for whitening
+    whitened_noise = unwhitened_noise.whiten(4, 2)
+    whitened_noise = whitened_noise.to_pycbc()
 
-    # plt.plot(whitened_noise[1*srate:-1*srate])
+    # plt.plot(whitened_noise[5*srate:-5*srate])
+
+    # # plt.loglog(psd.sample_frequencies, psd)
+    # # plt.xlim(10, 4096.)
     # plt.savefig('dummy.png')
-    print('OK', len(psd), len(unwhitened_noise.to_frequencyseries()), len(whitened_noise))
+    psd = None
+    print('OK', len(whitened_noise), whitened_noise.duration)
     # whitened_noise, psd = unwhitened_noise.whiten(
     #     len(unwhitened_noise) / (2 * srate),
     #     len(unwhitened_noise)/( 4 * srate),
@@ -65,6 +64,7 @@ for i in range(len(clean_gpstimes)):
     whitened_noise, unwhitened_noise, psd = get_TimeSeries_data(gps_start_time=gps_start_time, gps_end_time=gps_end_time)
     try:
         whitened_noise, unwhitened_noise, psd = get_TimeSeries_data(gps_start_time=gps_start_time, gps_end_time=gps_end_time)
+        
         # Print to file
         # with open('output.txt', 'a') as f:
         #     f.write(f"Unwhitened noise: {unwhitened_noise}, Whitened noise: {whitened_noise}, PSD: {psd}\n")
