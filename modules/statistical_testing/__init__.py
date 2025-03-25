@@ -14,6 +14,7 @@ from ._statistics import (
 )
 
 from ._visualizer import (
+    display_auc_roc,
     display_confusion_matrix,
     display_probability_plot,
     display_sample_plots,
@@ -24,6 +25,7 @@ from ._visualizer import (
 __all__ = {
     calculate_q_transform,
     calculate_sample_statistics,
+    display_auc_roc,
     display_confusion_matrix,
     display_probability_plot,
     display_sample_plots,

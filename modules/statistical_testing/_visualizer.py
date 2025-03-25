@@ -202,4 +202,39 @@ def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "
     else:
         plt.show()
 
+def display_auc_roc(y_true: pd.DataFrame, y_predicted: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro") -> None:
+    '''
+    Generate the ROC curve for the performance of the relevant statistical tests on the signal samples. The statistical tests being considered are
+    - Shapiro-Wilks Test
+    - Kolmogorov-Smirnov Test
+    - Anderson-Darling Test
 
+    Inputs:
+    - `data`: The dataset of IFO signal information being studied.
+
+    Display:
+    - ROC curve for the concerned statistic.
+    '''
+
+    if stat_test == "Shapiro":
+        title = "Shapiro-Wilk Receiver Operating Characteristic"
+    elif stat_test == "KS":
+        title = "Kolmogorov-Smirnov Receiver Operating Characteristic"
+    elif stat_test == "Anderson":
+        title = "Anderson-Darling Receiver Operating Characteristic"
+
+    fpr, tpr, thresholds = metrics.roc_curve(y_true, y_predicted)
+    roc_auc = metrics.auc(fpr, tpr)
+
+    # plotting the ROC curve
+    # This code was AI geenrated
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color='blue', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], color='gray', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(title)
+    plt.legend(loc="lower right")
+    plt.show()

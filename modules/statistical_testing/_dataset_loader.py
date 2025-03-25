@@ -7,6 +7,7 @@ import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
 from gwpy.timeseries import TimeSeries
+from gwpy.signal import filter_design
 from matplotlib.ticker import ScalarFormatter
 from sklearn.preprocessing import MinMaxScaler
 from sklearn import metrics
@@ -19,7 +20,7 @@ from ._statistics import calculate_sample_statistics
 
 warnings.filterwarnings('ignore')
 
-def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096, ifo='L1') -> list:
+def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096, ifo='L1', bandpass: bool=False) -> list:
     '''
     This function fetches data from the GWOSC TimeSeries API and stores them in "./glitch_timeseries_data" corresponding to the sample if not already present.
 
@@ -81,17 +82,26 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
     #     print(e)
     #     return [], [], {}, 0
     
+    if bandpass:
+        # Band pass between 50 to 250 Hz for Scattered Light glitches
+        bp = filter_design.bandpass(50, 250, srate)
+        unwhitened_noise = unwhitened_noise.filter(bp)
+
+    # Whitening the noise data
+    whitened_noise = unwhitened_noise.whiten(4, 2)
+
     # Converting the unwhitened noise to pycbc for whitening
     unwhitened_noise = unwhitened_noise.to_pycbc()
 
-    # Computing the PSD with Welch's method. I start at 8Hz
-    psd = unwhitened_noise.filter_psd(unwhitened_noise.duration, unwhitened_noise.delta_f, flow=8)
-    # According to me this smoothes the PSD to be able to whiten
-    psd = pycbc.psd.estimate.inverse_spectrum_truncation(psd,
-                   max_filter_len= int(1*srate),
-                   trunc_method='hann', low_frequency_cutoff=None,)
-    # We whiten the data
-    whitened_noise = (unwhitened_noise.to_frequencyseries() / psd ** 0.5).to_timeseries()
+    # Old method of whitening
+    # # Computing the PSD with Welch's method. I start at 8Hz
+    # psd = unwhitened_noise.filter_psd(unwhitened_noise.duration, unwhitened_noise.delta_f, flow=8)
+    # # According to me this smoothes the PSD to be able to whiten
+    # psd = pycbc.psd.estimate.inverse_spectrum_truncation(psd,
+    #                max_filter_len= int(1*srate),
+    #                trunc_method='hann', low_frequency_cutoff=None,)
+    # # We whiten the data
+    # whitened_noise = (unwhitened_noise.to_frequencyseries() / psd ** 0.5).to_timeseries()
 
     
     # Cropping the data to remove border effects
@@ -124,7 +134,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
         unwhitened_noise = unwhitened_noise[int(srate * 1.5):-int(srate * 1.5)]
         whitened_noise = whitened_noise[int(srate * 1.5):-int(srate * 1.5)]
 
-    return unwhitened_noise, whitened_noise, q_scan, psd
+    return unwhitened_noise, whitened_noise, q_scan
 
 def calculate_q_transform(sample: TimeSeries):
     '''
@@ -140,7 +150,7 @@ def calculate_q_transform(sample: TimeSeries):
     return q_scan
 
 
-def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0)-> pd.DataFrame:
+def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False)-> pd.DataFrame:
 
     '''
     Fetches the glitch TimeSeries samples from the TimeSeries API, performs the statistical tests on them retruns a datset with the relevant information appended 
@@ -197,7 +207,10 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
         # Except clause skips the current iteration and enters zero values
         # if TimeSeries fails to load
         try:
-            unwhitened_noise, whitened_noise, q_scan, psd = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo)
+            if bandpass and data_copy.iloc[i]['label'] == 'Scattered_Light':
+                unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo, bandpass=True)
+            else:
+                unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo)
             t = whitened_noise.times
             whitened_y = whitened_noise.value
             unwhitened_y = unwhitened_noise.value
@@ -287,7 +300,7 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
     for i in range(len(data)):
         
         try:
-            unwhitened_sample, whitened_sample, q_scan, psd = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo)
+            unwhitened_sample, whitened_sample, q_scan = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo)
         except ValueError as e:
             print(f"Failed to load data for segment {data.iloc[i]['start_time']} - {data.iloc[i]['end_time']}.")
             print(e)
