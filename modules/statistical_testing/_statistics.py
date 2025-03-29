@@ -1,4 +1,5 @@
 import os
+import ast
 import math as math
 import pycbc as pycbc
 import numpy as np
@@ -74,14 +75,14 @@ def calculate_sample_statistics(y_values: list) -> dict:
     return {
         "shapiro_statistic": sw_statistic.statistic,
         "shapiro_pvalue": sw_statistic.pvalue,
-        "shapiro_prediction": 1 if sw_statistic.pvalue <= 0.05 else 0,
+        # "shapiro_prediction": 1 if sw_statistic.pvalue <= 0.05 else 0,
         "ks_statistic": ks_statistic.statistic,
         "ks_pvalue": ks_statistic.pvalue,
-        "ks_prediction": 1 if ks_statistic.pvalue <= 0.05 else 0,
+        # "ks_prediction": 1 if ks_statistic.pvalue <= 0.05 else 0,
         "ad_statistic": ad_statistic.statistic,
         "ad_critical_values": ad_statistic.critical_values,
         "ad_significance_level": ad_statistic.significance_level,
-        "ad_prediction": 1 if ad_statistic.statistic > ad_statistic.critical_values[2] else 0,
+        # "ad_prediction": 1 if ad_statistic.statistic > ad_statistic.critical_values[2] else 0,
         "kurtosis": kurtosis,
         "skew": skew
     }
@@ -153,7 +154,10 @@ def get_section_statistics(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS
 
     return section_info
 
-def generate_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro") -> NDArray:
+def generate_confusion_matrix(
+        data: pd.DataFrame,
+        stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro",
+        threshold: float=0.05) -> NDArray:
     '''
     Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
     - Shapiro-Wilks Test
@@ -171,11 +175,16 @@ def generate_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", 
     cm = []
     
     if stat_test == "Shapiro":
-        cm = metrics.confusion_matrix(data["glitch_present"],data["shapiro_prediction"],labels=[1,0])
+        cm = metrics.confusion_matrix(data["glitch_present"],data["shapiro_pvalue"] <= threshold,labels=[1,0]) 
     if stat_test == "KS":
-        cm = metrics.confusion_matrix(data["glitch_present"],data["ks_prediction"],labels=[1,0])
+        cm = metrics.confusion_matrix(data["glitch_present"],data["ks_pvalue"] <= threshold,labels=[1,0])
     if stat_test == "Anderson":
-        cm = metrics.confusion_matrix(data["glitch_present"],data["ad_prediction"],labels=[1,0])
+        # Anderson test from scipy is a bit weird, the significance level is the threshold we
+        # considering to help determine whether the statistic is significant
+        # using the corresponding critical value
+
+        # Find the index of the significance level that is greater than or equal to the threshold
+        cm = metrics.confusion_matrix(data["glitch_present"],data.apply(lambda x: 1 if x["ad_statistic"] > threshold*100 else 0, axis=1),labels=[1,0])
     
     return cm
 

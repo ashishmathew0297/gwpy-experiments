@@ -169,7 +169,7 @@ def display_section_statistics(data: pd.DataFrame, gpstimekey: str = "GPStime", 
             fontsize=14, 
             bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
 
-def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", is_glitch: bool=True, per_glitch:bool=False,save_img: bool=False) -> None:
+def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", threshold: float= 0.05,per_glitch:bool=False, save_img: bool=False) -> None:
     '''
     Generate a confusion matrix for the performance of the relevant statistical tests on the signal sample. The statistical tests being considered are
     - Shapiro-Wilks Test
@@ -190,7 +190,7 @@ def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "
         title = f"Confusion Matrix of {stat_test} Test"
         filename = f"conf_matrix_{stat_test}.png"
     
-    disp = metrics.ConfusionMatrixDisplay(generate_confusion_matrix(data,stat_test), display_labels=["Glitch Present", "Glitch Not Present"])
+    disp = metrics.ConfusionMatrixDisplay(generate_confusion_matrix(data,stat_test, threshold), display_labels=["Glitch Present", "Glitch Not Present"])
     disp.plot()
     plt.grid(False)
     plt.title(title)
@@ -202,7 +202,7 @@ def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "
     else:
         plt.show()
 
-def display_auc_roc(y_true: pd.DataFrame, y_predicted: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro") -> None:
+def display_auc_roc(y_true: pd.DataFrame, data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", thresholds: list[float] = []) -> None:
     '''
     Generate the ROC curve for the performance of the relevant statistical tests on the signal samples. The statistical tests being considered are
     - Shapiro-Wilks Test
@@ -210,12 +210,16 @@ def display_auc_roc(y_true: pd.DataFrame, y_predicted: pd.DataFrame, stat_test: 
     - Anderson-Darling Test
 
     Inputs:
-    - `data`: The dataset of IFO signal information being studied.
+    - `y_true`: The true labels of the dataset.
+    - `data`: A datafram containing either p-values for Shapiro-Wilks/Kolmogorov-Smirnov test or Statistic and Critical values for Anderson-Darling test.
+    - `stat_test`: The statistic being considered.
 
     Display:
-    - ROC curve for the concerned statistic.
+    - ROC curve for the concerned statistic along with the AUC value.
     '''
 
+    fpr = []
+    tpr = []
     if stat_test == "Shapiro":
         title = "Shapiro-Wilk Receiver Operating Characteristic"
     elif stat_test == "KS":
@@ -223,11 +227,48 @@ def display_auc_roc(y_true: pd.DataFrame, y_predicted: pd.DataFrame, stat_test: 
     elif stat_test == "Anderson":
         title = "Anderson-Darling Receiver Operating Characteristic"
 
-    fpr, tpr, thresholds = metrics.roc_curve(y_true, y_predicted)
+    # Taking defaults of 0.05 for Shapiro and KS test
+    # and the 2nd critical value for Anderson-Darling test
+    if not len(thresholds):
+        if stat_test in ["Shapiro", "KS"]:
+            y_pred = data.apply(lambda x: 1 if x <= 0.05 else 0)
+        else:
+            y_pred = data.apply(lambda x: 1 if x["ad_statistic"] > x["ad_critical_values"][2] else 0, axis=1)
+        fpr, tpr, _ = metrics.roc_curve(y_true, y_pred)
+        roc_auc = metrics.auc(fpr, tpr)
+    # Using input thresholds
+    else:
+        fpr.append(0)
+        tpr.append(0)
+        for i in range(len(thresholds)):
+            if stat_test in ["Shapiro", "KS"]:
+                y_pred = data.apply(lambda x: 1 if x <= thresholds[i] else 0)
+            else:
+                # For Anderson-Darling, we need to reverse the critical values since it leads to errors
+                y_pred = data.apply(lambda x: 1 if x["ad_statistic"] > x["ad_critical_values"][::-1][i] else 0, axis=1)
+            
+            fpr_temp, tpr_temp, _ = metrics.roc_curve(y_true, y_pred)
+
+            # metrics.roc_curve returns a list of 3 values [0, value, 1]
+            # we are only interested in the 2nd value, so we append it
+            fpr.append(fpr_temp[1])
+            tpr.append(tpr_temp[1])
+        
+        fpr.append(1)
+        tpr.append(1)
+        
+        print(fpr, tpr)
+
+        # Appending 0 at the beginning and 1 at the end ensures that the
+        # Values mimic that from the metrics.roc_curve function for the fpr and tpr
+        # This is a bit of a hack but it works :)
+
+        fpr = np.array(fpr).flatten()
+        tpr = np.array(tpr).flatten()
+    
     roc_auc = metrics.auc(fpr, tpr)
 
     # plotting the ROC curve
-    # This code was AI geenrated
     plt.figure(figsize=(8, 6))
     plt.plot(fpr, tpr, color='blue', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.plot([0, 1], [0, 1], color='gray', lw=2, linestyle='--')

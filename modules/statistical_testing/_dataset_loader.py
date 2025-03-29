@@ -81,17 +81,17 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
     #     print(f"Failed to whiten sample for {gps_time}.")
     #     print(e)
     #     return [], [], {}, 0
-    
-    if bandpass:
-        # Band pass between 50 to 250 Hz for Scattered Light glitches
-        bp = filter_design.bandpass(50, 250, srate)
-        unwhitened_noise = unwhitened_noise.filter(bp)
 
+    # # Converting the unwhitened noise to pycbc for whitening
+    # unwhitened_noise = unwhitened_noise.to_pycbc()
+    
     # Whitening the noise data
     whitened_noise = unwhitened_noise.whiten(4, 2)
 
-    # Converting the unwhitened noise to pycbc for whitening
-    unwhitened_noise = unwhitened_noise.to_pycbc()
+    if bandpass:
+        # Band pass between 50 to 250 Hz for Scattered Light glitches
+        bp = filter_design.bandpass(15, 250, srate)
+        whitened_noise = whitened_noise.filter(bp)
 
     # Old method of whitening
     # # Computing the PSD with Welch's method. I start at 8Hz
@@ -231,14 +231,14 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
                 "q_scan": np.nan,
                 "shapiro_statistic": np.nan,
                 "shapiro_pvalue": np.nan,
-                "shapiro_prediction": np.nan,
+                # "shapiro_prediction": np.nan,
                 "ks_statistic": np.nan,
                 "ks_pvalue": np.nan,
-                "ks_prediction": np.nan,
+                # "ks_prediction": np.nan,
                 "ad_statistic": np.nan,
                 "ad_critical_values": np.nan,
                 "ad_significance_level": np.nan,
-                "ad_prediction": np.nan,
+                # "ad_prediction": np.nan,
                 "kurtosis": np.nan,
                 "skew": np.nan
             }
