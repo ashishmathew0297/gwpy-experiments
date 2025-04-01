@@ -207,10 +207,14 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
         # Except clause skips the current iteration and enters zero values
         # if TimeSeries fails to load
         try:
-            if bandpass and data_copy.iloc[i]['label'] == 'Scattered_Light':
-                unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo, bandpass=True)
-            else:
-                unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo)
+            # Applying the bandpass filter to the Scattered Light data if needed
+            # if bandpass and data_copy.iloc[i]['label'] == 'Scattered_Light':
+            #     unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo, bandpass=True)
+            # else:
+            #     unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo)
+
+            unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo, bandpass=bandpass)
+            
             t = whitened_noise.times
             whitened_y = whitened_noise.value
             unwhitened_y = unwhitened_noise.value
@@ -281,7 +285,7 @@ def fetch_gspy_glitch_data(glitchtype: str) -> None:
         ).to_pandas()
         glitch_data.to_csv(filepath, index=False)
 
-def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segment_duration_seconds: float=1, n_samples: int=50) -> pd.DataFrame:
+def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segment_duration_seconds: float=1, n_samples: int=50, bandpass: bool=False) -> pd.DataFrame:
     ''''
     Fetches Timeseries segments for all rows of the input DataFrame and returns a dataframe of whitened samples from it at a given segment size.
     '''
@@ -300,7 +304,7 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
     for i in range(len(data)):
         
         try:
-            unwhitened_sample, whitened_sample, q_scan = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo)
+            unwhitened_sample, whitened_sample, q_scan = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo, bandpass=bandpass)
         except ValueError as e:
             print(f"Failed to load data for segment {data.iloc[i]['start_time']} - {data.iloc[i]['end_time']}.")
             print(e)
