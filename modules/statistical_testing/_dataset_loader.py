@@ -20,27 +20,29 @@ from ._statistics import calculate_sample_statistics
 
 warnings.filterwarnings('ignore')
 
-def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096, ifo='L1', bandpass: bool=False) -> list:
+def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate: int=4096, ifo='L1', bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> list:
     '''
     This function fetches data from the GWOSC TimeSeries API and stores them in "./glitch_timeseries_data" corresponding to the sample if not already present.
 
     Inputs:
     - `gpstime`: The GPS time of the sample
-    - `tw`: Time window to be taken into consideration on either side of the glitch. Thefinal sample returned will have 2.5 seconds removed from either side.
+    - `gps_end_time`: The end time of the sample. Default = 0 (not provided). If provided, the function will fetch data from gps_time to gps_end_time
+    - `tw`: Time window to be taken into consideration on either side of the glitch for whitening. The final sample returned will contain the central 1 second of the sample.
             Default = 5 seconds 
     - `srate`: The sampling rate. Default= 4096
     - `ifo`: The interferometer being studied. Default=L1 (LIGO LivingstonObservatory)
+    - `bandpass`: Whether to apply a bandpass filter to the sample. Default = False
+    - `low_freq`: The lower frequency of the bandpass filter. Default = 10 Hz
+    - `high_freq`: The higher frequency of the bandpass filter. Default = 250 Hz
 
     Outputs:
     - `unwhitened_noise`: TimeSeries object of the sample
     - `whitened_noise`: : TimeSeries object of the whitened sample
-    - `q_scan`: q-scan of the sample
-    - `psd`: The calculated power spectral density of the sample
+    - `timeseries_file_location`: The file location of the saved sample
 
     '''
 
     filepath = "./timeseries_data/"
-    q_scan = {}
     
     # Create the directory if it does not exist
     if not os.path.isdir(filepath):
@@ -59,15 +61,18 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
         filename = f"sample_{ifo}_{gps_time}_{end_time}.h5"
         # print(f"Fetching sample data from {gps_time} to {end_time} ...")
 
-    if not os.path.isfile(filepath+filename):
+    # Loading and saving the TimeSeries for the given sample
+    timeseries_file_location = filepath+filename
+
+    if not os.path.isfile(timeseries_file_location):
         unwhitened_noise = TimeSeries.fetch_open_data(
             ifo,
             start_time,
             end_time,
             sample_rate=srate)
-        unwhitened_noise.write(filepath+filename)
+        unwhitened_noise.write(timeseries_file_location)
     else:
-        unwhitened_noise = TimeSeries.read(filepath+filename)
+        unwhitened_noise = TimeSeries.read(timeseries_file_location)
 
     # whitening the noise data
     # try:
@@ -90,7 +95,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
 
     if bandpass:
         # Band pass between 50 to 250 Hz for Scattered Light glitches
-        bp = filter_design.bandpass(15, 250, srate)
+        bp = filter_design.bandpass(low_freq, high_freq, srate)
         whitened_noise = whitened_noise.filter(bp)
 
     # Old method of whitening
@@ -116,25 +121,39 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate=4096
         unwhitened_noise = unwhitened_noise[int(srate * 1):-int(srate * 1)]
     
     # Conversion to GWPY for q-transform calculation
-    whitened_noise = TimeSeries(whitened_noise, sample_rate = srate)
-    unwhitened_noise = TimeSeries(unwhitened_noise, sample_rate = srate)
+    # whitened_noise = TimeSeries(whitened_noise, sample_rate = srate)
+    # unwhitened_noise = TimeSeries(unwhitened_noise, sample_rate = srate)
 
-    # Creating q-transforms of the data for visualization
-    # This is not done if the end time is provided
     # Try block added because some glitches throw ValueErrors
     if not gps_end_time:
-        try:
-            q_scan = calculate_q_transform(whitened_noise)
-        except ValueError as e:
-            print(f"Failed to generate q-transform for {gps_time}")
-            print(e)
+        # Creating q-transforms of the data for visualization
+        # This is not done if the end time is provided
+        # try:
+        #     q_scan = calculate_q_transform(whitened_noise)
+        # except ValueError as e:
+        #     print(f"Failed to generate q-transform for {gps_time}")
+        #     print(e)
 
         # Stripping the sample down to a 1 second window of central data
         # (this might need to be changed for different glitches)
         unwhitened_noise = unwhitened_noise[int(srate * 1.5):-int(srate * 1.5)]
         whitened_noise = whitened_noise[int(srate * 1.5):-int(srate * 1.5)]
 
-    return unwhitened_noise, whitened_noise, q_scan
+    return unwhitened_noise, whitened_noise, timeseries_file_location
+
+def get_sample_glitch_from_filepath(input_file: str = "", tw: int=5, srate: int=4096, bandpass: bool=False, low_freq: int=10, high_freq: int=250):
+    if os.path.isfile(input_file):
+        # If the input file is present, read it and return
+        unwhitened_noise = TimeSeries.read(input_file)
+        whitened_noise = unwhitened_noise.whiten(4, 2)
+        if bandpass:
+            # Band pass between 50 to 250 Hz for Scattered Light glitches
+            bp = filter_design.bandpass(low_freq, high_freq, srate)
+            whitened_noise = whitened_noise.filter(bp)
+    
+        whitened_noise = whitened_noise[int(srate * (tw - 0.5)):-int(srate * (tw - 0.5))]
+        unwhitened_noise = unwhitened_noise[int(srate * (tw - 0.5)):-int(srate * (tw - 0.5))]
+        return unwhitened_noise, whitened_noise
 
 def calculate_q_transform(sample: TimeSeries):
     '''
@@ -150,7 +169,7 @@ def calculate_q_transform(sample: TimeSeries):
     return q_scan
 
 
-def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False)-> pd.DataFrame:
+def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False, low_freq: int=10, high_freq: int=250)-> pd.DataFrame:
 
     '''
     Fetches the glitch TimeSeries samples from the TimeSeries API, performs the statistical tests on them retruns a datset with the relevant information appended 
@@ -198,7 +217,6 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
     while i < limit:
         unwhitened_noise = []
         whitened_noise = []
-        q_scan = []
         psd = 0
         
         g_star = data_copy.iloc[i][gpsTimeKey]
@@ -213,7 +231,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
             # else:
             #     unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo)
 
-            unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo, bandpass=bandpass)
+            unwhitened_noise, whitened_noise, timeseries_file_location = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo, bandpass=bandpass, low_freq=low_freq, high_freq=high_freq)
             
             t = whitened_noise.times
             whitened_y = whitened_noise.value
@@ -224,7 +242,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
                 "unwhitened_y": unwhitened_y,
                 "whitened_y": whitened_y,
                 "t": t,
-                "q_scan": q_scan}
+                "timeseries_file_location": timeseries_file_location}
         
             supplemental_glitch_data.update(calculate_sample_statistics(whitened_y))
         except ValueError as e:
@@ -232,17 +250,14 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
                 "unwhitened_y": np.nan,
                 "whitened_y": np.nan,
                 "t": np.nan,
-                "q_scan": np.nan,
+                "timeseries_file_location": np.nan,
                 "shapiro_statistic": np.nan,
                 "shapiro_pvalue": np.nan,
-                # "shapiro_prediction": np.nan,
                 "ks_statistic": np.nan,
                 "ks_pvalue": np.nan,
-                # "ks_prediction": np.nan,
                 "ad_statistic": np.nan,
                 "ad_critical_values": np.nan,
                 "ad_significance_level": np.nan,
-                # "ad_prediction": np.nan,
                 "kurtosis": np.nan,
                 "skew": np.nan
             }
@@ -285,7 +300,7 @@ def fetch_gspy_glitch_data(glitchtype: str) -> None:
         ).to_pandas()
         glitch_data.to_csv(filepath, index=False)
 
-def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segment_duration_seconds: float=1, n_samples: int=50, bandpass: bool=False) -> pd.DataFrame:
+def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segment_duration_seconds: float=1, n_samples: int=50, bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> pd.DataFrame:
     ''''
     Fetches Timeseries segments for all rows of the input DataFrame and returns a dataframe of whitened samples from it at a given segment size.
     '''
@@ -304,7 +319,7 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
     for i in range(len(data)):
         
         try:
-            unwhitened_sample, whitened_sample, q_scan = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo, bandpass=bandpass)
+            unwhitened_sample, whitened_sample, timeseries_file_location = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo, bandpass=bandpass, low_freq=low_freq, high_freq=high_freq)
         except ValueError as e:
             print(f"Failed to load data for segment {data.iloc[i]['start_time']} - {data.iloc[i]['end_time']}.")
             print(e)
@@ -327,6 +342,7 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
                     segment_data = {
                         "y": sample.value,
                         "t": sample.times,
+                        "timeseries_file_location": timeseries_file_location
                     }
 
                     segment_data.update(calculate_sample_statistics(segment_data['y']))

@@ -54,7 +54,7 @@ def calculate_sample_statistics(y_values: list) -> dict:
 
     # =================== Shapiro-Wilks Test ===================
 
-    sw_statistic = stats.shapiro(y_values)
+    sw_statistic = stats.shapiro(scaled_y_values)
 
     # =================== Two-Sample Kolmogorov-Smirnov Test ===================
 
@@ -65,24 +65,21 @@ def calculate_sample_statistics(y_values: list) -> dict:
 
     # =================== Anderson-Darling Test ===================
     # for our use case we consider a significance level of 5%
-    ad_statistic = stats.anderson(y_values, dist='norm')
+    ad_statistic = stats.anderson(scaled_y_values, dist='norm')
 
     # =================== Skew and Kurtosis ===================
 
-    kurtosis = stats.kurtosis(y_values, fisher=False)
-    skew = stats.skew(y_values)
+    kurtosis = stats.kurtosis(scaled_y_values, fisher=False)
+    skew = stats.skew(scaled_y_values)
 
     return {
         "shapiro_statistic": sw_statistic.statistic,
         "shapiro_pvalue": sw_statistic.pvalue,
-        # "shapiro_prediction": 1 if sw_statistic.pvalue <= 0.05 else 0,
         "ks_statistic": ks_statistic.statistic,
         "ks_pvalue": ks_statistic.pvalue,
-        # "ks_prediction": 1 if ks_statistic.pvalue <= 0.05 else 0,
         "ad_statistic": ad_statistic.statistic,
         "ad_critical_values": ad_statistic.critical_values,
         "ad_significance_level": ad_statistic.significance_level,
-        # "ad_prediction": 1 if ad_statistic.statistic > ad_statistic.critical_values[2] else 0,
         "kurtosis": kurtosis,
         "skew": skew
     }
@@ -207,9 +204,10 @@ def generate_evaluation_metrics(confusion_matrix):
     
     # Calculate metrics
     accuracy = (TP + TN) / (TP + TN + FP + FN)
-    precision = TP / (TP + FP) if (TP + FP) != 0 else 0
     recall = TP / (TP + FN) if (TP + FN) != 0 else 0
+    fpr = FP / (FP + TN) if (FP + TN) != 0 else 0
+    precision = TP / (TP + FP) if (TP + FP) != 0 else 0
     f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) != 0 else 0
     
     # Print metrics
-    return accuracy, precision, recall, f1_score
+    return accuracy, recall, fpr, precision, f1_score
