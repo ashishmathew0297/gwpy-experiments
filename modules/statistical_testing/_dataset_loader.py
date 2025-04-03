@@ -261,8 +261,8 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
                 "kurtosis": np.nan,
                 "skew": np.nan
             }
-            print(f"Failed to load data for {g_star}. Glitch Type = {data_copy.iloc[i]['label']}")
-            print(e)
+            # print(f"Failed to load data for {g_star}. Glitch Type = {data_copy.iloc[i]['label']}")
+            # print(e)
 
         for key, value in supplemental_glitch_data.items():
             if key in data_readings:
@@ -321,8 +321,8 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
         try:
             unwhitened_sample, whitened_sample, timeseries_file_location = get_TimeSeries(data.iloc[i]['start_time'], gps_end_time=data.iloc[i]['end_time'], srate=sample_rate, ifo=ifo, bandpass=bandpass, low_freq=low_freq, high_freq=high_freq)
         except ValueError as e:
-            print(f"Failed to load data for segment {data.iloc[i]['start_time']} - {data.iloc[i]['end_time']}.")
-            print(e)
+            # print(f"Failed to load data for segment {data.iloc[i]['start_time']} - {data.iloc[i]['end_time']}.")
+            # print(e)
             fail_count += 1
             continue
 
@@ -356,9 +356,11 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
     selected_indices = np.random.choice(len(whitened_samples), size=n_samples, replace=False)
     whitened_samples_df = pd.DataFrame([whitened_samples[i] for i in selected_indices])
 
-    print("Number of failed samples: ", fail_count)
-    print("Number of whitened samples obtained: ", len(whitened_samples_df))
+    # print("Number of failed samples: ", fail_count)
+    # print("Number of whitened samples obtained: ", len(whitened_samples_df))
 
+    whitened_samples_df["ifo"] = "L1"
+    whitened_samples_df["label"] = "clean_signal"
     whitened_samples_df["glitch_present"] = 0
 
     return whitened_samples_df
