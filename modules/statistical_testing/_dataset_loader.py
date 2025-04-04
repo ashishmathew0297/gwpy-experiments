@@ -339,15 +339,15 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
                 if not i < segment_size: #FIXME
                     sample = whitened_sample[i:i + segment_size]
 
-                    segment_data = {
-                        "y": sample.value,
-                        "t": sample.times,
-                        "timeseries_file_location": timeseries_file_location
-                    }
+                    if len(sample) == segment_size:
+                        segment_data = {
+                            "y": sample.value,
+                            "t": sample.times,
+                            "timeseries_file_location": timeseries_file_location
+                        }
 
-                    segment_data.update(calculate_sample_statistics(segment_data['y']))
-                    whitened_samples.append(segment_data)
-        
+                        segment_data.update(calculate_sample_statistics(segment_data['y']))
+                        whitened_samples.append(segment_data)
 
     # whitened_samples_df = pd.DataFrame(columns=['unwhitened_sample_timeseries', 'unwhitened_sample_timeseries'])
 
