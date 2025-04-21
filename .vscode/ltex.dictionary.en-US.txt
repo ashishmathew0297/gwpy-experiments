@@ -1,0 +1,13 @@
+Gaussianity
+Shapiro-Wilks
+Kolmogorov-Smirnov
+GWs
+Shapiro-Wilk
+Pérot
+Fabry
+aLIGO
+numpy
+Centre
+TimeSeries
+Tomte
+GWOSC
