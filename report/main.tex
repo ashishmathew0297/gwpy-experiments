@@ -23,7 +23,6 @@
 \usepackage{dirtytalk}
 \usepackage{scrextend}
 \usepackage{multicol}
-\usepackage[inkscapelatex=false]{svg}
 \usepackage{booktabs}
 
 \addbibresource{references.bib}
@@ -46,8 +45,8 @@ letterpaper,
 % right=0.75in,
 left=0.8in,
 right=0.8in,
-top=0.7in,
-bottom=0.85in
+top=0.8in,
+bottom=0.8in
 }
 
 % \title{Application of Multithreading to the Floyd-Steinberg Dithering Algorithm for Image Manipulation}
@@ -61,14 +60,14 @@ bottom=0.85in
 
 \begin{titlepage}
     \centering
-    \vspace{3cm}
+    \vfill
     {\LARGE \textbf{University of Massachusetts Dartmouth}}\\[1.5cm]
-    {\Large \textbf{Department of Mathematics}}\\[3cm]
+    {\Large \textbf{Department of Mathematics}}\\[2cm]
     {\huge \textbf{An Exploration of Statistical Methods in Determining the Gaussianity of LIGO Detector Data}}\\[3cm]
     {\Large A project in}\\[0.2cm]
     {\Large Data Science}\\[0.2cm]
     {\Large by}\\[0.2cm]
-    {\Large Ashish Thomas Mathew}\\[3cm]
+    {\Large Ashish Thomas Mathew}\\[2.5cm]
     {\Large Submitted in Partial Fulfillment of the}\\[0.5cm]
     {\Large Requirements for the Degree of}\\[0.5cm]
     {\Large Master of Science}\\[2cm]
@@ -120,14 +119,14 @@ bottom=0.85in
   \centering
   \begin{subfigure}[t]{0.4\textwidth}
     \centering
-    \includesvg[width=\textwidth]{images/interferometer.svg}
+    \includegraphics[width=\textwidth]{images/interferometer.pdf}
     \caption{Construction of an Interferometer}
     \label{fig:interferometer}
   \end{subfigure}
   \hspace{25px}
   \begin{subfigure}[t]{0.25\textwidth}
     \centering
-    \includesvg[width=\textwidth]{images/interference_pattern.svg}
+    \includegraphics[width=\textwidth]{images/interference_pattern.png}
     \caption{Interference pattern}
     \label{fig:sinusoidal_fringes}
   \end{subfigure}
@@ -139,7 +138,7 @@ bottom=0.85in
 
 \begin{figure}[H]
     \centering
-    \includesvg[width=\textwidth]{images/data_acquisition_preparation.svg}
+    \includegraphics[width=\textwidth]{images/data_acquisition_preparation.pdf}
     \caption{The Data Acquisition and Conditioning Pipeline}
     \label{fig:data_acq_cond}
   \end{figure}
