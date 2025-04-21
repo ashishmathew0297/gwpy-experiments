@@ -12,6 +12,7 @@ from typing import Literal
 from numpy.typing import NDArray
 
 from ._statistics import get_section_statistics, generate_confusion_matrix
+from ._dataset_loader import get_TimeSeries, calculate_q_transform
 
 def display_statistic_pvalue_histogram(pvalues: pd.DataFrame, stat_test: Literal["Shapiro-Wilk", "Kolmogorov-Smirnov"]="Shapiro-Wilk") -> None:
     '''
@@ -53,6 +54,11 @@ def display_sample_plots(data: pd.DataFrame) -> None:
     Display:
     A plot of the whitened glitch, the unwhitened glitch, and the q-transform of the glitch
     '''
+
+    q_scan, time_elapsed = calculate_q_transform(TimeSeries.read(data['timeseries_file_location']))
+
+    print(f"Time elapsed for q-transform: {time_elapsed:.2f} seconds")
+    
     fig, ax = plt.subplots(1,3, figsize=(24, 6))
     ax[0].plot(data['t'], data['whitened_y'])
     ax[0].set_xlabel("Time (s)")
@@ -64,7 +70,7 @@ def display_sample_plots(data: pd.DataFrame) -> None:
     ax[1].set_ylabel("Amplitude")
     ax[1].legend()
 
-    ax[2].imshow(data['q_scan'])
+    ax[2].imshow(q_scan)
     ax[2].set_yscale('log', base=2)
     ax[2].set_xscale('linear')
     ax[2].set_ylabel('Frequency (Hz)')

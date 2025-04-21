@@ -1,4 +1,5 @@
 import os
+import time
 import math as math
 import pycbc as pycbc
 import numpy as np
@@ -97,6 +98,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate: int
         # Band pass between 50 to 250 Hz for Scattered Light glitches
         bp = filter_design.bandpass(low_freq, high_freq, srate)
         whitened_noise = whitened_noise.filter(bp)
+        unwhitened_noise = unwhitened_noise.filter(bp)
 
     # Old method of whitening
     # # Computing the PSD with Welch's method. I start at 8Hz
@@ -165,8 +167,10 @@ def calculate_q_transform(sample: TimeSeries):
     Outputs:
     - `q_scan`: q-scan of the sample
     '''
+    start_time = time.time()
     q_scan = sample.q_transform(qrange=[4,64], frange=[10, 2048], tres=0.002, fres=0.5, whiten=False)
-    return q_scan
+    end_time = time.time()
+    return q_scan, end_time - start_time
 
 
 def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False, low_freq: int=10, high_freq: int=250)-> pd.DataFrame:
@@ -236,7 +240,6 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
             t = whitened_noise.times
             whitened_y = whitened_noise.value
             unwhitened_y = unwhitened_noise.value
-
             # Fetching relevant data to be appended to the input dataframe
             supplemental_glitch_data = {
                 "unwhitened_y": unwhitened_y,
@@ -338,15 +341,18 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
                 # Only accept samples that are of the exact segment size
                 if not i < segment_size: #FIXME
                     sample = whitened_sample[i:i + segment_size]
+                    sample_un = unwhitened_sample[i:i + segment_size]
 
                     if len(sample) == segment_size:
                         segment_data = {
-                            "y": sample.value,
+                            "whitened_y": sample.value,
                             "t": sample.times,
                             "timeseries_file_location": timeseries_file_location
                         }
+                    if len(sample_un) == segment_size:
+                        segment_data["unwhitened_y"] = sample_un.value
 
-                        segment_data.update(calculate_sample_statistics(segment_data['y']))
+                        segment_data.update(calculate_sample_statistics(segment_data['whitened_y']))
                         whitened_samples.append(segment_data)
 
     # whitened_samples_df = pd.DataFrame(columns=['unwhitened_sample_timeseries', 'unwhitened_sample_timeseries'])
