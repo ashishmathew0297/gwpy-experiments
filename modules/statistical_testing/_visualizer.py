@@ -62,7 +62,7 @@ def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
 
     print(f"Time elapsed for q-transform: {time_elapsed:.2f} seconds")
     
-    fig, ax = plt.subplots(1,3, figsize=(24, 6))
+    fig, ax = plt.subplots(3,1, figsize=(12, 24))
 
 
     ax[0].plot(data['t'],data['unwhitened_y'])
