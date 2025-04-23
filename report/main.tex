@@ -187,9 +187,16 @@ The GPS times of glitch occurrences are obtained using \textit{Gravity Spy} \cit
 
 \subsection{Data Conditioning}
 
-The TimeSeries data obtained from GWpy needs to be conditioned before being used for statistical testing.
+The TimeSeries data obtained from GWpy needs to be conditioned before use for statistical testing. The two main steps taken for this are \textbf{whitening} and \textbf{filtering}.
 
 \subsubsection{Whitening}
+
+The information obtained from GW detectors encompasses a wide range of frequencies. Due to this, it is observed that low frequency noise often domainates the data, hence hiding the high frequency components which would be indicative of a signal's presence.
+
+\medskip
+\noindent Considering example of a glitch 
+
+Whitening is the process of 
 \subsubsection{Filtering}
 
 \section{Methods}\label{Methods}
