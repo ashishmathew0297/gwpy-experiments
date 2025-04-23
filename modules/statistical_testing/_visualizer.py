@@ -40,7 +40,7 @@ def display_statistic_pvalue_histogram(pvalues: pd.DataFrame, stat_test: Literal
     print(f"Maximum p-value: {max(pvalues)}")
     print(f"Minimum p-value: {min(pvalues)}")
 
-def display_sample_plots(data: pd.DataFrame) -> None:
+def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
     '''
     A function to display a whitened sample glitch from the input dataframe along its original form and q-transform.
 
@@ -55,20 +55,25 @@ def display_sample_plots(data: pd.DataFrame) -> None:
     A plot of the whitened glitch, the unwhitened glitch, and the q-transform of the glitch
     '''
 
-    q_scan, time_elapsed = calculate_q_transform(TimeSeries.read(data['timeseries_file_location']))
+    timeseries = TimeSeries.read(data['timeseries_file_location'])
+    timeseries = timeseries.whiten(4,2)
+    timeseries = timeseries[int(4096 * 4):-int(4096 * 4)]
+    q_scan, time_elapsed = calculate_q_transform(timeseries)
 
     print(f"Time elapsed for q-transform: {time_elapsed:.2f} seconds")
     
     fig, ax = plt.subplots(1,3, figsize=(24, 6))
-    ax[0].plot(data['t'], data['whitened_y'])
+    ax[0].plot(data['t'],data['unwhitened_y'])
     ax[0].set_xlabel("Time (s)")
     ax[0].set_ylabel("Amplitude")
-    ax[0].legend()
+    ax[0].set_title("Unwhitened Glitch")
+    # ax[0].legend()
 
-    ax[1].plot(data['t'],data['unwhitened_y'])
-    ax[2].set_xlabel("Time (s)")
+    ax[1].plot(data['t'], data['whitened_y'])
+    ax[1].set_xlabel("Time (s)")
     ax[1].set_ylabel("Amplitude")
-    ax[1].legend()
+    ax[1].set_title("Whitened Glitch")
+    # ax[1].legend()
 
     ax[2].imshow(q_scan)
     ax[2].set_yscale('log', base=2)
@@ -76,9 +81,14 @@ def display_sample_plots(data: pd.DataFrame) -> None:
     ax[2].set_ylabel('Frequency (Hz)')
     ax[2].set_xlabel('Time (s)')
     ax[2].images[0].set_clim(0, 25.5)
+    ax[2].set_title("Q-Transform")
     fig.colorbar(ax[2].images[0], ax=ax[2], label='Normalized energy', orientation='vertical', fraction=0.046, pad=0.04)
 
     plt.show()
+
+    if save_path:
+        plt.savefig(save_path)
+        plt.close()
 
 def display_probability_plot(sample: pd.DataFrame) -> None:
     '''
