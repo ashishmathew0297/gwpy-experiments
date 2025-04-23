@@ -136,7 +136,7 @@ bottom=0.8in
     \includegraphics[width=\textwidth]{images/data_acquisition_preparation.pdf}
     \caption{The Data Acquisition and Conditioning Pipeline}
     \label{fig:data_acq_cond}
-  \end{figure}
+\end{figure}
 
 \medskip
 \noindent We use two separate modules to load the glitched time series and the clean time series sample data.
@@ -191,10 +191,17 @@ The TimeSeries data obtained from GWpy needs to be conditioned before use for st
 
 \subsubsection{Whitening}
 
-The information obtained from GW detectors encompasses a wide range of frequencies. Due to this, it is observed that low frequency noise often domainates the data, hence hiding the high frequency components which would be indicative of a signal's presence.
+The information obtained from GW detectors encompasses a wide range of frequencies. Due to this, low frequency noise often domainates the data, hence hiding the high frequency components which would be indicative of a signal's presence. Hence, some signal processing is required to counteract this.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/sample_plot.pdf}
+  \caption{Example of a Tomte glitch with a high SNR. Note that the unwhitened data is dominated by low frequency noise, hence making it difficult to detect the glitch. The whitened data, however, shows a clear peak at the glitch.}
+  \label{fig:data_acq_cond}
+\end{figure}
 
 \medskip
-\noindent Considering example of a glitch 
+\noindent Consider the example of a Tomte glitch 
 
 Whitening is the process of 
 \subsubsection{Filtering}
