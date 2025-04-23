@@ -63,27 +63,37 @@ def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
     print(f"Time elapsed for q-transform: {time_elapsed:.2f} seconds")
     
     fig, ax = plt.subplots(1,3, figsize=(24, 6))
+
+
     ax[0].plot(data['t'],data['unwhitened_y'])
-    ax[0].set_xlabel("Time (s)")
-    ax[0].set_ylabel("Amplitude")
-    ax[0].set_title("Unwhitened Glitch")
+    ax[0].set_xlabel("Time (s)", fontsize=25)
+    ax[0].set_ylabel("Amplitude", fontsize=25)
+    ax[0].set_title("Unwhitened Glitch", fontsize=30)
+    ax[0].tick_params(axis='both', which="major", labelsize=25)
+    ax[0].tick_params(axis='both', which="minor", labelsize=25)
     # ax[0].legend()
 
     ax[1].plot(data['t'], data['whitened_y'])
-    ax[1].set_xlabel("Time (s)")
-    ax[1].set_ylabel("Amplitude")
-    ax[1].set_title("Whitened Glitch")
+    ax[1].set_xlabel("Time (s)", fontsize=25)
+    ax[1].set_ylabel("Amplitude", fontsize=25)
+    ax[1].set_title("Whitened Glitch", fontsize=30)
+    ax[1].tick_params(axis='both', which="major", labelsize=25)
+    ax[1].tick_params(axis='both', which="minor", labelsize=25)
     # ax[1].legend()
 
     ax[2].imshow(q_scan)
     ax[2].set_yscale('log', base=2)
     ax[2].set_xscale('linear')
-    ax[2].set_ylabel('Frequency (Hz)')
-    ax[2].set_xlabel('Time (s)')
+    ax[2].set_ylabel('Frequency (Hz)', fontsize=25)
+    ax[2].set_xlabel('Time (s)', fontsize=25)
     ax[2].images[0].set_clim(0, 25.5)
-    ax[2].set_title("Q-Transform")
-    fig.colorbar(ax[2].images[0], ax=ax[2], label='Normalized energy', orientation='vertical', fraction=0.046, pad=0.04)
-
+    ax[2].set_title("Q-Transform", fontsize=30)
+    ax[2].tick_params(axis='both', which="major", labelsize=25)
+    ax[2].tick_params(axis='both', which="minor", labelsize=25)
+    cbr = fig.colorbar(ax[2].images[0], ax=ax[2], label='Normalized energy', orientation='vertical', fraction=0.046, pad=0.04)
+    #set colorbar fontsize
+    cbr.ax.tick_params(labelsize=25)
+    
     if len(save_path):
         plt.tight_layout()
         plt.savefig(save_path, dpi=100)
