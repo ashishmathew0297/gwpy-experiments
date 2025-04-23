@@ -84,11 +84,11 @@ def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
     ax[2].set_title("Q-Transform")
     fig.colorbar(ax[2].images[0], ax=ax[2], label='Normalized energy', orientation='vertical', fraction=0.046, pad=0.04)
 
+    if len(save_path):
+        plt.tight_layout()
+        plt.savefig(save_path, dpi=100)
     plt.show()
 
-    if save_path:
-        plt.savefig(save_path)
-        plt.close()
 
 def display_probability_plot(sample: pd.DataFrame) -> None:
     '''
