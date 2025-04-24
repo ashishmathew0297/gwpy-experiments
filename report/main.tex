@@ -198,10 +198,17 @@ bottom=0.8in
 \noindent The \textbf{Power Spectral Density (PSD)} is a method to represent how power is distributed across different frequencies in a signal \cite{Oppenheim_2009, Li:2013lza}. It is calculated by taking the average of the square of the Fast Fourier transforms (FFT) of the time series data, decomposing the signal into its constituent frequencies. The PSD provides a measure of how much power or strain noise is present at each frequency, allowing for the identification of dominant frequency components and their corresponding amplitudes.
 
 \medskip
-\noindent One way to visualize the timeseries data is by using its \textbf{Amplitude Spectral Density (ASD)} values, which are found by taking the square root of the PSD. ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
+\noindent One way to visualize the timeseries data is by using its \textbf{Amplitude Spectral Density (ASD)} values, which are found by taking the square root of the PSD.
+
+\begin{equation}
+    ASD(f) = \sqrt{PSD(f)}
+    \label{eq:asd}
+\end{equation}
+
+\noindent ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
 
 \medskip
-\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, one would need to integrate over the squares of the ASD over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 512 Hz and 1024 Hz, marked by dotted lines, there is a big chance that these are of instrumental origin.
+\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines, there is a big chance that these are of instrumental origin. The problem with this plot, however, is that it does not capture the glitch signal well as glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data.
 
 \begin{figure}[H]
   \centering
@@ -210,26 +217,19 @@ bottom=0.8in
   \label{fig:asdtomte}
 \end{figure}
 
-The TimeSeries data obtained from GWpy needs to be conditioned before use for statistical testing.
-
-
-The two main steps taken for this are \textbf{whitening} and \textbf{filtering}.
-
 \subsubsection{Whitening}
+
+\textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the weaker signals at sensitive frequency ranges. This is done by dividing the ASD by the PSD, effectively normalizing the data.
 
 The information obtained from GW detectors encompasses a wide range of frequencies. Due to this, low frequency noise often domainates the data, hence hiding the high frequency components which would be indicative of a signal's presence. Hence, some signal processing is required to counteract this. In Figure \ref{fig:sampletomte} we observe this phenomenon occur in the case of .
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.5\textwidth]{images/sample_plot.pdf}
-  \caption{Example of a Tomte glitch with a high SNR. Note that the unwhitened data is dominated by low frequency noise, hence making it difficult to detect the glitch. The whitened data, however, shows a clear peak at the glitch.}
+  \caption{Example of a Tomte glitch with a high SNR.}
   \label{fig:sampletomte}
 \end{figure}
 
-\medskip
-\noindent Consider the example of a Tomte glitch 
-
-Whitening is the process of 
 \subsubsection{Filtering}
 
 \section{Methods}\label{Methods}
