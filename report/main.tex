@@ -91,7 +91,7 @@ bottom=0.8in
 \noindent Among these noise sources, the most problematic are \textbf{glitches}: transient events caused by non-astrophysical phenomena such as anthropogenic noise, weather conditions, or instrument malfunctions \cite{collaboration_guide_2020, collaboration_characterization_2016}. Glitches manifest as localized bursts of excess power in interferometer time series data and often do not have well-defined sources. They can occur at energy levels and frequencies that overlap with GW signals, thereby mimicking them and increasing the number of false positive detections. During the first half of the third observing run (O3a) LIGO Hanford and Livingston recorded glitches rates of $0.29\text{ min}^{-1}$ and $1.10\text{ min}^{-1}$ respectively, which rose to $0.32\text{ min}^{-1}$ and $1.17\text{ min}^{-1}$ during the second half (O3b) \cite{collaboration_gwtc-3_2023}. Of the 90 candidate events detected in this run, 17 had a probability of astronomical origin ($p_\text{astro}$) below 0.5, suggesting significant ambiguity about their origin. A notable example of glitches posing such an issue was during the binary neutron star merger event GW170817 \cite{collaboration_gw170817_2017}, during which instrumental noise transients were detected before the event's coalescence time, complicating its detection and subsequent analysis.
 
 \medskip
-\noindent Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive and lack the efficiency required for near-real-time assessment of the signals for glitch activity. The more popular solutions incorporate the \textit{q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. This q-transform computes a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is computationally intensive for real-time uses. Performing q-transforms on 10-second sample of interferometer data on a laptop requires between 20 and 45 seconds. When scaled up to multiple samples, the computational time would increase significantly.
+\noindent Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive and lack the efficiency required for near-real-time assessment of the signals for glitch activity. The more popular solutions incorporate the \textit{q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. This q-transform computes a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is ineffective for real-time use. Additionally, when scaled up to perform calculate on multiple samples, the computational time would increase significantly.
 
 % TODO: Incomplete
 
@@ -129,7 +129,7 @@ bottom=0.8in
 \noindent The \texttt{GWpy} Python package is widely used in this project. It provides a sute of tools to access and condition detector strain data from the Gravitational-Wave Open Science Centre (GWOSC) database \cite{gwpy}. This data is in the time domain, as timestamps in the GPS time system at nanosecond precision, and records the amplitude of the noise event as a differential change in lengths of the interferometer arms. GWpy handles detector data using the \texttt{TimeSeries} object, which is built upon \texttt{numpy} arrays. This allows compatibility with most of the core numpy utilities along with custom functions for signal processing, tabular data filtering, and visualization.
 
 \medskip
-\noindent We use the strain data from LIGO Livingston (L1) during the first part of the third observing run (O3a) for this project.  Figure \ref{fig:data_acq_cond} shows the steps taken to acquire signal data from the detector and condition it for statistical testing.
+\noindent We use the strain data from LIGO Livingston (L1) during the first part of the third observing run (O3a) for this project due to the high rate of occurrence of glitches. Figure \ref{fig:data_acq_cond} shows the steps taken to acquire signal data from the detector and condition it for statistical testing.
 
 \begin{figure}[H]
     \centering
@@ -139,11 +139,12 @@ bottom=0.8in
 \end{figure}
 
 \medskip
-\noindent We use two separate modules to load the glitched time series and the clean time series sample data.
+\noindent There are two main types of detector samples that we receive from the detectors: \textbf{Glitched detector data} and \textbf{Clean detector data}. The following sections will go a bit deeper into each of these types of data and how they are obtained.
   
-\subsection{Glitch Samples}
+\subsection{Glitch data}
 
-The GPS times of glitch occurrences are obtained using \textit{Gravity Spy} \cite{Zevin_2017}, a large-scale citizen-science project that combines astrophysics, machine learning, and human efforts to classify glitches in GW interferometer data. The \textit{Omicron} transient search algorithm is used by Gravity Spy to generate q-transform spectrograms and calculate SNR of the time series samples \cite{robinet_omicron_2020}. This algorithm is crucial in identifying the most useful samples for data classification and analysis. Based on the morphological characteristics from the spectrograms, a total of 22 glitch classes were identified with an SNR above 7.5 and peak frequencies between 10 Hz and 2048 Hz.
+\medskip
+\noindent The GPS times of glitch occurrences are obtained using \textit{Gravity Spy} \cite{Zevin_2017}, a large-scale citizen-science project that combines astrophysics, machine learning, and human efforts to classify glitches in GW interferometer data. The \textit{Omicron} transient search algorithm is used by Gravity Spy to generate q-transform spectrograms and calculate SNR of the time series samples \cite{robinet_omicron_2020}. This algorithm is crucial in identifying the most useful samples for data classification and analysis. Based on the morphological characteristics from the spectrograms, a total of 22 glitch classes were identified with an SNR above 7.5 and peak frequencies between 10 Hz and 2048 Hz.
 
 \medskip
 \noindent In the O3a data for L1, Fast\_Scattering and Tomte glitches are the most prevalent, while Chirp, 1080Lines and Wandering\_line glitches have fewer samples, as shown in Table \ref{tab:glitch_classes}. The No\_Glitch class represents glitch samples that lack significant traits or energy levels and do not fit in with the other classes morphologically. Hence, for our study, we do not consider this glitch class.
@@ -185,19 +186,28 @@ The GPS times of glitch occurrences are obtained using \textit{Gravity Spy} \cit
 \medskip
 \noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.95 are considered to be clean segments of data, and are used to obtain the corresponding TimeSeries data from GWpy. The TimeSeries data is then, similar to the glitch data conditioned for statistical testing and cropped down to 1-second samples for further use.
 
+
 \subsection{Data Conditioning}
 
-The TimeSeries data obtained from GWpy needs to be conditioned before use for statistical testing. The two main steps taken for this are \textbf{whitening} and \textbf{filtering}.
+\noindent The strain readings obtained from a GW detector is usually a combination of the GW signal and detector noise. In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, hence keeping the statistical properties constant. However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
+
+\medskip
+\noindent The \textbf{Power Spectral Density (PSD)} is a method to represent how power is distributed across different frequencies in a signal \cite{Oppenheim_2009}. It is calculated by taking the average of the square of the Fast Fourier transforms (FFT) of the time series data, decomposing the signal into its constituent frequencies. The PSD provides a measure of how much power or strain noise is present at each frequency, allowing for the identification of dominant frequency components and their corresponding amplitudes.
+
+The TimeSeries data obtained from GWpy needs to be conditioned before use for statistical testing.
+
+
+The two main steps taken for this are \textbf{whitening} and \textbf{filtering}.
 
 \subsubsection{Whitening}
 
-The information obtained from GW detectors encompasses a wide range of frequencies. Due to this, low frequency noise often domainates the data, hence hiding the high frequency components which would be indicative of a signal's presence. Hence, some signal processing is required to counteract this.
+The information obtained from GW detectors encompasses a wide range of frequencies. Due to this, low frequency noise often domainates the data, hence hiding the high frequency components which would be indicative of a signal's presence. Hence, some signal processing is required to counteract this. In Figure \ref{fig:sampletomte} we observe this phenomenon occur in the case of .
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{images/sample_plot.pdf}
+  \includegraphics[width=0.5\textwidth]{images/sample_plot.pdf}
   \caption{Example of a Tomte glitch with a high SNR. Note that the unwhitened data is dominated by low frequency noise, hence making it difficult to detect the glitch. The whitened data, however, shows a clear peak at the glitch.}
-  \label{fig:data_acq_cond}
+  \label{fig:sampletomte}
 \end{figure}
 
 \medskip
