@@ -174,7 +174,7 @@ bottom=0.8in
 \end{table}
 
 \pagebreak
-\noindent Using the glitch GPS times, the time series information is obtained from the GWOSC database using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy. Here, a time window of 10 seconds is taken on either side of each of the GPS times with the glitch in the center, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second sample for further use.
+\noindent Using the glitch GPS times, the time series information is obtained from the GWOSC database using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy. Here, a time window of 10 seconds is taken on either side of each of the GPS times with the glitch in the center, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second time window around the glitch for further use.
 
 \subsection{Clean Samples}
 
@@ -190,12 +190,25 @@ bottom=0.8in
 \subsection{Data Conditioning}
 
 \noindent The strain readings obtained from a GW detector is usually a combination of the GW signal and detector noise. In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, hence keeping the statistical properties constant. However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
+\pagebreak
+
+\subsubsection{Power Spectral Density and Amplitude Spectral Density}
 
 \medskip
 \noindent The \textbf{Power Spectral Density (PSD)} is a method to represent how power is distributed across different frequencies in a signal \cite{Oppenheim_2009, Li:2013lza}. It is calculated by taking the average of the square of the Fast Fourier transforms (FFT) of the time series data, decomposing the signal into its constituent frequencies. The PSD provides a measure of how much power or strain noise is present at each frequency, allowing for the identification of dominant frequency components and their corresponding amplitudes.
 
 \medskip
-\noindent One way to visualize the timeseries data is by using its \textbf{Amplitude Spectral Density (ASD)} values, which are found by taking the square root of the PSD. ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess the a detector's sensitivity to specific frequencies. The ASD is typically plotted on a logarithmic scale, with frequency on the x-axis and ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies. Figure shows an example
+\noindent One way to visualize the timeseries data is by using its \textbf{Amplitude Spectral Density (ASD)} values, which are found by taking the square root of the PSD. ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
+
+\medskip
+\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, one would need to integrate over the squares of the ASD over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 512 Hz and 1024 Hz, marked by dotted lines, there is a big chance that these are of instrumental origin.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/unwhitened_asd.pdf}
+  \caption{ASD plot for a Tomte Glitch.}
+  \label{fig:asdtomte}
+\end{figure}
 
 The TimeSeries data obtained from GWpy needs to be conditioned before use for statistical testing.
 
