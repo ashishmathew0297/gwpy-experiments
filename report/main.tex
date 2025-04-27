@@ -189,9 +189,9 @@ bottom=0.8in
 
 \subsection{Data Conditioning}
 
-\noindent The strain readings obtained from a GW detector is usually a combination of the GW signal and detector noise. In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, hence keeping the statistical properties constant. However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
-\pagebreak
+\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise. In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, hence keeping the statistical properties constant. However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
 
+\medskip
 \subsubsection{Power Spectral Density and Amplitude Spectral Density}
 
 \medskip
@@ -208,27 +208,31 @@ bottom=0.8in
 \noindent ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
 
 \medskip
-\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines, there is a big chance that these are of instrumental origin. The problem with this plot, however, is that it does not capture the glitch signal well as glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data.
+\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines, there is a big chance that these are of instrumental origin. The problem with this plot, however, is that it does not capture the glitch signal well because glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data and view its time-amplitude plot.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.75\textwidth]{images/unwhitened_asd.pdf}
+  \includegraphics[width=0.9\textwidth]{images/unwhitened_asd.pdf}
   \caption{ASD plot for a Tomte Glitch.}
   \label{fig:asdtomte}
 \end{figure}
 
 \subsubsection{Whitening}
 
-\textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the weaker signals at sensitive frequency ranges. This is done by dividing the ASD by the PSD, effectively normalizing the data.
+\textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the weaker signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and can vary significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
 
-The information obtained from GW detectors encompasses a wide range of frequencies. Due to this, low frequency noise often domainates the data, hence hiding the high frequency components which would be indicative of a signal's presence. Hence, some signal processing is required to counteract this. In Figure \ref{fig:sampletomte} we observe this phenomenon occur in the case of .
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.5\textwidth]{images/sample_plot.pdf}
-  \caption{Example of a Tomte glitch with a high SNR.}
+  \includegraphics[width=0.52\textwidth]{images/sample_plot.pdf}
+  \caption{Example of a Tomte glitch signal before and after whitening.}
   \label{fig:sampletomte}
 \end{figure}
+
+\medskip
+\noindent Figure \ref{fig:sampletomte} shows a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the timeseries data. As we can see, the whitening process has effectively flattened the noise floor, allowing for a clearer view of the glitch signal.
+
+\noindent This is done by taking the inverse of the ASD and multiplying it with the original time series data. This effectively flattens the noise floor, allowing for a clearer view of the glitch signal. The resulting whitened data can then be used for further analysis, such as statistical testing or machine learning classification.
 
 \subsubsection{Filtering}
 
