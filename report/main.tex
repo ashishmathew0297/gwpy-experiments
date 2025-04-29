@@ -189,13 +189,55 @@ bottom=0.8in
 
 \subsection{Data Conditioning}
 
-\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise. In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, hence keeping the statistical properties constant. However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
+\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
 
-\medskip
+\begin{equation}
+    s(t) = n(t) + h(t)
+    \label{eq:strain_output}
+\end{equation}
+
+\noindent Given the signal $x(t)$ we get its corresponding Fourier Transform as:
+
+\begin{equation}
+    \bar{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
+    \label{eq:fourier_transform}
+\end{equation}
+
+\noindent and the inverse Fourier Transform given by:
+
+\begin{equation}
+  x(t) = \mathcal{F}^{-1} \{ \bar{x}(f) \} (t) = \int_{-\infty}^{\infty} \bar{x}(f) e^{2 \pi i f t} df
+  \label{eq:inverse_fourier_transform}
+\end{equation}
+
 \subsubsection{Power Spectral Density and Amplitude Spectral Density}
 
+\noindent In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are uncorrelated, hence keeping it Gaussian. I reality the detector noise may have some non-statioonary components, but we ignore these for the time being. Hence, the statistical properties of the noise can be described by the autocorrerlation matrix
+
+\begin{equation}
+    C_n(\tau) = \langle n_a(t+\tau) n_b(t) \rangle - \langle n_a(t+\tau) \rangle \langle n_b(t) \rangle 
+    \label{eq:autocorrelation}
+\end{equation}
+
+\noindent where $\langle \cdot \rangle$ represents the average over time.
+
+its power spectral density (PSD) $S_n(f)$, which is defined as the Fourier transform of the autocorrelation function of the noise. The PSD provides a measure of how much power is present at each frequency in the noise signal. The PSD is given by:
+
+
 \medskip
-\noindent The \textbf{Power Spectral Density (PSD)} is a method to represent how power is distributed across different frequencies in a signal \cite{Oppenheim_2009, Li:2013lza}. It is calculated by taking the average of the square of the Fast Fourier transforms (FFT) of the time series data, decomposing the signal into its constituent frequencies. The PSD provides a measure of how much power or strain noise is present at each frequency, allowing for the identification of dominant frequency components and their corresponding amplitudes.
+However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
+
+
+
+
+
+\medskip
+\noindent The \textbf{Power Spectral Density (PSD)} is a method to represent how power is distributed across different frequencies in a signal \cite{Oppenheim_2009, Li:2013lza}. It is calculated by taking the average of the square of the Fast Fourier transforms (FFT) of the time series data, decomposing the signal into its constituent frequencies. The PSD provides a measure of how much power or strain noise is present at each frequency, allowing for the identification of dominant frequency components and their corresponding amplitudes. Given $x(t)$ to be the signal PSD is calculated using the following equation:
+
+\begin{equation}
+    S_{n}(f) = \lim_{T \to \infty} \frac{1}{T} \left| \int_{-T/2}^{T/2} x(t) e^{-i 2 \pi f t} dt \right|^2
+    \label{eq:psd}
+\end{equation}
 
 \medskip
 \noindent One way to visualize the timeseries data is by using its \textbf{Amplitude Spectral Density (ASD)} values, which are found by taking the square root of the PSD.
@@ -219,7 +261,7 @@ bottom=0.8in
 
 \subsubsection{Whitening}
 
-\textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the weaker signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and can vary significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
+\textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the weaker signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and varies significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
 
 
 \begin{figure}[H]
@@ -229,10 +271,11 @@ bottom=0.8in
   \label{fig:sampletomte}
 \end{figure}
 
-\medskip
-\noindent Figure \ref{fig:sampletomte} shows a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the timeseries data. As we can see, the whitening process has effectively flattened the noise floor, allowing for a clearer view of the glitch signal.
+\pagebreak
+\noindent This is done by taking the inverse of the ASD and multiplying it with the original time series data. This effectively flattens the noise floor, spreading the power evenly across all frequencies, allowing for a clearer view of the glitch signal. The resulting whitened data can then be used for further analysis, such as statistical testing or machine learning classification.
 
-\noindent This is done by taking the inverse of the ASD and multiplying it with the original time series data. This effectively flattens the noise floor, allowing for a clearer view of the glitch signal. The resulting whitened data can then be used for further analysis, such as statistical testing or machine learning classification.
+\noindent Figure \ref{fig:sampletomte} shows a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the timeseries data. The whitening process effectively flattens the noise floor, allowing for a clearer view of the glitch signal.
+
 
 \subsubsection{Filtering}
 
