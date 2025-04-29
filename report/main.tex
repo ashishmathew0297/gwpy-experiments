@@ -199,45 +199,46 @@ bottom=0.8in
 \noindent Given the signal $x(t)$ we get its corresponding Fourier Transform as:
 
 \begin{equation}
-    \bar{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
+    \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
     \label{eq:fourier_transform}
 \end{equation}
 
 \noindent and the inverse Fourier Transform given by:
 
 \begin{equation}
-  x(t) = \mathcal{F}^{-1} \{ \bar{x}(f) \} (t) = \int_{-\infty}^{\infty} \bar{x}(f) e^{2 \pi i f t} df
+  x(t) = \mathcal{F}^{-1} \{ \tilde{x}(f) \} (t) = \int_{-\infty}^{\infty} \tilde{x}(f) e^{2 \pi i f t} df
   \label{eq:inverse_fourier_transform}
 \end{equation}
 
 \subsubsection{Power Spectral Density and Amplitude Spectral Density}
 
-\noindent In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are uncorrelated, hence keeping it Gaussian. I reality the detector noise may have some non-statioonary components, but we ignore these for the time being. Hence, the statistical properties of the noise can be described by the autocorrerlation matrix
+\noindent In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are uncorrelated, hence keeping it Gaussian. In reality the detector noise may have some non-stationary components, but we ignore these for the time being. Hence, the statistical properties of the noise can be described by the autocorrelation matrix
 
 \begin{equation}
-    C_n(\tau) = \langle n_a(t+\tau) n_b(t) \rangle - \langle n_a(t+\tau) \rangle \langle n_b(t) \rangle 
+    C_n(\tau) = \langle n_a(t+\tau) n_b(t) \rangle - \langle n_a(t+\tau) \rangle \langle n_b(t) \rangle,
     \label{eq:autocorrelation}
 \end{equation}
 
-\noindent where $\langle \cdot \rangle$ represents the average over time.
+\medskip
+\noindent The Wiener-Khinchin theorem \cite{chatfield1989analysis} states that the Fourier transform of this correlation matrix multiplied by two gives us the \textbf{power spectral density} (PSD) $S_n(f)$. The PSD provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009, Li:2013lza}, allowing for the identification of dominant frequency components and their corresponding amplitudes. The PSD is calculated as follows:
 
-its power spectral density (PSD) $S_n(f)$, which is defined as the Fourier transform of the autocorrelation function of the noise. The PSD provides a measure of how much power is present at each frequency in the noise signal. The PSD is given by:
+\begin{equation}
+    S_n(f) = 2 \int_{-\infty}^{\infty} C_n(\tau) e^{-2 \pi i f \tau} d\tau \\
+    S_n(f) = 2 \tilde{C_n}(\tau) \\
+    \label{eq:psd_autocorrelation}
+\end{equation}
 
+\noindent This satisfies the relation
+
+\begin{equation}
+  \langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} \delta(f - f') S_n(f).
+  \label{eq:psd_relation}
+\end{equation}
+
+\noindent Here $\langle \cdot \rangle$ represents the average over time, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate.
 
 \medskip
 However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
-
-
-
-
-
-\medskip
-\noindent The \textbf{Power Spectral Density (PSD)} is a method to represent how power is distributed across different frequencies in a signal \cite{Oppenheim_2009, Li:2013lza}. It is calculated by taking the average of the square of the Fast Fourier transforms (FFT) of the time series data, decomposing the signal into its constituent frequencies. The PSD provides a measure of how much power or strain noise is present at each frequency, allowing for the identification of dominant frequency components and their corresponding amplitudes. Given $x(t)$ to be the signal PSD is calculated using the following equation:
-
-\begin{equation}
-    S_{n}(f) = \lim_{T \to \infty} \frac{1}{T} \left| \int_{-T/2}^{T/2} x(t) e^{-i 2 \pi f t} dt \right|^2
-    \label{eq:psd}
-\end{equation}
 
 \medskip
 \noindent One way to visualize the timeseries data is by using its \textbf{Amplitude Spectral Density (ASD)} values, which are found by taking the square root of the PSD.
