@@ -57,12 +57,12 @@ def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
 
     timeseries = TimeSeries.read(data['timeseries_file_location'])
     timeseries = timeseries.whiten(4,2)
-    timeseries = timeseries[int(4096 * 4):-int(4096 * 4)]
+    timeseries = timeseries[int(4096 * 4.5):-int(4096 * 4.5)]
     q_scan, time_elapsed = calculate_q_transform(timeseries)
 
     print(f"Time elapsed for q-transform: {time_elapsed:.2f} seconds")
     
-    fig, ax = plt.subplots(3,1, figsize=(12, 24))
+    fig, ax = plt.subplots(3,1, figsize=(12, 24), sharex=True, constrained_layout=True)
 
 
     ax[0].plot(data['t'],data['unwhitened_y'])
@@ -90,12 +90,12 @@ def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
     ax[2].set_title("Q-Transform", fontsize=30)
     ax[2].tick_params(axis='both', which="major", labelsize=25)
     ax[2].tick_params(axis='both', which="minor", labelsize=25)
-    cbr = fig.colorbar(ax[2].images[0], ax=ax[2], label='Normalized energy', orientation='vertical', fraction=0.046, pad=0.04)
+    cbr = fig.colorbar(ax[2].images[0], ax=ax[2], label='Normalized energy', orientation='vertical', fraction=0.046, pad=0.05)
     #set colorbar fontsize
+    cbr.set_label('Normalized energy', fontsize=25)
     cbr.ax.tick_params(labelsize=25)
     
     if len(save_path):
-        plt.tight_layout()
         plt.savefig(save_path, dpi=100)
     plt.show()
 

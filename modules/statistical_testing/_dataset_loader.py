@@ -100,46 +100,18 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate: int
         whitened_noise = whitened_noise.filter(bp)
         unwhitened_noise = unwhitened_noise.filter(bp)
 
-    # Old method of whitening
-    # # Computing the PSD with Welch's method. I start at 8Hz
-    # psd = unwhitened_noise.filter_psd(unwhitened_noise.duration, unwhitened_noise.delta_f, flow=8)
-    # # According to me this smoothes the PSD to be able to whiten
-    # psd = pycbc.psd.estimate.inverse_spectrum_truncation(psd,
-    #                max_filter_len= int(1*srate),
-    #                trunc_method='hann', low_frequency_cutoff=None,)
-    # # We whiten the data
-    # whitened_noise = (unwhitened_noise.to_frequencyseries() / psd ** 0.5).to_timeseries()
-
     
     # Cropping the data to remove border effects
     # If end_time is not provided, we crop it down to 2 seconds on either side for q_scan calculations
     if not gps_end_time:
-        # Crop times at each side down to 4 seconds for q_scans
-        whitened_noise = whitened_noise[int(srate * (tw - 2)):-int(srate * (tw - 2))]
-        unwhitened_noise = unwhitened_noise[int(srate * (tw - 2)):-int(srate * (tw - 2))]
+        # Stripping the sample down to a 1 second window of central data
+        # (this might need to be changed for different glitches)
+        unwhitened_noise = unwhitened_noise[int(srate * 4.5):-int(srate * 4.5)]
+        whitened_noise = whitened_noise[int(srate * 4.5):-int(srate * 4.5)]
     else:
         # Crop 1 second at each side to avoid border effects
         whitened_noise = whitened_noise[int(srate * 1):-int(srate * 1)]
         unwhitened_noise = unwhitened_noise[int(srate * 1):-int(srate * 1)]
-    
-    # Conversion to GWPY for q-transform calculation
-    # whitened_noise = TimeSeries(whitened_noise, sample_rate = srate)
-    # unwhitened_noise = TimeSeries(unwhitened_noise, sample_rate = srate)
-
-    # Try block added because some glitches throw ValueErrors
-    if not gps_end_time:
-        # Creating q-transforms of the data for visualization
-        # This is not done if the end time is provided
-        # try:
-        #     q_scan = calculate_q_transform(whitened_noise)
-        # except ValueError as e:
-        #     print(f"Failed to generate q-transform for {gps_time}")
-        #     print(e)
-
-        # Stripping the sample down to a 1 second window of central data
-        # (this might need to be changed for different glitches)
-        unwhitened_noise = unwhitened_noise[int(srate * 1.5):-int(srate * 1.5)]
-        whitened_noise = whitened_noise[int(srate * 1.5):-int(srate * 1.5)]
 
     return unwhitened_noise, whitened_noise, timeseries_file_location
 
