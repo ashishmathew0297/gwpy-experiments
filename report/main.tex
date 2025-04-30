@@ -196,14 +196,14 @@ bottom=0.8in
     \label{eq:strain_output}
 \end{equation}
 
-\noindent Given the signal $x(t)$ we get its corresponding Fourier Transform as:
+\noindent Given the signal $x(t)$ we get its corresponding Fourier Transform as
 
 \begin{equation}
     \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
     \label{eq:fourier_transform}
 \end{equation}
 
-\noindent and the inverse Fourier Transform given by:
+\noindent and the inverse Fourier Transform given by
 
 \begin{equation}
   x(t) = \mathcal{F}^{-1} \{ \tilde{x}(f) \} (t) = \int_{-\infty}^{\infty} \tilde{x}(f) e^{2 \pi i f t} df
@@ -212,7 +212,7 @@ bottom=0.8in
 
 \subsubsection{Power Spectral Density and Amplitude Spectral Density}
 
-\noindent In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are uncorrelated, hence keeping it Gaussian. In reality the detector noise may have some non-stationary components, but we ignore these for the time being. Hence, the statistical properties of the noise can be described by the autocorrelation matrix
+\noindent In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are, for the most part, uncorrelated, hence keeping it Gaussian. As a result, the statistical properties of the noise can be described by an auto-correlation matrix described by
 
 \begin{equation}
     C_n(\tau) = \langle n_a(t+\tau) n_b(t) \rangle - \langle n_a(t+\tau) \rangle \langle n_b(t) \rangle,
@@ -220,50 +220,45 @@ bottom=0.8in
 \end{equation}
 
 \medskip
-\noindent The Wiener-Khinchin theorem \cite{chatfield1989analysis} states that the Fourier transform of this correlation matrix multiplied by two gives us the \textbf{power spectral density} (PSD) $S_n(f)$. The PSD provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009, Li:2013lza}, allowing for the identification of dominant frequency components and their corresponding amplitudes. The PSD is calculated as follows:
+\noindent The Wiener-Khinchin theorem \cite{chatfield1989analysis} states that the Fourier transform of the correlation matrix of a signal gives us the \textbf{power spectral density} (PSD) $S_n(f)$. This would give us the following equation:
 
 \begin{equation}
-    S_n(f) = 2 \int_{-\infty}^{\infty} C_n(\tau) e^{-2 \pi i f \tau} d\tau \\
-    S_n(f) = 2 \tilde{C_n}(\tau) \\
-    \label{eq:psd_autocorrelation}
+  S_n(f) = 2 \int_{-\infty}^{\infty} C_n(\tau) e^{-2 \pi i f \tau} d\tau \\
+  S_n(f) = 2 \tilde{C_n}(\tau) \\
+  \label{eq:psd_autocorrelation}
 \end{equation}
 
-\noindent This satisfies the relation
+\noindent The PSD provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009, Li:2013lza}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Considering the frequency domain representation of the noise signal, the ensemble average of the auto-correlation can be expressed as
 
 \begin{equation}
   \langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} \delta(f - f') S_n(f).
   \label{eq:psd_relation}
 \end{equation}
 
-\noindent Here $\langle \cdot \rangle$ represents the average over time, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate.
+\noindent Here $\langle \cdot \rangle$ represents the ensemble average, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate. 
 
 \medskip
-However, this is not the case with glitches. Glitches, as discussed in the introduction (\ref{Introduction}) are transient, non-Stationary, non-Gaussian events caused by various environmental factors. These can occur at any time during the observation run and can have a significant impact on the data collected by the detectors. Despite their sources being unknown, they have a large variety of time-frequency morphologies that help characterize them better. During detection runs, glitches show up as short-lived spikes of power in the time series data, increasing the noise floor and affecting the estimation of the power spectral density (PSD) of the data.
-
-\medskip
-\noindent One way to visualize the timeseries data is by using its \textbf{Amplitude Spectral Density (ASD)} values, which are found by taking the square root of the PSD.
-
-\begin{equation}
-    ASD(f) = \sqrt{PSD(f)}
-    \label{eq:asd}
-\end{equation}
-
-\noindent ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
-
-\medskip
-\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines, there is a big chance that these are of instrumental origin. The problem with this plot, however, is that it does not capture the glitch signal well because glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data and view its time-amplitude plot.
+\noindent Aside from Power Spectral Density, another way to chartacterize the noise of a detector is with the \textbf{Amplitude Spectral Density (ASD)} values, given by $\sqrt{S_n(f)}$. The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{images/unwhitened_asd.pdf}
+  \includegraphics[width=0.7\textwidth]{images/unwhitened_asd.pdf}
   \caption{ASD plot for a Tomte Glitch.}
   \label{fig:asdtomte}
 \end{figure}
+
+\medskip
+\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines, there is a big chance that these are of instrumental origin. The problem with this plot, however, is that it does not capture the glitch signal well because glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data and view its time-amplitude plot.
 
 \subsubsection{Whitening}
 
 \textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the weaker signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and varies significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
 
+\medskip
+\noindent Whitening is done by taking the inverse of the ASD and multiplying it with the original time series data. This effectively flattens the PSD across all frequencies, allowing for a clearer view of the glitch signal. The resulting whitened data can then be used for further analysis, such as statistical testing or machine learning classification.
+
+\medskip
+\noindent Figure \ref{fig:sampletomte} shows a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the time series data. However, after whitening the data, we can clearly see the glitch signal in the time-amplitude plot. The Q-transform allows a view of the non-stationary portion of the glitch signal
 
 \begin{figure}[H]
   \centering
@@ -271,11 +266,6 @@ However, this is not the case with glitches. Glitches, as discussed in the intro
   \caption{Example of a Tomte glitch signal before and after whitening.}
   \label{fig:sampletomte}
 \end{figure}
-
-\pagebreak
-\noindent This is done by taking the inverse of the ASD and multiplying it with the original time series data. This effectively flattens the noise floor, spreading the power evenly across all frequencies, allowing for a clearer view of the glitch signal. The resulting whitened data can then be used for further analysis, such as statistical testing or machine learning classification.
-
-\noindent Figure \ref{fig:sampletomte} shows a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the timeseries data. The whitening process effectively flattens the noise floor, allowing for a clearer view of the glitch signal.
 
 
 \subsubsection{Filtering}
