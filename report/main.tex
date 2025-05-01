@@ -291,7 +291,7 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
     \label{eq:shapiro_wilk_statistic}
 \end{equation}
 
-\noindent Taking $m = (m_1, m_2, \ldots, m_n)$ to be the expected values of the order statistics of a normal distribution such that $m_i = \mathbb{E}[z_i]$ where $z_i$ is the $i$-th order statistic of the normal distribution, and $V$ the covariance matrix of the ordered statistics, the constants $a_i$ can be computed as
+\noindent Taking $m = (m_1, m_2, \ldots, m_n)$ to be the expected values of the order statistics of a normal distribution such that $m_i = \mathbb{E}[z_i]$ where $z_i$ is the $i$-th order statistic of the normal distribution, and $V$ the covariance matrix of the ordered statistics, the constants $a_i$, which make up the \textbf{optimal weight vector} $a \in \mathbb{R}^n$, can be computed as
 
 \begin{align}
     a_i &= \frac{m^T V^{-1}}{||V^{-1} m||} \\
@@ -301,15 +301,18 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
 
 \noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be normally distributed. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is not normally distributed.
 
-\pagebreak
-\noindent In our implementation, we consider the p-value of the statistic to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
+\medskip
+\noindent In our implementation, we use the p-value of the statistic to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
+
+\medskip
+\noindent The Shapiro-Wilk test, though powerful, has some limitations. It is sensitive to the sample size and may not perform well with small or large samples. It works ideally for sample sizes $n \leq 2000$. The \texttt{shapiro()} function from \texttt{scipy.stats} works well for $n \leq 5000$ after which the p-value calculations' accuracy drops. Additionally, for this test to work the data must be continuous and univariate.
 
 \subsection{The Kolmogorov-Smirnov Test}
 
-The Kolmogorov-Smirnov (KS) test is a non-parametric test to compare the empirical distribution function of a sample with either a reference probability distribution, or another empirical distribution function. For our purposes, this can be used as a test for normality by comparing the empirical distribution function of the sample data with that of a normal distribution. Hence, the null hypothesis $H_0$ in this case is that the sample data's distribution resembles that of the normal distribution.
+The Kolmogorov-Smirnov (KS) test is a non-parametric test used to compare the empirical distribution function of a sample with another reference probability distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical  sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. This  project, we will be using the one-sample KS test to compare the empirical distribution of our sample data with that of a normal distribution.
 
 \medskip
-\noindent This test has two versions
+\noindent For our purposes, we use as a test for normality by comparing the empirical distribution function of the sample data with that of a normal distribution. Hence, the null hypothesis $H_0$ in this case is that the sample data's distribution resembles that of the normal distribution.
 
 \medskip
 \noindent The test statistic $D_n$ for this test measures the maximum vertical distance between the sample distribution function and the \textbf{cumulative distribution function (CDF)} of the normal distribution. 

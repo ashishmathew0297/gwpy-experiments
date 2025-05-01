@@ -61,7 +61,8 @@ def calculate_sample_statistics(y_values: list) -> dict:
     # The Kolmogorov Smirnov statistic needs to be applied to a scaled
     # version of our data to work properly since it is a distance-based
     # metric
-    ks_statistic = stats.ks_2samp(scaled_y_values, stats.norm.rvs(size=len(y_values)))
+    # ks_statistic = stats.ks_2samp(scaled_y_values, stats.norm.rvs(size=len(y_values)))
+    ks_statistic = stats.ks_1samp(scaled_y_values, stats.norm.cdf)
 
     # =================== Anderson-Darling Test ===================
     # for our use case we consider a significance level of 5%
