@@ -258,10 +258,7 @@ bottom=0.8in
 \noindent Whitening is done by taking the inverse of the ASD and multiplying it with the original time series data. This effectively flattens the power across all frequencies, allowing for a clearer view of the glitch signal. The resulting whitened data can then be used for further analysis, such as statistical testing or machine learning classification.
 
 \medskip
-\noindent In figure \ref{fig:sampletomte} we see a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the time series data. However, after whitening the data, we can clearly see the glitch signal in the time-amplitude plot. The Q-transform allows a view of the non-stationary portion of the glitch signal, which shows a clear peak in the normalized energy coinciding with the glitch event.
-
-\medskip
-\noindent Similarly, for a clean signal we notice that the whitened data does not show any significant peaks, which is verified by the  Q-transform. This indicates that the signal is, primarily stationary and hence, most probably doesn't contain a glitch.
+\noindent In figure \ref{fig:sampletomte} we see a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the time series data. However, after whitening the data, we can clearly see the glitch signal in the time-amplitude plot. The Q-transform allows a view of the non-stationary portion of the glitch signal, which shows a clear peak in the normalized energy coinciding with the glitch event. For a clean signal we would not see any significant peaks in the whitened time series or non-stationary parts in the Q-transform.
 
 
 This whitened signal can now be used for our statistical testing.
@@ -275,14 +272,20 @@ This whitened signal can now be used for our statistical testing.
 
 \section{Methods}\label{Methods}
 
-The main objective of this project is to determine the Gaussianity of the time series data obtained from the LIGO Livingston detector and to use this as a criterion to classify the data as either clean or containing a glitch. The more non-Gaussian the signal, the higher the chance of a glitch being present. From the previous section, have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gausian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
+The main objective of this project is to determine the Gaussianity of the time series data obtained from the LIGO Livingston detector and use this as a criterion to classify the data as either clean or containing a glitch. The more non-Gaussian the signal, the higher the chance of a glitch being present. From the previous section, have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gausian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
 
 % TODO: Add images for clean and glitched signal distributions. Also
 
 \medskip
-\noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests has its own strengths and weaknesses, and they are used to assess the normality of the data in different ways.
+\noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests have their own strengths and weaknesses, and are used to assess the normality of the data in different ways.
 
 \subsection{Shapiro-Wilks Test}
+
+The Shapiro-Wilks is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis $H_0$ in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance its actual variance. The explanation below is adapted from the original paper.
+
+\medskip
+\noindent If we were to consider $x_1, x_2, \ldots, x_n$, to be a collection of ordered sample points from a population, ranked smallest to largest, with the sample mean $\bar{x}$ and $a_1, a_2, \ldots, a_n$
+
 \subsection{KS}
 \subsection{AD}
 \section{Experimentation with the complete frequency range}\label{Experiment_1}
