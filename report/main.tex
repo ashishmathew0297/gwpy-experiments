@@ -196,7 +196,7 @@ bottom=0.8in
     \label{eq:strain_output}
 \end{equation}
 
-\noindent Given the signal $x(t)$ we get its corresponding Fourier Transform as
+\noindent A lot of the preprocessing in this project involves the use of Fourier transforms. Given the signal $x(t)$ we get its corresponding Fourier transform as
 
 \begin{equation}
     \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
@@ -242,7 +242,7 @@ bottom=0.8in
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{images/unwhitened_asd.pdf}
+  \includegraphics[width=0.6\textwidth]{images/unwhitened_asd.pdf}
   \caption{ASD plot for a Tomte Glitch.}
   \label{fig:asdtomte}
 \end{figure}
@@ -260,8 +260,8 @@ bottom=0.8in
 \medskip
 \noindent In figure \ref{fig:sampletomte} we see a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the time series data. However, after whitening the data, we can clearly see the glitch signal in the time-amplitude plot. The Q-transform allows a view of the non-stationary portion of the glitch signal, which shows a clear peak in the normalized energy coinciding with the glitch event. For a clean signal we would not see any significant peaks in the whitened time series or non-stationary parts in the Q-transform.
 
-
-This whitened signal can now be used for our statistical testing.
+\medskip
+\noindent With this, the received signal can now be used for our statistical testing.
 
 \begin{figure}[H]
   \centering
@@ -277,16 +277,44 @@ The main objective of this project is to determine the Gaussianity of the time s
 % TODO: Add images for clean and glitched signal distributions. Also
 
 \medskip
-\noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests have their own strengths and weaknesses, and are used to assess the normality of the data in different ways.
+\noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. The \texttt{scipy.stats} package is used in this project to perform these tests. The methods in this package not only calculate the relevant statistic but also return the p-value associated with it. We will dive a bit deeper into the p-value and its selection in the appendix.
 
-\subsection{Shapiro-Wilks Test}
+\subsection{The Shapiro-Wilk Test}
 
-The Shapiro-Wilks is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis $H_0$ in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance its actual variance. The explanation below is adapted from the original paper.
+The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis $H_0$ in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance.
 
 \medskip
-\noindent If we were to consider $x_1, x_2, \ldots, x_n$, to be a collection of ordered sample points from a population, ranked smallest to largest, with the sample mean $\bar{x}$ and $a_1, a_2, \ldots, a_n$
+\noindent If we were to consider $x_1, x_2, \ldots, x_n$, to be a collection of ordered sample points from a population, ranked smallest to largest, with the sample mean $\bar{x}$ and $a_1, a_2, \ldots, a_n$ being constants computed from the expected values of the order statistics of a normal distribution, then the test statistic $W$ is given by:
 
-\subsection{KS}
+\begin{equation}
+    W = \frac{(\sum\limits_{i=1}^{n} a_i x_{(i)})^2}{\sum\limits_{i=1}^{n} (x_i - \bar{x})^2}
+    \label{eq:shapiro_wilk_statistic}
+\end{equation}
+
+\noindent Taking $m = (m_1, m_2, \ldots, m_n)$ to be the expected values of the order statistics of a normal distribution such that $m_i = \mathbb{E}[z_i]$ where $z_i$ is the $i$-th order statistic of the normal distribution, and $V$ the covariance matrix of the ordered statistics, the constants $a_i$ can be computed as
+
+\begin{align}
+    a_i &= \frac{m^T V^{-1}}{||V^{-1} m||} \\
+        &= \frac{m^T V^{-1}}{(m^T V^{-1}V^{-1}m)^{1/2}}
+    \label{eq:shapiro_wilk_constants}
+\end{align}
+
+\noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be normally distributed. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is not normally distributed.
+
+\pagebreak
+\noindent In our implementation, we consider the p-value of the statistic to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
+
+\subsection{The Kolmogorov-Smirnov Test}
+
+The Kolmogorov-Smirnov (KS) test is a non-parametric test to compare the empirical distribution function of a sample with either a reference probability distribution, or another empirical distribution function. For our purposes, this can be used as a test for normality by comparing the empirical distribution function of the sample data with that of a normal distribution. Hence, the null hypothesis $H_0$ in this case is that the sample data's distribution resembles that of the normal distribution.
+
+\medskip
+\noindent This test has two versions
+
+\medskip
+\noindent The test statistic $D_n$ for this test measures the maximum vertical distance between the sample distribution function and the \textbf{cumulative distribution function (CDF)} of the normal distribution. 
+
+
 \subsection{AD}
 \section{Experimentation with the complete frequency range}\label{Experiment_1}
 \section{Experimentation with a band pass filter applied}\label{Experiment_2}
@@ -297,6 +325,9 @@ The Shapiro-Wilks is a parametric test, meaning that it assumes the data follows
 \section{Conclusions}\label{Conclusions}
 
 \section{Future Scope}\label{Future Scope}
+
+% The p-value is the probability of observing a test statistic as extreme as the one calculated, assuming that the null hypothesis is true. If the p-value is less than a predetermined significance level (commonly 0.05), we reject the null hypothesis and conclude that the sample data is not normally distributed.
+
 
 \section{Appendix}\label{Appendix}
 
