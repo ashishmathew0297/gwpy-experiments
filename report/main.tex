@@ -265,6 +265,20 @@ bottom=0.8in
 \medskip
 \noindent With this, the received signal can now be used for our statistical testing.
 
+\subsubsection{Scaling}
+
+\noindent Some of our statistical tests, particularly the Kolmogorov-Smirnov test, are highly affected by the values of the data. We need to ensure that the comparisons being done in these tests are not biased due to the absolute values of the data points. This can be done by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
+
+\medskip
+\noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used. This module works by transposing the data to have a zero mean, calculates the standard deviation, and scales the data points down such that the standard deviation is 1. The \textbf{standard score} or \textbf{z-score} of a sample point, which tells us how many standard deviations it is from the mean, is given by
+
+\begin{equation}
+    z = \frac{x - \mu}{\sigma},
+    \label{eq:scaling_formula}
+\end{equation}
+
+\noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. The $z$ value obtained can be treated as the new data point after scaling and is particularly useful in this case as it does not change the position of the data point in its calculation. We discuss a bit more about applying z-scores to anomaly detection in the appendix.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{images/sample_plot.pdf}
@@ -272,18 +286,7 @@ bottom=0.8in
   \label{fig:sampletomte}
 \end{figure}
 
-\subsubsection{Scaling}
 
-\noindent Some of our statistical methods, particularly the Kolmogorov-Smirnov test, is highly affected by the values of the data. To ensure that the comparison being done in this test is not biased due to the absolute values of the data points, we scale the whitened data to have a mean of 0 and a standard deviation of 1.
-
-\noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used, which transposes the data to have a zero mean, calculates the standard deviation, and scales the data down such that the standard deviation is 1. The standard score of a sample, which tells us how many standard deviations a data point is from the mean, is given by
-
-\begin{equation}
-    z = \frac{x - \mu}{\sigma}
-    \label{eq:scaling_formula}
-\end{equation}
-
-\noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. This is used to determine the new data point $z$ after scaling $\mu$ to zero.
 
 \section{Methods}\label{Methods}
 
@@ -355,6 +358,8 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test used to compare the em
 \subsection{P-values and Selecting a Threshold}
 
 \subsection{Selecting a Suitable Scaling Method}
+
+\subsection{Experimentation with Time Series Anomaly Detection}
 
 
 % Bibliography
