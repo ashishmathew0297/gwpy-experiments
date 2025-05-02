@@ -186,6 +186,8 @@ bottom=0.8in
 \medskip
 \noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.95 are considered to be clean segments of data, and are used to obtain the corresponding TimeSeries data from GWpy. The TimeSeries data is then, similar to the glitch data, conditioned for statistical testing and cropped down to 1-second samples for further use.
 
+% \medskip
+% \noindent The number of clean samples obtained from this process is significantly lower than the number of glitch samples. This is because the LIGO detectors are highly sensitive and are often affected by noise events, leading to fewer segments of clean data to work.
 
 \subsection{Data Conditioning}
 
@@ -270,18 +272,37 @@ bottom=0.8in
   \label{fig:sampletomte}
 \end{figure}
 
+\subsubsection{Scaling}
+
+\noindent Some of our statistical methods, particularly the Kolmogorov-Smirnov test, is highly affected by the values of the data. To ensure that the comparison being done in this test is not biased due to the absolute values of the data points, we scale the whitened data to have a mean of 0 and a standard deviation of 1.
+
+\noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used, which transposes the data to have a zero mean, calculates the standard deviation, and scales the data down such that the standard deviation is 1. The standard score of a sample, which tells us how many standard deviations a data point is from the mean, is given by
+
+\begin{equation}
+    z = \frac{x - \mu}{\sigma}
+    \label{eq:scaling_formula}
+\end{equation}
+
+\noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. This is used to determine the new data point $z$ after scaling $\mu$ to zero.
+
 \section{Methods}\label{Methods}
 
-The main objective of this project is to determine the Gaussianity of the time series data obtained from the LIGO Livingston detector and use this as a criterion to classify the data as either clean or containing a glitch. The more non-Gaussian the signal, the higher the chance of a glitch being present. From the previous section, have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gausian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
+Our main objective is to determine the Gaussianity of time series data obtained from the LIGO Livingston detector and use this as a criterion to determine the presence of a glitch in the data. If a sample is found to be non-Gaussian, there is a higher chance of a glitch being present. From the previous section, have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
 
-% TODO: Add images for clean and glitched signal distributions. Also
+% TODO: Add images for clean and glitched signal distributions. Also compare with normal distribution.
 
 \medskip
-\noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. The \texttt{scipy.stats} package is used in this project to perform these tests. The methods in this package not only calculate the relevant statistic but also return the p-value associated with it. We will dive a bit deeper into the p-value and its selection in the appendix.
+\noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. Each of these tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result.
+
+\medskip
+\noindent For our use case, the null hypothesis $H_0$ is that the sample data contains a glitch non-Gaussian/ not normally distributed, while the alternative hypothesis $H_1$ is that the sample data is Gaussian. As we will see in the following sections, this is the inverse of the null hypothesis for the statistical tests being used This is so that we can determine the effectiveness of these tests as glitch detection tools.
+
+\medskip
+\noindent The \texttt{scipy.stats} package contains dedicated functions that can be used to perform these tests efficiently. The methods in this package not only calculate the relevant statistic but also return the p-value associated with it. We will be focusing on the p-values obtained to determine the Gaussianity of our data samples. We will dive a bit deeper into the p-values and its threshold selection in the appendix.
 
 \subsection{The Shapiro-Wilk Test}
 
-The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis $H_0$ in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance.
+The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance.
 
 \medskip
 \noindent If we were to consider $x_1, x_2, \ldots, x_n$, to be a collection of ordered sample points from a population, ranked smallest to largest, with the sample mean $\bar{x}$ and $a_1, a_2, \ldots, a_n$ being constants computed from the expected values of the order statistics of a normal distribution, then the test statistic $W$ is given by:
@@ -302,17 +323,14 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
 \noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be normally distributed. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is not normally distributed.
 
 \medskip
-\noindent In our implementation, we use the p-value of the statistic to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
+\noindent The p-value of the statistic is usually used to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch, hence satisfying our null hypothesis.
 
 \medskip
 \noindent The Shapiro-Wilk test, though powerful, has some limitations. It is sensitive to the sample size and may not perform well with small or large samples. It works ideally for sample sizes $n \leq 2000$. The \texttt{shapiro()} function from \texttt{scipy.stats} works well for $n \leq 5000$ after which the p-value calculations' accuracy drops. Additionally, for this test to work the data must be continuous and univariate.
 
 \subsection{The Kolmogorov-Smirnov Test}
 
-The Kolmogorov-Smirnov (KS) test is a non-parametric test used to compare the empirical distribution function of a sample with another reference probability distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical  sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. This  project, we will be using the one-sample KS test to compare the empirical distribution of our sample data with that of a normal distribution.
-
-\medskip
-\noindent For our purposes, we use as a test for normality by comparing the empirical distribution function of the sample data with that of a normal distribution. Hence, the null hypothesis $H_0$ in this case is that the sample data's distribution resembles that of the normal distribution.
+The Kolmogorov-Smirnov (KS) test is a non-parametric test used to compare the empirical distribution function of a sample with another reference probability distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical  sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test to compare our detector data with a standard normal distribution.
 
 \medskip
 \noindent The test statistic $D_n$ for this test measures the maximum vertical distance between the sample distribution function and the \textbf{cumulative distribution function (CDF)} of the normal distribution. 
@@ -333,6 +351,10 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test used to compare the em
 
 
 \section{Appendix}\label{Appendix}
+
+\subsection{P-values and Selecting a Threshold}
+
+\subsection{Selecting a Suitable Scaling Method}
 
 
 % Bibliography
