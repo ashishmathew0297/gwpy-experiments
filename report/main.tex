@@ -91,7 +91,7 @@ bottom=0.8in
 \noindent Among these noise sources, the most problematic are \textbf{glitches}: transient events caused by non-astrophysical phenomena such as anthropogenic noise, weather conditions, or instrument malfunctions \cite{collaboration_guide_2020, collaboration_characterization_2016}. Glitches manifest as localized bursts of excess power in interferometer time series data and often do not have well-defined sources. They can occur at energy levels and frequencies that overlap with GW signals, thereby mimicking them and increasing the number of false positive detections. During the first half of the third observing run (O3a) LIGO Hanford and Livingston recorded glitches rates of $0.29\text{ min}^{-1}$ and $1.10\text{ min}^{-1}$ respectively, which rose to $0.32\text{ min}^{-1}$ and $1.17\text{ min}^{-1}$ during the second half (O3b) \cite{collaboration_gwtc-3_2023}. Of the 90 candidate events detected in this run, 17 had a probability of astronomical origin ($p_\text{astro}$) below 0.5, suggesting significant ambiguity about their origin. A notable example of glitches posing such an issue was during the binary neutron star merger event GW170817 \cite{collaboration_gw170817_2017}, during which instrumental noise transients were detected before the event's coalescence time, complicating its detection and subsequent analysis.
 
 \medskip
-\noindent Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive and lack the efficiency required for near-real-time assessment of the signals for glitch activity. The more popular solutions incorporate the \textit{q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. This q-transform computes a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is ineffective for real-time use. Additionally, when scaled up to perform calculate on multiple samples, the computational time would increase significantly.
+\noindent Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive and lack the efficiency required for near-real-time assessment of the signals for glitch activity. The more popular solutions incorporate the \textit{q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. This q-transform computes a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is ineffective for real-time use as, when scaled up to work on multiple samples, the computational time would increase significantly.
 
 % TODO: Incomplete
 
@@ -106,7 +106,7 @@ bottom=0.8in
 \section{Data Acquisition and Conditioning}\label{Data}
 
 \medskip
-\noindent The Advanced LIGO and Virgo interferometers are large-scale, heavily modified versions of the Michelson interferometer (Figure \ref{fig:interferometer}), originally invented by American physicist Albert A. Michelson in 1887 \cite{weiss_report_1972,collaboration_gwtc-3_2023}. LIGO operates in a vacuum, using a laser beam of light split into two orthogonal parts with the help of a half-silvered mirror mounted on horizontal seismometer suspensions. The orthogonally split beams are then sent through two arms of the interferometer, known as Fabry–Pérot cavities. Each of these arms is 4 kilometers long, consisting of mirrors at each end. The first of the mirrors is fixed in place, while the second one is movable with the help of precise micrometer drives. The laser beams, when reflected by the mirrors on either end of the arms, are combined again at the beam splitter and sent to photoelectric detectors. The aLIGO interferometer is designed such that if the beams travel equal distances, the recombination would lead to a destructive interference pattern, resulting in no light coming out of the instrument \cite{ligo_what_interferometer}. When a disturbance of either astrophysical or terrestrial origin is detected, an infinitesimally small change occurs in lengths of the detector arms, in the order of $10^{-8}m$ \cite{ghonge_assessing_2024}. One of the arms is stretched, and the other arm is compressed in the perpendicular direction, altering the lengths of the reflected and combined beams, misaligning them and resulting in an interference pattern (Figure \ref{fig:sinusoidal_fringes}). This interference pattern, coupled with results from several other sensors, provides detailed information on the \textit{strain} of the GW or glitch event being observed.
+\noindent The Advanced LIGO and Virgo interferometers are large-scale, heavily modified versions of the Michelson interferometer (Figure \ref{fig:interferometer}), originally invented by American physicist Albert A. Michelson in 1887 \cite{weiss_report_1972,collaboration_gwtc-3_2023}. LIGO operates in a vacuum, using a laser beam of light split into two orthogonal parts with the help of a half-silvered mirror mounted on horizontal seismometer suspensions. The orthogonally split beams are then sent through two arms of the interferometer, known as Fabry–Pérot cavities. Each of these arms is 4 kilometers long, consisting of mirrors at each end. The first of the mirrors is fixed in place, while the second one is movable with the help of precise micrometer drives. The laser beams, when reflected by the mirrors on either end of the arms, are combined again at the beam splitter and sent to photoelectric detectors. The advanced LIGO interferometer is designed such that if the beams travel equal distances, the recombination would lead to a destructive interference pattern, resulting in no light coming out of the instrument \cite{ligo_what_interferometer}. When a disturbance of either astrophysical or terrestrial origin is detected, an infinitesimally small change occurs in lengths of the detector arms, in the order of $10^{-8}m$ \cite{ghonge_assessing_2024}. One of the arms is stretched, and the other arm is compressed in the perpendicular direction, altering the lengths of the reflected and combined beams, misaligning them and resulting in an interference pattern (Figure \ref{fig:sinusoidal_fringes}). This interference pattern, coupled with results from several other sensors, provides detailed information on the \textit{strain} of the GW or glitch event being observed.
 
 \begin{figure}[H]
   \centering
@@ -141,7 +141,7 @@ bottom=0.8in
 \medskip
 \noindent There are two main types of detector samples that we receive from the detectors: \textbf{Glitched detector data} and \textbf{Clean detector data}. The following sections will go a bit deeper into each of these types of data and how they are obtained.
   
-\subsection{Glitch data}
+\subsection{Glitch data}\label{Glitchdata}
 
 \medskip
 \noindent The GPS times of glitch occurrences are obtained using \textit{Gravity Spy} \cite{Zevin_2017}, a large-scale citizen-science project that combines astrophysics, machine learning, and human efforts to classify glitches in GW interferometer data. The \textit{Omicron} transient search algorithm is used by Gravity Spy to generate q-transform spectrograms and calculate SNR of the time series samples \cite{robinet_omicron_2020}. This algorithm is crucial in identifying the most useful samples for data classification and analysis. Based on the morphological characteristics from the spectrograms, a total of 22 glitch classes were identified with an SNR above 7.5 and peak frequencies between 10 Hz and 2048 Hz.
@@ -176,7 +176,7 @@ bottom=0.8in
 \pagebreak
 \noindent Using the glitch GPS times, the time series information is obtained from the GWOSC database using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy. Here, a time window of 10 seconds is taken on either side of each of the GPS times with the glitch in the center, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second time window around the glitch for further use.
 
-\subsection{Clean Samples}
+\subsection{Clean Samples}\label{Cleandata}
 
 \noindent The process of finding gaps of clean detector noise is done using \texttt{gwtrigfind}, a package developed to search for event triggers files from GW detectors, in conjunction with \texttt{EventTable}, provided by GWpy.
 
@@ -189,7 +189,7 @@ bottom=0.8in
 % \medskip
 % \noindent The number of clean samples obtained from this process is significantly lower than the number of glitch samples. This is because the LIGO detectors are highly sensitive and are often affected by noise events, leading to fewer segments of clean data to work.
 
-\subsection{Data Conditioning}
+\subsection{Data Conditioning}\label{DataConditioning}
 
 \noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
 
@@ -212,7 +212,7 @@ bottom=0.8in
   \label{eq:inverse_fourier_transform}
 \end{equation}
 
-\subsubsection{Power Spectral Density and Amplitude Spectral Density}
+\subsubsection{Power Spectral Density and Amplitude Spectral Density}\label{PSD_ASD}
 
 \noindent In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are, for the most part, uncorrelated, hence keeping it Gaussian. As a result, the statistical properties of the noise can be described by an auto-correlation matrix described by
 
@@ -252,7 +252,7 @@ bottom=0.8in
 \medskip
 \noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines, there is a big chance that these are of instrumental origin. The problem with this plot, however, is that it does not capture the glitch signal well because glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data and view its time-amplitude plot.
 
-\subsubsection{Whitening}
+\subsubsection{Whitening}\label{Whitening}
 
 \textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the underlying signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and varies significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
 
@@ -265,9 +265,9 @@ bottom=0.8in
 \medskip
 \noindent With this, the received signal can now be used for our statistical testing.
 
-\subsubsection{Scaling}
+\subsubsection{Scaling}\label{Scaling}
 
-\noindent Some of our statistical tests, particularly the Kolmogorov-Smirnov test, are highly affected by the values of the data. We need to ensure that the comparisons being done in these tests are not biased due to the absolute values of the data points. This can be done by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
+\noindent Some of our statistical tests, particularly the Kolmogorov-Smirnov test, is highly affected by the values of the data. We need to ensure that the comparisons being done in these tests are not biased due to the absolute values of the data points. Hence, this requires for the data to be scaled down to the same range of a standard normal distribution. This is achieved by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
 
 \medskip
 \noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used. This module works by transposing the data to have a zero mean, calculates the standard deviation, and scales the data points down such that the standard deviation is 1. The \textbf{standard score} or \textbf{z-score} of a sample point, which tells us how many standard deviations it is from the mean, is given by
@@ -277,7 +277,7 @@ bottom=0.8in
     \label{eq:scaling_formula}
 \end{equation}
 
-\noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. The $z$ value obtained can be treated as the new data point after scaling and is particularly useful in this case as it does not change the position of the data point in its calculation. We discuss a bit more about applying z-scores to anomaly detection in the appendix.
+\noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. The $z$ value obtained can be treated as the new data point after scaling and is particularly useful in this case as it does not change the position of the data point in its calculation.
 
 \begin{figure}[H]
   \centering
@@ -286,24 +286,23 @@ bottom=0.8in
   \label{fig:sampletomte}
 \end{figure}
 
+\section{Methods}\label{Methods}\label{Methods}
 
-
-\section{Methods}\label{Methods}
-
-Our main objective is to determine the Gaussianity of time series data obtained from the LIGO Livingston detector and use this as a criterion to determine the presence of a glitch in the data. If a sample is found to be non-Gaussian, there is a higher chance of a glitch being present. From the previous section, have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
+Our main objective is to determine the Gaussianity of time series data obtained from the LIGO Livingston detector and use this as a criterion to determine the presence of a glitch in it. If a sample is found to be non-Gaussian, there is a high chance of a glitch being present. From the previous section, we have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
 
 % TODO: Add images for clean and glitched signal distributions. Also compare with normal distribution.
 
 \medskip
 \noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. Each of these tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result.
 
-\medskip
-\noindent For our use case, the null hypothesis $H_0$ is that the sample data contains a glitch non-Gaussian/ not normally distributed, while the alternative hypothesis $H_1$ is that the sample data is Gaussian. As we will see in the following sections, this is the inverse of the null hypothesis for the statistical tests being used This is so that we can determine the effectiveness of these tests as glitch detection tools.
+% \medskip
+% \noindent For our use case, the null hypothesis $H_0$ is that the sample data contains a glitch non-Gaussian/ not normally distributed, while the alternative hypothesis $H_1$ is that the sample data is Gaussian. As we will see in the following sections, this is the inverse of the null hypothesis for the statistical tests being used This is so that we can determine the effectiveness of these tests as glitch detection tools.
 
 \medskip
 \noindent The \texttt{scipy.stats} package contains dedicated functions that can be used to perform these tests efficiently. The methods in this package not only calculate the relevant statistic but also return the p-value associated with it. We will be focusing on the p-values obtained to determine the Gaussianity of our data samples. We will dive a bit deeper into the p-values and its threshold selection in the appendix.
 
-\subsection{The Shapiro-Wilk Test}
+\subsection{The Normal Distribution}
+\subsection{The Shapiro-Wilk Test}\label{ShapiroWilk}
 
 The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance.
 
@@ -326,20 +325,42 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
 \noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be normally distributed. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is not normally distributed.
 
 \medskip
-\noindent The p-value of the statistic is usually used to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch, hence satisfying our null hypothesis.
+\noindent The p-value of the statistic is usually used to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
 
 \medskip
 \noindent The Shapiro-Wilk test, though powerful, has some limitations. It is sensitive to the sample size and may not perform well with small or large samples. It works ideally for sample sizes $n \leq 2000$. The \texttt{shapiro()} function from \texttt{scipy.stats} works well for $n \leq 5000$ after which the p-value calculations' accuracy drops. Additionally, for this test to work the data must be continuous and univariate.
 
-\subsection{The Kolmogorov-Smirnov Test}
+\subsection{The Kolmogorov-Smirnov Test}\label{KolmogorovSmirnov}
 
-The Kolmogorov-Smirnov (KS) test is a non-parametric test used to compare the empirical distribution function of a sample with another reference probability distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical  sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test to compare our detector data with a standard normal distribution.
+The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, that is used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. compare the empirical distribution function of a sample with another reference probability distribution . This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical  sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test to compare our detector data against a standard normal distribution.
+
+% TODO: Add EDF and CDF comparison image
 
 \medskip
-\noindent The test statistic $D_n$ for this test measures the maximum vertical distance between the sample distribution function and the \textbf{cumulative distribution function (CDF)} of the normal distribution. 
+\noindent The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (EDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference normal distribution. Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the ECDF of the reference function, a normal distribution in this case, is given by
+
+\begin{equation}
+    F_N = \frac{n(i)}{N}
+    \label{eq:edf}
+\end{equation}
+
+\noindent where $n(i)$ is the number of points less than or equal to $X_i$ in the sample. This is in the form of a step function increasing at steps of $1/N$ at each ordered point \cite{guthrie_nistsematech_2020}. Taking the CDF of the theoretical CDF of the distribution  being tested as $F$, and the Empirical the KS test statistic $D_n$ is defined as
+
+\begin{equation}
+    D_n = \sup_{1 \leq i \leq N} \left( F(X_i) - \frac{i - 1}{N} , \frac{i}{N} - F(X_i) \right)
+    \label{eq:ks_statistic}
+\end{equation}
+
+\noindent If $D_n$ is significantly large, it indicates that the ECDF of the sample data significantly differs from the CDF of the normal distribution. A critical value is used to determine the significance of this result. The null hypothesis is rejected if $D_n$ is greater than the critical value, indicating that the sample data is not normally distributed.
+
+\medskip
+\noindent Similar to the Shapiro-Wilk test, instead of the statistic itself, we consider the p-value of the KS test statistic to determine the significance of the result. If the p-value is less than the significance level of 0.05, the null hypothesis that both the empirical distribution and the normal distribution are the same is rejected, indicating that the sample data is non-Gaussian and likely containing a glitch.
+
+\subsection{The Anderson Darling test}\label{AndersonDarling}
+
+The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov test and is more sensitive to differences in the tails of the distribution \cite {guthrie_nistsematech_2020}. The AD test is particularly useful when dealing with small sample sizes or when the data has heavy tails.
 
 
-\subsection{AD}
 \section{Experimentation with the complete frequency range}\label{Experiment_1}
 \section{Experimentation with a band pass filter applied}\label{Experiment_2}
 % No of samples, how to recreate the tests we did
