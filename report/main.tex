@@ -198,6 +198,7 @@ bottom=0.8in
     \label{eq:strain_output}
 \end{equation}
 
+\medskip
 \noindent A lot of the preprocessing in this project involves the use of Fourier transforms. Given the signal $x(t)$ we get its corresponding Fourier transform as
 
 \begin{equation}
@@ -205,6 +206,7 @@ bottom=0.8in
     \label{eq:fourier_transform}
 \end{equation}
 
+\medskip
 \noindent and the inverse Fourier Transform given by
 
 \begin{equation}
@@ -230,6 +232,7 @@ bottom=0.8in
   \label{eq:psd_autocorrelation}
 \end{equation}
 
+\medskip
 \noindent The PSD provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009, Li:2013lza}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Considering the frequency domain representation of the noise signal, the ensemble average of the auto-correlation can be expressed as
 
 \begin{equation}
@@ -237,10 +240,8 @@ bottom=0.8in
   \label{eq:psd_relation}
 \end{equation}
 
-\noindent Here $\langle \cdot \rangle$ represents the ensemble average, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate. 
-
 \medskip
-\noindent Aside from Power Spectral Density, another way to chartacterize the noise of a detector is with the \textbf{Amplitude Spectral Density (ASD)} values, given by $\sqrt{S_n(f)}$. The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
+\noindent Here $\langle \cdot \rangle$ represents the ensemble average, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate. Aside from Power Spectral Density, another way to chartacterize the noise of a detector is with the \textbf{Amplitude Spectral Density (ASD)} values, given by $\sqrt{S_n(f)}$. The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
 
 \begin{figure}[H]
   \centering
@@ -277,6 +278,7 @@ bottom=0.8in
     \label{eq:scaling_formula}
 \end{equation}
 
+\medskip
 \noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. The $z$ value obtained can be treated as the new data point after scaling and is particularly useful in this case as it does not change the position of the data point in its calculation.
 
 \begin{figure}[H]
@@ -314,6 +316,7 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
     \label{eq:shapiro_wilk_statistic}
 \end{equation}
 
+\medskip
 \noindent Taking $m = (m_1, m_2, \ldots, m_n)$ to be the expected values of the order statistics of a normal distribution such that $m_i = \mathbb{E}[z_i]$ where $z_i$ is the $i$-th order statistic of the normal distribution, and $V$ the covariance matrix of the ordered statistics, the constants $a_i$, which make up the \textbf{optimal weight vector} $a \in \mathbb{R}^n$, can be computed as
 
 \begin{align}
@@ -322,6 +325,7 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
     \label{eq:shapiro_wilk_constants}
 \end{align}
 
+\medskip
 \noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be normally distributed. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is not normally distributed.
 
 \medskip
@@ -344,6 +348,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
     \label{eq:edf}
 \end{equation}
 
+\medskip
 \noindent where $n(i)$ is the number of points less than or equal to $X_i$ in the sample. This is in the form of a step function increasing at steps of $1/N$ at each ordered point \cite{guthrie_nistsematech_2020}. Taking the CDF of the theoretical CDF of the distribution  being tested as $F$, and the Empirical the KS test statistic $D_n$ is defined as
 
 \begin{equation}
@@ -351,6 +356,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
     \label{eq:ks_statistic}
 \end{equation}
 
+\medskip
 \noindent If $D_n$ is significantly large, it indicates that the ECDF of the sample data significantly differs from the CDF of the normal distribution. A critical value is used to determine the significance of this result. The null hypothesis is rejected if $D_n$ is greater than the critical value, indicating that the sample data is not normally distributed.
 
 \medskip
@@ -358,7 +364,15 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 
 \subsection{The Anderson Darling test}\label{AndersonDarling}
 
-The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov test and is more sensitive to differences in the tails of the distribution \cite {guthrie_nistsematech_2020}. The AD test is particularly useful when dealing with small sample sizes or when the data has heavy tails.
+The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov test with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}. The AD test is particularly useful when dealing with small sample sizes or when the data has heavy tails.
+
+% Cramer-Von Mises test
+% KL- Divergence
+% Jarque-Bera test
+% D'agostino's K-squared test
+% Bispectrum test - 3rd order cumulant
+% Trispectrum test - 4th order cumulant
+% Coefficient of Variation Envelope
 
 
 \section{Experimentation with the complete frequency range}\label{Experiment_1}
