@@ -261,7 +261,7 @@ bottom=0.8in
 \noindent Whitening is done by taking the inverse of the ASD and multiplying it with the original time series data.
 
 \begin{align}
-    \tilde{n}_\text{whitened}(f) = \frac{\tilde{n}(f)}{\sqrt{S_n(f)}} \\
+    \tilde{n}_\text{whitened}(f) = \frac{\tilde{n}(f)}{ASD} = \frac{\tilde{n}(f)}{\sqrt{S_n(f)}} \\
     n_\text{whitened}(t) = \mathcal{F}^{-1} \left\{ \tilde{n}_\text{whitened}(f) \right\}
     \label{eq:whitening}
 \end{align}
