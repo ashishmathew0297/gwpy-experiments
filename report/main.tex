@@ -106,7 +106,7 @@ bottom=0.8in
 \section{Data Acquisition and Conditioning}\label{Data}
 
 \medskip
-\noindent The Advanced LIGO and Virgo interferometers are large-scale, heavily modified versions of the Michelson interferometer (Figure \ref{fig:interferometer}), originally invented by American physicist Albert A. Michelson in 1887 \cite{weiss_report_1972,collaboration_gwtc-3_2023}. LIGO operates in a vacuum, using a laser beam of light split into two orthogonal parts with the help of a half-silvered mirror mounted on horizontal seismometer suspensions. The orthogonally split beams are then sent through two arms of the interferometer, known as Fabry–Pérot cavities. Each of these arms is 4 kilometers long, consisting of mirrors at each end. The first of the mirrors is fixed in place, while the second one is movable with the help of precise micrometer drives. The laser beams, when reflected by the mirrors on either end of the arms, are combined again at the beam splitter and sent to photoelectric detectors. The advanced LIGO interferometer is designed such that if the beams travel equal distances, the recombination would lead to a destructive interference pattern, resulting in no light coming out of the instrument \cite{ligo_what_interferometer}. When a disturbance of either astrophysical or terrestrial origin is detected, an infinitesimally small change occurs in lengths of the detector arms, in the order of $10^{-8}m$ \cite{ghonge_assessing_2024}. One of the arms is stretched, and the other arm is compressed in the perpendicular direction, altering the lengths of the reflected and combined beams, misaligning them and resulting in an interference pattern (Figure \ref{fig:sinusoidal_fringes}). This interference pattern, coupled with results from several other sensors, provides detailed information on the \textit{strain} of the GW or glitch event being observed.
+\noindent The Advanced LIGO and Virgo interferometers are large-scale, heavily modified versions of the Michelson interferometer (Figure \ref{fig:interferometer}), originally invented by American physicist Albert A. Michelson in 1887 \cite{weiss_report_1972,collaboration_gwtc-3_2023}. LIGO operates in a vacuum, using a laser beam of light split into two orthogonal parts with the help of a half-silvered mirror mounted on horizontal seismometer suspensions. The orthogonally split beams are then sent through two arms of the interferometer, known as Fabry-Pérot cavities. Each of these arms is 4 kilometers long, consisting of mirrors at each end. The first of the mirrors is fixed in place, while the second one is movable with the help of precise micrometer drives. The laser beams, when reflected by the mirrors on either end of the arms, are combined again at the beam splitter and sent to photoelectric detectors. The advanced LIGO interferometer is designed such that if the beams travel equal distances, the recombination would lead to a destructive interference pattern, resulting in no light coming out of the instrument \cite{ligo_what_interferometer}. When a disturbance of either astrophysical or terrestrial origin is detected, an infinitesimally small change occurs in lengths of the detector arms, in the order of $10^{-8}m$ \cite{ghonge_assessing_2024}. One of the arms is stretched, and the other arm is compressed in the perpendicular direction, altering the lengths of the reflected and combined beams, misaligning them and resulting in an interference pattern (Figure \ref{fig:sinusoidal_fringes}). This interference pattern, coupled with results from several other sensors, provides detailed information on the \textit{strain} of the GW or glitch event being observed.
 
 \begin{figure}[H]
   \centering
@@ -392,7 +392,38 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov test with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}. The AD test is particularly useful when dealing with small sample sizes or when the data has heavy tails.
 
 \medskip
-\noindent Similar to the KS test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. 
+\noindent Similar to the KS test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. Here, taking $n$ to be the number of elements in the sample and $w(x)$ to be the weighting function the squared area between the sample stepped CDF $F_n$ and the reference distribution $F$ is calculated as
+
+\begin{equation}
+  n \int_{-\infty}^{\infty} \left( F_n(x) - F(x) \right)^2 w(x) dF(x)
+  \label{eq:ad_distance_function}
+\end{equation}
+
+\medskip
+\noindent The weighting function $w(x)$ is defined as
+
+\begin{equation}
+    w(x) = \frac{1}{F(x) (1 - F(x))}
+    \label{eq:ad_weighting_function}
+\end{equation}
+
+\medskip
+\noindent Taking the above into consideration, the distance $A^2$ \cite{anderson1954test} is given by
+
+\begin{equation}
+    A^2 = n \int_{-\infty}^{\infty} \frac{\left( F_n(x) - F(x) \right)^2}{F(x)(1 - F(x))} \; dF(x)
+    \label{eq:ad_statistic_distance_updated}
+\end{equation}
+
+\medskip
+\noindent Another way to look at this formula is the fact that to obtain random samples from a distribution function, the CDF is to be calculated and random samples $x$ are to be taken from a uniform distribution $x \in [0, 1]$. Hence, the above equation can be rewritten as
+
+\begin{align}
+    A^2 =& -n -S \\
+    A^2 =& -n - \frac{1}{n} \sum\limits_{i=1}^{n} \left( \frac{2i - 1}{N} \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right)
+    \label{eq:ad_statistic}
+\end{align}
+
 
 % Cramer-Von Mises test
 % KL- Divergence
