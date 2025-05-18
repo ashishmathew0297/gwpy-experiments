@@ -96,7 +96,7 @@ bottom=0.8in
 % TODO: Incomplete
 
 \medskip
-\noindent This project explores statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the frequency domain. Building on the idea presented in \cite{collaboration_guide_2020}, which treats detector noise as stochastic processes with joint probability distributions, it would be reasonable to assume that parametric and non-parametric statistical tests could be effectively applied to such data. This study focuses on applying (1) the Shapiro-Wilk test, (2) the Kolmogorov-Smirnov test, and (3) the Anderson-Darling test on preprocessed samples of clean and glitched data from the LIGO Livingston interferometer. The objective is to determine the normality of these samples and assess how well these tests differentiate between Gaussian (clean) and non-Gaussian (glitched) samples. This experiment also includes studying the distributions, waveforms, and frequency ranges, with particular emphasis on failure points for each statistical test across various glitch types. Furthermore, considering the frequency bands at which each glitch type occurs, this study also examines how each statistical test performs under band-pass filtering at various frequency ranges.
+\noindent This project explores statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the frequency domain. Building on the idea presented in \cite{collaboration_guide_2020}, which treats detector noise as stochastic processes with joint probability distributions, it would be reasonable to assume that parametric and non-parametric statistical tests could be effectively applied to such data. GW detectors have a noise floor that can be approximated to be stationary and non-Gaussian where the real and imaginary parts of the whitened noise are independent and identically distributed. In the presence of glitches, the detector data would be non-Gaussian and non-stationary. This study focuses on applying (1) the Shapiro-Wilk test, (2) the Kolmogorov-Smirnov test, and (3) the Anderson-Darling test on preprocessed samples of the LIGO Livingston interferometer data to determine its normality and assess how well these tests differentiate between Gaussian (clean) and non-Gaussian (glitched) samples. This experiment also includes studying the distributions, waveforms, and frequency ranges, with particular emphasis on failure points for each statistical test across various glitch types. Furthermore, considering the frequency bands at which each glitch type occurs, this study also examines how each statistical test performs under band-pass filtering at various frequency ranges.
 
 \medskip
 \noindent This report is organized as follows: Section \ref{Data} discusses how interferometer data is obtained and describes the properties of the time series data used in this study. It also outlines the process of acquiring clean and glitched samples and the preprocessing applied. Section \ref{Methods} describes in detail the statistical tests of Gaussianity used to assess the sample data. The experimental procedures and results are presented in Sections \ref{Experiment_1} and \ref{Experiment_2}. Finally, Section \ref{Conclusions} summarizes the findings of our experiments, discussing the strengths and limitations of the methods, followed by the future scope in Section \ref{Future Scope}.
@@ -186,23 +186,22 @@ bottom=0.8in
 \medskip
 \noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.95 are considered to be clean segments of data, and are used to obtain the corresponding TimeSeries data from GWpy. The TimeSeries data is then, similar to the glitch data, conditioned for statistical testing and cropped down to 1-second samples for further use.
 
-\subsection{The Normal Distribution}\label{NormalDistribution}
+% \subsubsection{Relationship between the Gaussian distribution and clean detector data}\label{NormalDistribution}
 
-The reference distribution we use in this project is called a \textbf{normal distribution} or \textbf{Gaussian distribution}. This is a continuous probability distribution for a random variable where most of the data points are located around the mean, with lesser amounts of data further away. This distribution is important as it can approximate many real world phenomena, such as the distribution of heights, weights, and test scores. This distribution is also the basis for many statistical tests and methods, including the ones in this project.
+% The \textbf{normal distribution} or \textbf{Gaussian distribution} is a continuous probability distribution for a random variable where most of the data points are located around the mean, with lesser amounts of data further away. This distribution is important as it can approximate many real world phenomena, such as the distribution of heights and weights of a country's population. It is also the basis for many statistical tests and methods.
 
-\medskip
-\noindent In the case of interferometer noise
+% % Add Image of normal distribution
 
-\medskip
-\noindent The normal distribution is symmetric about the mean and has a bell-shaped curve. The mean $\mu$ of this distribution is equal to zero, with the standard deviation $\sigma$ being equal to 1. The probability density function (PDF) of a normal distribution is given by
+% \medskip
+% \noindent The normal distribution is symmetric about the mean and has a bell-shaped curve. The mean $\mu$ of this distribution is equal to zero, with the standard deviation $\sigma$ being equal to 1. The probability density function (PDF) of this distribution is given by
 
-\begin{equation}
-    f(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}}
-    \label{eq:normal_distribution}
-\end{equation}
+% \begin{equation}
+%   f(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}}
+%   \label{eq:normal_distribution}
+% \end{equation}
 
-\medskip
-\noindent We use the normal distribution as a reference for our statistical tests.
+% \medskip
+% \noindent In the case of LIGO-Virgo detectors, the noise floor is approximated to be stationary and Gaussian aside from the cases of transient disturbances \cite{collaboration_guide_2020}. To study this, the Fourier transformed samples of the data are taken into account. In the case of Gaussian noise, the real and imaginary parts of the Fourier transformed parts of the noise are independent and identically distributed (i.i.d.) random variables, with a mean of 0 and a variance of $\sigma^2$. The Fourier transformed data can be modeled as a complex Gaussian distribution, which is a generalization of the normal distribution to complex numbers. The real and imaginary parts of the Fourier transformed data are normally distributed, and their joint distribution is given by
 
 % \medskip
 % \noindent The number of clean samples obtained from this process is significantly lower than the number of glitch samples. This is because the LIGO detectors are highly sensitive and are often affected by noise events, leading to fewer segments of clean data to work.
