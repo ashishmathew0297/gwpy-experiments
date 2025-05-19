@@ -331,7 +331,7 @@ Our main objective is to determine the Gaussianity of time series data obtained 
 
 \subsection{The Shapiro-Wilk Test}\label{ShapiroWilk}
 
-The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance.
+The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance. This was the first test that could detect departures from normality due to either the skewness or the kurtosis of the data. 
 
 \medskip
 \noindent If we were to consider $x_1, x_2, \ldots, x_n$, to be a collection of ordered sample points from a population, ranked smallest to largest, with the sample mean $\bar{x}$ and $a_1, a_2, \ldots, a_n$ being constants computed from the expected values of the order statistics of a normal distribution, then the test statistic $W$ is given by:
@@ -389,7 +389,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 
 \subsection{The Anderson Darling test}\label{AndersonDarling}
 
-The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov test with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}. The AD test is particularly useful when dealing with small sample sizes or when the data has heavy tails.
+The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov and Cramer-von Mises tests with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}. The AD test is particularly useful when dealing with small sample sizes or when the data has heavy tails.
 
 \medskip
 \noindent Similar to the KS test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. Here, taking $n$ to be the number of elements in the sample and $w(x)$ to be the weighting function the squared area between the sample stepped CDF $F_n$ and the reference distribution $F$ is calculated as
@@ -416,16 +416,24 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \end{equation}
 
 \medskip
-\noindent Another way to look at this formula is the fact that to obtain random samples from a distribution function, the CDF is to be calculated and random samples $x$ are to be taken from a uniform distribution $x \in [0, 1]$. Hence, the above equation can be rewritten as
+\noindent To obtain random samples from a distribution function, the CDF is to be calculated and random samples $x$ are to be taken from a uniform distribution $x \in [0, 1]$. Hence, the above equation can be rewritten as
 
 \begin{align}
     A^2 =& -n -S \\
-    A^2 =& -n - \frac{1}{n} \sum\limits_{i=1}^{n} \left( \frac{2i - 1}{N} \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right)
+    A^2 =& -n - \frac{1}{n} \sum\limits_{i=1}^{n} \left( \frac{2i - 1}{N} \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right),
     \label{eq:ad_statistic}
 \end{align}
 
+\noindent which is effectively a weighted cross-product of the samples, allowing for a comparison of the sample data with the reference distribution.
 
-% Cramer-Von Mises test
+\medskip
+\noindent In the case of the mean and standard deviation of  the sample distribution being known with the distribution size, $n$ being greater than $5$, the significance levels are $1\%$, $2.5\%$, $5\%$, $10\%$ and $15\%$, with the critical values for each significant level being pre-computed through Monte-Carlo simulations. The null hypothesis is rejected if the calculated statistic is greater than the critical value at a selected significance level, indicating that the sample data is not normally distributed.
+
+\medskip
+\noindent The work in \cite{razali2011power}, states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test. The following sections will study how effective these tests are for GW detector data while validating this claim.
+
+
+% Cramer-Von Mises test (It is a part of the Anderson-Darling test so it might not be needed)
 % KL- Divergence
 % Jarque-Bera test
 % D'agostino's K-squared test
