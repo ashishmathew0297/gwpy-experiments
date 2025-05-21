@@ -11,3 +11,4 @@ Centre
 TimeSeries
 Tomte
 GWOSC
+kurtosis

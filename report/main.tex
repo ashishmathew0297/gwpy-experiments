@@ -326,9 +326,6 @@ Our main objective is to determine the Gaussianity of time series data obtained 
 % \medskip
 % \noindent For our use case, the null hypothesis $H_0$ is that the sample data contains a glitch non-Gaussian/ not normally distributed, while the alternative hypothesis $H_1$ is that the sample data is Gaussian. As we will see in the following sections, this is the inverse of the null hypothesis for the statistical tests being used This is so that we can determine the effectiveness of these tests as glitch detection tools.
 
-\medskip
-\noindent The \texttt{scipy.stats} package contains dedicated functions that can be used to perform these tests efficiently. The methods in this package not only calculate the relevant statistic but also return the p-value associated with it. We will be focusing on the p-values obtained to determine the Gaussianity of our data samples. We will dive a bit deeper into the p-values and its threshold selection in the appendix.
-
 \subsection{The Shapiro-Wilk Test}\label{ShapiroWilk}
 
 The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance. This was the first test that could detect departures from normality due to either the skewness or the kurtosis of the data. 
@@ -354,7 +351,7 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
 \noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be normally distributed. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is not normally distributed.
 
 \medskip
-\noindent The p-value of the statistic is usually used to determine the significance of the result. If the p-value of the calculated statistic is less than the predetermined significance level, in this case 0.05, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
+\noindent The p-value of the statistic is usually used to determine the significance of the result. If the p-value is less than the significance level defined, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
 
 \medskip
 \noindent The Shapiro-Wilk test, though powerful, has some limitations. It is sensitive to the sample size and may not perform well with small or large samples. It works ideally for sample sizes $n \leq 2000$. The \texttt{shapiro()} function from \texttt{scipy.stats} works well for $n \leq 5000$ after which the p-value calculations' accuracy drops. Additionally, for this test to work the data must be continuous and univariate.
@@ -384,15 +381,12 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 \medskip
 \noindent If $D_n$ is significantly large, it indicates that the ECDF of the sample data significantly differs from the CDF of the normal distribution. A critical value is used to determine the significance of this result. The null hypothesis is rejected if $D_n$ is greater than the critical value, indicating that the sample data is not normally distributed.
 
-\medskip
-\noindent Similar to the Shapiro-Wilk test, instead of the statistic itself, we consider the p-value of the KS test statistic to determine the significance of the result. If the p-value is less than the significance level of 0.05, the null hypothesis that both the empirical distribution and the normal distribution are the same is rejected, indicating that the sample data is non-Gaussian and likely containing a glitch.
-
 \subsection{The Anderson Darling test}\label{AndersonDarling}
 
-The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov and Cramer-von Mises tests with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}. The AD test is particularly useful when dealing with small sample sizes or when the data has heavy tails.
+The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov and Cramer-von Mises tests with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}.
 
 \medskip
-\noindent Similar to the KS test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. Here, taking $n$ to be the number of elements in the sample and $w(x)$ to be the weighting function the squared area between the sample stepped CDF $F_n$ and the reference distribution $F$ is calculated as
+\noindent Similar to the Kolmogorov-Smirnov test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. Here, taking $n$ to be the number of elements in the sample and $w(x)$ to be the weighting function the squared area between the sample stepped CDF $F_n$ and the reference distribution $F$ is calculated as
 
 \begin{equation}
   n \int_{-\infty}^{\infty} \left( F_n(x) - F(x) \right)^2 w(x) dF(x)
@@ -429,8 +423,14 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \medskip
 \noindent In the case of the mean and standard deviation of  the sample distribution being known with the distribution size, $n$ being greater than $5$, the significance levels are $1\%$, $2.5\%$, $5\%$, $10\%$ and $15\%$, with the critical values for each significant level being pre-computed through Monte-Carlo simulations. The null hypothesis is rejected if the calculated statistic is greater than the critical value at a selected significance level, indicating that the sample data is not normally distributed.
 
+\pagebreak
+\noindent For all the tests used here, the p-value obtained along with the calculated statistics are used to determine Gaussianity of our sample data as opposed to the statistics themselves. This allows us to better understand the results, as they provide a direct measure of their significance. For example, if we took the Kolmogorov-Smirnov test, the calculated statistic is a distance measure, which can be difficult to interpret in terms of the distribution being Gaussian or not. The p-value, on the other hand, gives us a direct measure of the probability of the test statistic being as extreme as calculated hence, eliminating the need to determine a critical value for each statistic. Additionally, setting different critical values for each test would lead to vastly different results, making it difficult to compare the results. The p-values standardize the results hence allowing for like-to-like comparison of the result.
+
 \medskip
-\noindent The work in \cite{razali2011power}, states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test. The following sections will study how effective these tests are for GW detector data while validating this claim.
+\noindent If the p-value is less than a predetermined significance level, 0.05 in this case, we reject the null hypothesis and conclude that the sample data is not normally distributed, hence containing a glitch. Appendix \ref{pvalues} discusses p-values and the discourse and reasoning behind the selection of the 0.05 threshold.
+
+\medskip
+\noindent Along with studying how effective these tests are at determining the Gaussianity of GW detector data, we will also be validating the claim in \cite{razali2011power}, which states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test.
 
 
 % Cramer-Von Mises test (It is a part of the Anderson-Darling test so it might not be needed)
@@ -442,7 +442,15 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 % Coefficient of Variation Envelope
 
 
-\section{Experimentation with the complete frequency range}\label{Experiment_1}
+\section{Experimentation}\label{Experimentation}
+
+The implementation of the proposed statistical tests on the whitened detector TimeSeries is fairly straightforward, with the \texttt{scipy.stats} package providing dedicated functions for each. Treating each point in the TimeSeries as a sample of a distribution, we can use the corresponding functions to obtain the relevant statistics and p-values. 
+
+\medskip
+
+
+\subsection{Using the complete frequency range}\label{Experiment_1}
+
 \section{Experimentation with a band pass filter applied}\label{Experiment_2}
 % No of samples, how to recreate the tests we did
 
@@ -457,7 +465,7 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 
 \section{Appendix}\label{Appendix}
 
-\subsection{P-values and Selecting a Threshold}
+\subsection{P-values and Selecting a Threshold}\label{pvalues}
 
 \subsection{Selecting a Suitable Scaling Method}
 
