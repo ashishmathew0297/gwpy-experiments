@@ -21,7 +21,7 @@ from ._statistics import calculate_sample_statistics
 
 warnings.filterwarnings('ignore')
 
-def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate: int=4096, ifo='L1', bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> list:
+def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=10, srate: int=4096, ifo='L1', bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> list:
     '''
     This function fetches data from the GWOSC TimeSeries API and stores them in "./glitch_timeseries_data" corresponding to the sample if not already present.
 
@@ -115,7 +115,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=5, srate: int
 
     return unwhitened_noise, whitened_noise, timeseries_file_location
 
-def get_sample_glitch_from_filepath(input_file: str = "", tw: int=5, srate: int=4096, bandpass: bool=False, low_freq: int=10, high_freq: int=250):
+def get_sample_glitch_from_filepath(input_file: str = "", tw: int=10, srate: int=4096, bandpass: bool=False, low_freq: int=10, high_freq: int=250):
     if os.path.isfile(input_file):
         # If the input file is present, read it and return
         unwhitened_noise = TimeSeries.read(input_file)
@@ -145,7 +145,7 @@ def calculate_q_transform(sample: TimeSeries):
     return q_scan, end_time - start_time
 
 
-def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=5, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False, low_freq: int=10, high_freq: int=250)-> pd.DataFrame:
+def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=10, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False, low_freq: int=10, high_freq: int=250)-> pd.DataFrame:
 
     '''
     Fetches the glitch TimeSeries samples from the TimeSeries API, performs the statistical tests on them retruns a datset with the relevant information appended 

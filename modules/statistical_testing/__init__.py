@@ -3,6 +3,7 @@ from ._dataset_loader import (
     fetch_clean_segment_samples,
     fetch_glitch_data_from_csv,
     fetch_gspy_glitch_data,
+    get_sample_glitch_from_filepath,
     get_TimeSeries
 )
 
