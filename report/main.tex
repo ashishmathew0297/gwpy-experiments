@@ -52,18 +52,22 @@ bottom=0.8in
 \begin{document}
 
 \begin{titlepage}
-  \vspace*{1cm}
+  % \vspace*{1cm}
   \centering
-  {\LARGE \textbf{University of Massachusetts Dartmouth}}\\[1.5cm]
+  {\LARGE \textbf{University of Massachusetts Dartmouth}}\\[0.5cm]
   {\Large \textbf{Department of Mathematics}}\\[2cm]
-  {\huge \textbf{An Exploration of Statistical Methods in Determining the Gaussianity of LIGO Detector Data}}\\[3cm]
-  {\Large A project in}\\[0.2cm]
-  {\Large Data Science}\\[0.2cm]
+  {\huge \textbf{An Exploration of Statistical Methods in Determining the Gaussianity of LIGO Detector Data}}\\[2cm]
+  {\Large A Data Science project}\\[0.2cm]
   {\Large by}\\[0.2cm]
-  {\Large Ashish Thomas Mathew}\\[2.5cm]
-  {\Large Submitted in Partial Fulfillment of the}\\[0.5cm]
-  {\Large Requirements for the Degree of}\\[0.5cm]
-  {\Large Master of Science}\\[2cm]
+  {\Large \textbf{Ashish Thomas Mathew}}\\[0.2cm]
+  {\Large (02101455)}\\[1.5cm]
+  {\Large Project Advisors:}\\[0.75cm]
+  {\Large \textbf{Dr. Sarah Caudill}}\\[0.2cm]
+  {\Large University of Massachusetts Dartmouth}\\[0.75cm]{\Large \textbf{Dr. Melissa Lopez}}\\[0.2cm]
+  {\Large National Institute for Subatomic Physics (Nikhef)}\\[1.5cm]
+  {\Large Submitted in Partial Fulfillment of the}\\[0.2cm]
+  {\Large Requirements for the Degree of}\\[0.2cm]
+  {\Large Master of Science}\\[1.5cm]
   {\large \textbf{May, 2025}}
   \vfill
 \end{titlepage}
@@ -78,7 +82,7 @@ bottom=0.8in
 
 \justifying
 
-\noindent The Advanced Laser Interferometer Gravitational-wave Observatory (LIGO) is one of the most sophisticated instruments ever built, capable of measuring motion 10,000 times smaller than a proton, and was the first device to detect a Gravitational Wave (GW) event. Due to its high sensitivity, a common issue is its susceptibility to glitches: transient, non-Gaussian noise bursts occurring at a high enough rate to contaminate the time series data obtained from the detector. The current methods to detect and study glitches, though highly effective for analyzing the strain data during the detection run, prove to be slow when working with a large throughput of detector data. Here we study a few possible statistical approaches to detecting these glitches in the time-amplitude domain. By sampling the strain data, conditioning it, and applying tests of normality, mainly the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test; to them, we gauge their effectiveness in determining the presence of a glitch in a sample time-series strain data. The alternate hypothesis of these tests, i.e., the sample belonging to a non-Gaussian distribution, indicates the presence of a glitch or a signal. The results of this experiment explore in detail the viability of these tests as efficient alternatives to the current solutions used in detecting a glitch or astrophysical event in a time series signal.
+\noindent The Advanced Laser Interferometer Gravitational-wave Observatory (LIGO) is one of the most sophisticated instruments ever built, capable of measuring motion 10,000 times smaller than a proton, and was the first device to detect a gravitational wave (GW) event. While analyzing the GW data from LIGO, the detector noise is approximated to be stationary and Gaussian. However, due to its high sensitivity, a common issue is its susceptibility to glitches: transient, non-Gaussian noise bursts that contaminate the time series data obtained from the detector. This project aims to develop a tool to test if the detector noise is Gaussian or not as a way to assess whether it is clean up to a defined threshold, hence improving the quality of the analysis performed. Taking the null hypothesis that the distribution of the noise data samples in the time-amplitude domain is Gaussian, we study statistical approaches, namely the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test, to test this against the alternative hypothesis of the distribution being non-Gaussian. We found that of the three tests, the Shapiro-Wilk test performed the best in detecting non-Gaussian samples, 
 
 \section{Introduction}\label{Introduction}
 
