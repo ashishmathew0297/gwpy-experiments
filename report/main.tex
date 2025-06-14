@@ -94,12 +94,26 @@ bottom=0.8in
 \noindent A consequence of these detectors' sensitivities is their susceptibility to noise. During observation runs, various noise sources, such as seismic noise, suspension thermal noise, and sensing noise, affect the data collected by the interferometers. Among these, the most problematic are \textbf{glitches}: transient events caused by non-astrophysical phenomena such as anthropogenic noise, weather conditions, or instrument malfunctions \cite{collaboration_guide_2020, collaboration_characterization_2016}. Glitches manifest as localized bursts of excess power in interferometer time series data and often do not have well-defined sources. They can occur at energy levels and frequencies that overlap with GW signals, thereby mimicking them and increasing the number of false positive detections. During the first half of the third observing run (O3a) H1 and L1 recorded glitches rates of $0.29\text{ min}^{-1}$ and $1.10\text{ min}^{-1}$ respectively, which rose to $0.32\text{ min}^{-1}$ and $1.17\text{ min}^{-1}$ during the second half (O3b) \cite{collaboration_gwtc-3_2023}. A notable example of glitches posing such an issue was during the binary neutron star merger event GW170817 \cite{collaboration_gw170817_2017}, during which instrumental noise transients were detected before the event's coalescence time, complicating its detection and subsequent analysis.
 
 \medskip
-\noindent All these noise sources collectively produce time series signals which can be treated as stochastic processes with their corresponding joint probability distributions and statistical properties \cite{collaboration_guide_2020}. In the absence of astronomical signals or glitches, the probability distribution of the noise follows a normal distribution, also known as \textit{Gaussian} noise. In the event of a Gravitational wave or any other signal, the noise exhibits a high signal-to-noise ratio (SNR), making it \textit{non-Gaussian}.
+\noindent All these noise sources collectively produce time series signals which can be treated as stochastic processes with their corresponding joint probability distributions and statistical properties \cite{collaboration_guide_2020}. In the absence of astronomical signals or glitches, the probability distribution of the noise follows a normal distribution, also known as \textit{Gaussian} noise. In the event of a glitch, the noise has some structure with a high signal-to-noise ratio (SNR), making it \textit{non-Gaussian}. A \textbf{normal distribution} or \textbf{Gaussian distribution} is a continuous probability distribution for a random variable where most of the data points are located around the mean, with lesser amounts of data further away. The Gaussian distribution is symmetric about the mean $\mu$, which is equal to zero, with the standard deviation $\sigma$ being equal to 1. This distribution is important as it can approximate many real world phenomena, such as the distribution of heights and weights of a country's population. It is also the basis for many statistical tests and methods. 
+
+% % Add Image of normal distribution
+
+% The probability density function (PDF) of this distribution is given by
+
+% \begin{equation}
+%   f(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}}
+%   \label{eq:normal_distribution}
+% \end{equation}
 
 
+% \medskip
+% \noindent In the case of LIGO-Virgo detectors, the noise floor is approximated to be stationary and Gaussian aside from the cases of transient disturbances \cite{collaboration_guide_2020}. To study this, the Fourier transformed samples of the data are taken into account. In the case of Gaussian noise, the real and imaginary parts of the Fourier transformed parts of the noise are independent and identically distributed (i.i.d.) random variables, with a mean of 0 and a variance of $\sigma^2$. The Fourier transformed data can be modeled as a complex Gaussian distribution, which is a generalization of the normal distribution to complex numbers. The real and imaginary parts of the Fourier transformed data are normally distributed, and their joint distribution is given by
+
+% \medskip
+% \noindent The number of clean samples obtained from this process is significantly lower than the number of glitch samples. This is because the LIGO detectors are highly sensitive and are often affected by noise events, leading to fewer segments of clean data to work.
 
 \medskip
-\noindent Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive and lack the efficiency required for near-real-time assessment of the signals for glitch activity. The more popular solutions incorporate the \textit{q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. This q-transform computes a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is ineffective for real-time use as, when scaled up to work on multiple samples, the computational time would increase significantly.
+\noindent Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive, slowing down the process of assessing of the signals for glitch activity. The more popular solutions incorporate the \textit{Q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. The Q-transform is used as inputs to statistical tests to obtain a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is much slower when scaled up to work on multiple samples.
 
 % TODO: Incomplete
 
@@ -194,25 +208,7 @@ bottom=0.8in
 \medskip
 \noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.95 are considered to be clean segments of data, and are used to obtain the corresponding TimeSeries data from GWpy. The TimeSeries data is then, similar to the glitch data, conditioned for statistical testing and cropped down to 1-second samples for further use.
 
-% \subsubsection{Relationship between the Gaussian distribution and clean detector data}\label{NormalDistribution}
 
-% The \textbf{normal distribution} or \textbf{Gaussian distribution} is a continuous probability distribution for a random variable where most of the data points are located around the mean, with lesser amounts of data further away. This distribution is important as it can approximate many real world phenomena, such as the distribution of heights and weights of a country's population. It is also the basis for many statistical tests and methods.
-
-% % Add Image of normal distribution
-
-% \medskip
-% \noindent The normal distribution is symmetric about the mean and has a bell-shaped curve. The mean $\mu$ of this distribution is equal to zero, with the standard deviation $\sigma$ being equal to 1. The probability density function (PDF) of this distribution is given by
-
-% \begin{equation}
-%   f(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}}
-%   \label{eq:normal_distribution}
-% \end{equation}
-
-% \medskip
-% \noindent In the case of LIGO-Virgo detectors, the noise floor is approximated to be stationary and Gaussian aside from the cases of transient disturbances \cite{collaboration_guide_2020}. To study this, the Fourier transformed samples of the data are taken into account. In the case of Gaussian noise, the real and imaginary parts of the Fourier transformed parts of the noise are independent and identically distributed (i.i.d.) random variables, with a mean of 0 and a variance of $\sigma^2$. The Fourier transformed data can be modeled as a complex Gaussian distribution, which is a generalization of the normal distribution to complex numbers. The real and imaginary parts of the Fourier transformed data are normally distributed, and their joint distribution is given by
-
-% \medskip
-% \noindent The number of clean samples obtained from this process is significantly lower than the number of glitch samples. This is because the LIGO detectors are highly sensitive and are often affected by noise events, leading to fewer segments of clean data to work.
 
 \subsection{Data Conditioning}\label{DataConditioning}
 
