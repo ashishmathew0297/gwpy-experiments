@@ -21,14 +21,14 @@ from ._statistics import calculate_sample_statistics
 
 warnings.filterwarnings('ignore')
 
-def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=10, srate: int=4096, ifo='L1', bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> list:
+def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10, srate: int=4096, ifo='L1', bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> list:
     '''
     This function fetches data from the GWOSC TimeSeries API and stores them in "./glitch_timeseries_data" corresponding to the sample if not already present.
 
     Inputs:
     - `gpstime`: The GPS time of the sample
     - `gps_end_time`: The end time of the sample. Default = 0 (not provided). If provided, the function will fetch data from gps_time to gps_end_time
-    - `tw`: Time window to be taken into consideration on either side of the glitch for whitening. The final sample returned will contain the central 1 second of the sample.
+    - `whitening_tw`: Time window to be taken into consideration on either side of the glitch for whitening. The final sample returned will contain the central 1 second of the sample.
             Default = 5 seconds 
     - `srate`: The sampling rate. Default= 4096
     - `ifo`: The interferometer being studied. Default=L1 (LIGO LivingstonObservatory)
@@ -52,9 +52,9 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, tw: int=10, srate: in
     # Check if TimeSeries information is already loaded.
     # Fetch noise data from the LIGO GWOSC if not present
     if not gps_end_time:
-        filename = f"sample_{ifo}_{gps_time}_{tw}.h5"
-        start_time = gps_time - tw
-        end_time = gps_time + tw
+        filename = f"sample_{ifo}_{gps_time}_{whitening_tw}.h5"
+        start_time = gps_time - whitening_tw
+        end_time = gps_time + whitening_tw
         # print(f"Fetching sample data for GPS time {gps_time} with a {tw} second time window ...")
     else:
         start_time = gps_time # End time already provided
