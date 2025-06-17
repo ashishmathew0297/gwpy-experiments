@@ -207,7 +207,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
             # else:
             #     unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo)
 
-            unwhitened_noise, whitened_noise, timeseries_file_location = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo, bandpass=bandpass, low_freq=low_freq, high_freq=high_freq)
+            unwhitened_noise, whitened_noise, timeseries_file_location = get_TimeSeries(g_star, whitening_tw=tw, srate=srate, ifo=ifo, bandpass=bandpass, low_freq=low_freq, high_freq=high_freq)
             
             t = whitened_noise.times
             whitened_y = whitened_noise.value
