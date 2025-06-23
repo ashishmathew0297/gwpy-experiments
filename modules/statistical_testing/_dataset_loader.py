@@ -21,7 +21,7 @@ from ._statistics import calculate_sample_statistics
 
 warnings.filterwarnings('ignore')
 
-def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10, srate: int=4096, ifo='L1', bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> list:
+def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10, observation_tw: float = 1, srate: int=4096, ifo='L1', bandpass: bool=False, low_freq: int=10, high_freq: int=250) -> list:
     '''
     This function fetches data from the GWOSC TimeSeries API and stores them in "./glitch_timeseries_data" corresponding to the sample if not already present.
 
@@ -106,8 +106,10 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10,
     if not gps_end_time:
         # Stripping the sample down to a 1 second window of central data
         # (this might need to be changed for different glitches)
-        unwhitened_noise = unwhitened_noise[int(srate * 4.5):-int(srate * 4.5)]
-        whitened_noise = whitened_noise[int(srate * 4.5):-int(srate * 4.5)]
+        # unwhitened_noise = unwhitened_noise[int(srate * 4.5):-int(srate * 4.5)]
+        # whitened_noise = whitened_noise[int(srate * 4.5):-int(srate * 4.5)]
+        unwhitened_noise = unwhitened_noise[int(srate * ((whitening_tw - observation_tw)/2)):-int(srate * ((whitening_tw - observation_tw)/2))]
+        whitened_noise = whitened_noise[int(srate * ((whitening_tw - observation_tw)/2)):-int(srate * ((whitening_tw - observation_tw)/2))]
     else:
         # Crop 1 second at each side to avoid border effects
         whitened_noise = whitened_noise[int(srate * 1):-int(srate * 1)]
@@ -115,7 +117,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10,
 
     return unwhitened_noise, whitened_noise, timeseries_file_location
 
-def get_sample_glitch_from_filepath(input_file: str = "", tw: int=10, srate: int=4096, bandpass: bool=False, low_freq: int=10, high_freq: int=250):
+def get_sample_glitch_from_filepath(input_file: str = "", whitening_tw: int=10, srate: int=4096, bandpass: bool=False, low_freq: int=10, high_freq: int=250):
     if os.path.isfile(input_file):
         # If the input file is present, read it and return
         unwhitened_noise = TimeSeries.read(input_file)
@@ -125,8 +127,8 @@ def get_sample_glitch_from_filepath(input_file: str = "", tw: int=10, srate: int
             bp = filter_design.bandpass(low_freq, high_freq, srate)
             whitened_noise = whitened_noise.filter(bp)
     
-        whitened_noise = whitened_noise[int(srate * (tw - 0.5)):-int(srate * (tw - 0.5))]
-        unwhitened_noise = unwhitened_noise[int(srate * (tw - 0.5)):-int(srate * (tw - 0.5))]
+        whitened_noise = whitened_noise[int(srate * (whitening_tw - 0.5)):-int(srate * (whitening_tw - 0.5))]
+        unwhitened_noise = unwhitened_noise[int(srate * (whitening_tw - 0.5)):-int(srate * (whitening_tw - 0.5))]
         return unwhitened_noise, whitened_noise
 
 def calculate_q_transform(sample: TimeSeries):
@@ -145,7 +147,7 @@ def calculate_q_transform(sample: TimeSeries):
     return q_scan, end_time - start_time
 
 
-def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw: int=10, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False, low_freq: int=10, high_freq: int=250)-> pd.DataFrame:
+def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", whitening_tw: int=10, observation_tw: float = 1, srate=4096, ifo='L1', begin=0, n_samples=0, bandpass: bool=False, low_freq: int=10, high_freq: int=250)-> pd.DataFrame:
 
     '''
     Fetches the glitch TimeSeries samples from the TimeSeries API, performs the statistical tests on them retruns a datset with the relevant information appended 
@@ -207,7 +209,7 @@ def fetch_glitch_data_from_csv(data: pd.DataFrame, gpsTimeKey: str="GPStime", tw
             # else:
             #     unwhitened_noise, whitened_noise, q_scan = get_TimeSeries(g_star, tw=tw, srate=srate, ifo=ifo)
 
-            unwhitened_noise, whitened_noise, timeseries_file_location = get_TimeSeries(g_star, whitening_tw=tw, srate=srate, ifo=ifo, bandpass=bandpass, low_freq=low_freq, high_freq=high_freq)
+            unwhitened_noise, whitened_noise, timeseries_file_location = get_TimeSeries(g_star, whitening_tw=whitening_tw, observation_tw=observation_tw, srate=srate, ifo=ifo, bandpass=bandpass, low_freq=low_freq, high_freq=high_freq)
             
             t = whitened_noise.times
             whitened_y = whitened_noise.value
