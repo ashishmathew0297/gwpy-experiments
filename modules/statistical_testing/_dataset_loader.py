@@ -52,14 +52,14 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10,
     # Check if TimeSeries information is already loaded.
     # Fetch noise data from the LIGO GWOSC if not present
     if not gps_end_time:
-        filename = f"sample_{ifo}_{gps_time}_{whitening_tw}.h5"
+        filename = f"sample_{ifo}_{gps_time}_white{whitening_tw}.h5"
         start_time = gps_time - whitening_tw
         end_time = gps_time + whitening_tw
         # print(f"Fetching sample data for GPS time {gps_time} with a {tw} second time window ...")
     else:
         start_time = gps_time # End time already provided
         end_time = gps_end_time
-        filename = f"sample_{ifo}_{gps_time}_{end_time}.h5"
+        filename = f"sample_{ifo}_cleanseg_{gps_time}_{end_time}.h5"
         # print(f"Fetching sample data from {gps_time} to {end_time} ...")
 
     # Loading and saving the TimeSeries for the given sample
@@ -342,5 +342,6 @@ def fetch_clean_segment_samples(data ,ifo:str="L1", sample_rate: int=4096, segme
     whitened_samples_df["ifo"] = "L1"
     whitened_samples_df["label"] = "clean_signal"
     whitened_samples_df["glitch_present"] = 0
+    whitened_samples_df["snr"] = 0
 
     return whitened_samples_df
