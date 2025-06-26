@@ -40,7 +40,7 @@ def display_statistic_pvalue_histogram(pvalues: pd.DataFrame, stat_test: Literal
     print(f"Maximum p-value: {max(pvalues)}")
     print(f"Minimum p-value: {min(pvalues)}")
 
-def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
+def display_sample_plots(data: pd.DataFrame, whitening_tw: int=10, observation_tw: float=1, srate: int=4096, save_path: str = "") -> None:
     '''
     A function to display a whitened sample glitch from the input dataframe along its original form and q-transform.
 
@@ -57,7 +57,8 @@ def display_sample_plots(data: pd.DataFrame, save_path: str = "") -> None:
 
     timeseries = TimeSeries.read(data['timeseries_file_location'])
     timeseries = timeseries.whiten(4,2)
-    timeseries = timeseries[int(4096 * 4.5):-int(4096 * 4.5)]
+    print(type(srate), type(whitening_tw), type(observation_tw))
+    timeseries = timeseries[int(srate * (whitening_tw - (observation_tw/2))):-int(srate * (whitening_tw - (observation_tw/2)))]
     q_scan, time_elapsed = calculate_q_transform(timeseries)
 
     print(f"Time elapsed for q-transform: {time_elapsed:.2f} seconds")

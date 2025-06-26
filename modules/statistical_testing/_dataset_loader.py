@@ -108,8 +108,8 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10,
         # (this might need to be changed for different glitches)
         # unwhitened_noise = unwhitened_noise[int(srate * 4.5):-int(srate * 4.5)]
         # whitened_noise = whitened_noise[int(srate * 4.5):-int(srate * 4.5)]
-        unwhitened_noise = unwhitened_noise[int(srate * ((whitening_tw - observation_tw)/2)):-int(srate * ((whitening_tw - observation_tw)/2))]
-        whitened_noise = whitened_noise[int(srate * ((whitening_tw - observation_tw)/2)):-int(srate * ((whitening_tw - observation_tw)/2))]
+        unwhitened_noise = unwhitened_noise[int(srate * (whitening_tw - (observation_tw/2))):-int(srate * (whitening_tw - (observation_tw/2)))]
+        whitened_noise = whitened_noise[int(srate * (whitening_tw - (observation_tw/2))):-int(srate * (whitening_tw - (observation_tw/2)))]
     else:
         # Crop 1 second at each side to avoid border effects
         whitened_noise = whitened_noise[int(srate * 1):-int(srate * 1)]
@@ -117,7 +117,7 @@ def get_TimeSeries(gps_time: float, gps_end_time: float=0, whitening_tw: int=10,
 
     return unwhitened_noise, whitened_noise, timeseries_file_location
 
-def get_sample_glitch_from_filepath(input_file: str = "", whitening_tw: int=10, srate: int=4096, bandpass: bool=False, low_freq: int=10, high_freq: int=250):
+def get_sample_glitch_from_filepath(input_file: str = "", whitening_tw: int=10, observation_tw: float = 1, srate: int=4096, bandpass: bool=False, low_freq: int=10, high_freq: int=250):
     if os.path.isfile(input_file):
         # If the input file is present, read it and return
         unwhitened_noise = TimeSeries.read(input_file)
@@ -127,8 +127,10 @@ def get_sample_glitch_from_filepath(input_file: str = "", whitening_tw: int=10, 
             bp = filter_design.bandpass(low_freq, high_freq, srate)
             whitened_noise = whitened_noise.filter(bp)
     
-        whitened_noise = whitened_noise[int(srate * (whitening_tw - 0.5)):-int(srate * (whitening_tw - 0.5))]
-        unwhitened_noise = unwhitened_noise[int(srate * (whitening_tw - 0.5)):-int(srate * (whitening_tw - 0.5))]
+        # whitened_noise = whitened_noise[int(srate * (whitening_tw - 0.5)):-int(srate * (whitening_tw - 0.5))]
+        # unwhitened_noise = unwhitened_noise[int(srate * (whitening_tw - 0.5)):-int(srate * (whitening_tw - 0.5))]
+        whitened_noise = whitened_noise[int(srate * (whitening_tw - (observation_tw/2))):-int(srate * (whitening_tw - (observation_tw/2)))]
+        unwhitened_noise = unwhitened_noise[int(srate * (whitening_tw - (observation_tw/2))):-int(srate * (whitening_tw - (observation_tw/2)))]
         return unwhitened_noise, whitened_noise
 
 def calculate_q_transform(sample: TimeSeries):
