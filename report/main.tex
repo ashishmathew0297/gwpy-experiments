@@ -82,7 +82,7 @@ bottom=0.8in
 
 \justifying
 
-\noindent The Advanced Laser Interferometer Gravitational-wave Observatory (LIGO) is one of the most sophisticated instruments ever built, capable of measuring motion 10,000 times smaller than a proton. It was the first device to detect a gravitational wave (GW) event. While analyzing the GW data from LIGO, the detector noise is approximated to be stationary and Gaussian. However, due to its high sensitivity, a common issue it faces is its susceptibility to glitches: transient, non-Gaussian noise bursts that contaminate the time series data obtained from the detector. This project aims to develop a tool to test if the distribution of the amplitudes of the detector noise is Gaussian or not as a way to assess whether it is clean up to a defined threshold, hence improving the quality of the analysis performed. Taking the null hypothesis that the distribution is Gaussian, we study statistical approaches of normality testing, namely the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test, to test this null hypothesis against the alternative of the distribution being non-Gaussian. We found that of the three tests, the Shapiro-Wilk test performed the best in detecting non-Gaussian samples with an accuracy of 72.9\% and a precision of 91.41\%. In comparison, the Kolmogorov-Smirnov test had an accuracy of 61.77\% and a precision of 100\%, while the Anderson-Darling test had an accuracy of 61.30\% and a precision of 100\% when detecting non-Gaussianity. 
+\noindent The Advanced Laser Interferometer Gravitational-wave Observatory (LIGO) is one of the most sophisticated instruments ever built, capable of measuring motion 10,000 times smaller than a proton. It was the first device to detect a gravitational wave (GW) event. While analyzing the GW data from LIGO, the detector noise is approximated to be stationary and Gaussian. However, due to its high sensitivity, a common issue it faces is its susceptibility to glitches: transient, non-Gaussian noise bursts that contaminate the time series data obtained from the detector. This project aims to develop a tool to test if the distribution of the amplitudes of the detector noise is Gaussian or not as a way to assess whether it is clean up to a defined threshold, hence improving the quality of the analysis performed. Taking the null hypothesis that the distribution is Gaussian, we study statistical approaches of normality testing, namely the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test, to test this null hypothesis against the alternative of the distribution being non-Gaussian. We found that of the three tests, the Shapiro-Wilk test performed the best in detecting non-Gaussian samples with an accuracy of 73.86\% and a precision of 91.67\%. In comparison, the Kolmogorov-Smirnov test had an accuracy of 64.43\% and a precision of 100\%, while the Anderson-Darling test had an accuracy of 63.9\% and a precision of 100\% when detecting non-Gaussianity. 
 
 % (The results of this project show that statistical hypothesis testing can be an effective tool for detecting glitches in LIGO detector data, and can be used as a fast alternative to the current methods used in the field. The results also show that the Shapiro-Wilk test is the most effective of the three tests studied, and can be used as a reliable tool for detecting non-Gaussian samples in LIGO detector data.)
 
@@ -94,7 +94,7 @@ bottom=0.8in
 \noindent A consequence of these detectors' sensitivities is their susceptibility to noise. During observation runs, various noise sources, such as seismic noise, suspension thermal noise, and sensing noise, affect the data collected by the interferometers. Among these, the most problematic are \textbf{glitches}: transient events caused by non-astrophysical phenomena such as anthropogenic noise, weather conditions, or instrument malfunctions \cite{collaboration_guide_2020, collaboration_characterization_2016}. Glitches manifest as localized bursts of excess power in interferometer time series data and often do not have well-defined sources. They can occur at energy levels and frequencies that overlap with GW signals, thereby mimicking them and increasing the number of false positive detections. During the first half of the third observing run (O3a) H1 and L1 recorded glitches rates of $0.29\text{ min}^{-1}$ and $1.10\text{ min}^{-1}$ respectively, which rose to $0.32\text{ min}^{-1}$ and $1.17\text{ min}^{-1}$ during the second half (O3b) \cite{collaboration_gwtc-3_2023}. A notable example of glitches posing such an issue was during the binary neutron star merger event GW170817 \cite{collaboration_gw170817_2017}, during which instrumental noise transients were detected before the event's coalescence time, complicating its detection and subsequent analysis.
 
 \medskip
-\noindent The main focus of this project is the idea of Gaussianity: the property of a sample distribution of data being normally distributed, also known as a Gaussian distribution. A \textbf{normal distribution} or \textbf{Gaussian distribution} is a continuous probability distribution for a random variable where most of the data points are located around the mean, with lesser amounts of data further away. The Gaussian distribution is symmetric about the mean $\mu$, which is equal to zero, with the standard deviation $\sigma$ being equal to 1. This distribution is important as it can approximate many real world phenomena, such as the distribution of heights and weights of a country's population. It is also the basis for many statistical tests and methods. Figure \ref{fig:gaussian_distribution} shows an example of a Gaussian distribution. Any variation from this distribution is considered non-Gaussian.
+\noindent This project aims to develop a tool to test if the amplitudes of detector noise in a sample of data from the detector contains a glitch through tests of \textbf{Gaussianity}. Gaussianity is the property of a sample distribution of data being normally distributed, also known as a Gaussian distribution. A normal/Gaussian distribution is a continuous probability distribution for a random variable where most of the data points are located around the mean, with lesser amounts of data further away. The Gaussian distribution is symmetric about the mean $\mu$, which is equal to zero, with the standard deviation $\sigma$ being equal to 1. This distribution is important as it can approximate many real world phenomena, such as the distribution of heights and weights of a country's population. It is also the basis for many statistical tests and methods. Any variation from this distribution is considered non-Gaussian. Figure \ref{fig:gaussian_distribution} shows an example of a Gaussian distribution.
 
 \begin{figure}[H]
     \centering
@@ -117,10 +117,12 @@ bottom=0.8in
 % \noindent The number of clean samples obtained from this process is significantly lower than the number of glitch samples. This is because the LIGO detectors are highly sensitive and are often affected by noise events, leading to fewer segments of clean data to work.
 
 \medskip
-\noindent All these noise sources collectively produce time series signals which can be treated as stochastic processes with their corresponding joint probability distributions and statistical properties \cite{collaboration_guide_2020}. In gravitational wave data analysis the noise floor of the detectors is approximated to be stationary and Gaussian. In the event of a glitch, the noise has some structure with a high signal-to-noise ratio (SNR), making it \textit{non-Gaussian}.
+\noindent All the noise sources in a detector collectively produce time series signals which can be treated as stochastic processes with their corresponding joint probability distributions and statistical properties \cite{collaboration_guide_2020}. In gravitational wave data analysis the noise floor of the detectors is approximated to be stationary and Gaussian. In the event of a glitch, the noise has some structure with a high signal-to-noise ratio (SNR), making it \textit{non-Gaussian}.
 
 \medskip
-\noindent This project aims to develop a tool to test if the distribution of the amplitudes of detector noise is Gaussian or not to help improve the quality of the analysis performed. The null hypothesis ($h_0$) here is that the distribution is Gaussian, indicating that the signal is clean and the alternative hypothesis is that the distribution is non-Gaussian. This study uses three tests of Gaussianity, namely, (1) the Shapiro-Wilk test, (2) the Kolmogorov-Smirnov test, and (3) the Anderson-Darling test on preprocessed samples of the L1 interferometer data to determine its normality and assess how well these tests differentiate between Gaussian (clean) and non-Gaussian (glitched) samples. This experiment also includes studying the distributions, durations, and frequency ranges, with particular emphasis on failure points for each statistical test across various glitch types. Furthermore, considering the frequency bands at which each glitch type occurs, this study also examines how each statistical test performs under band-pass filtering at various frequency ranges.
+\noindent We propose a pair of hypotheses to determine the presence of a glitch in a sample of data from the detector.
+
+The null hypothesis ($h_0$) in this project is that the sample distributions being studied are Gaussian, indicating that the signal is clean. The alternative hypothesis ($h_1$) is that the distribution is non-Gaussian. This study uses three tests of Gaussianity, namely, (1) the Shapiro-Wilk test, (2) the Kolmogorov-Smirnov test, and (3) the Anderson-Darling test on preprocessed samples of the L1 interferometer data to determine their normality and assess how well these tests differentiate between Gaussian and non-Gaussian samples. This experiment also includes studying the distributions, durations, and frequency ranges, with particular emphasis on failure points for each statistical test across various glitch types. Furthermore, considering the frequency bands at which each glitch type occurs, this study also examines how each statistical test performs under band-pass filtering at various frequency ranges.
 
 \medskip
 \noindent This project explores statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the time-frequency domain. Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive, slowing down the process of assessing of the signals for glitch activity. The more popular solutions incorporate the \textit{Q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. The Q-transform is used as inputs to statistical tests to obtain a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is much slower when scaled up to work on multiple samples. Figures \ref{fig:qtransform_vs_windowsize} and \ref{fig:qtransform_vs_samplecount} illustrate the time taken to compute the Q-transform while varying the sample window size and the number of samples respectively. 
@@ -129,14 +131,14 @@ bottom=0.8in
 
 \begin{figure}[H]
   \centering
-  \begin{subfigure}[t]{0.7\textwidth}
+  \begin{subfigure}[t]{0.65\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/q_transform_time_vs_window_size.pdf}
     \caption{A plot of the Q-transform calculation time against the sample window for a single  }
     \label{fig:qtransform_vs_windowsize}
   \end{subfigure}
   \hspace{25px}
-  \begin{subfigure}[t]{0.7\textwidth}
+  \begin{subfigure}[t]{0.65\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/q_transform_time_vs_sample_count.pdf}
     \caption{Interference pattern}
@@ -189,12 +191,12 @@ bottom=0.8in
 \end{figure}
 
 \medskip
-\noindent There are two main types of detector samples that we receive from the detectors: \textbf{Glitched detector data} and \textbf{Clean detector data}. The following sections will go a bit deeper into each of these types of data and how they are obtained.
+\noindent There are two main types of detector samples that we receive from the detectors: \textbf{Glitched detector data} and \textbf{Clean detector data} with separate modules used to obtain them.
   
-\subsection{Glitch data}\label{Glitchdata}
+\subsection{The Glitch Segment Acquisition Module}\label{Glitchdata}
 
 \medskip
-\noindent The GPS times of glitch occurrences are obtained using \textit{Gravity Spy} \cite{Zevin_2017}, a large-scale citizen-science project that combines astrophysics, machine learning, and human efforts to classify glitches in GW interferometer data. The \textit{Omicron} transient search algorithm is used by Gravity Spy to generate q-transform spectrograms and calculate SNR of the time series samples \cite{robinet_omicron_2020}. This algorithm is crucial in identifying the most useful samples for data classification and analysis. Based on the morphological characteristics from the spectrograms, a total of 22 glitch classes were identified with an SNR above 7.5 and peak frequencies between 10 Hz and 2048 Hz.
+\noindent The \textbf{Glitch Segment Acquisition Module} uses GPS times of glitch occurrences obtained from \textit{Gravity Spy} \cite{Zevin_2017} to obtain our glitch samples. GravitySpy is a large-scale citizen-science project that combines astrophysics, machine learning, and human efforts to classify glitches in GW interferometer data. The \textit{Omicron} transient search algorithm is used by Gravity Spy to generate q-transform spectrograms and calculate SNR of the time series samples \cite{robinet_omicron_2020}. This algorithm is crucial in identifying the most useful samples for data classification and analysis. Based on the morphological characteristics from the spectrograms, a total of 22 glitch classes were identified with an SNR above 7.5 and peak frequencies between 10 Hz and 2048 Hz.
 
 \medskip
 \noindent In the O3a data for L1, Fast\_Scattering and Tomte glitches are the most prevalent, while Chirp, 1080Lines and Wandering\_line glitches have fewer samples, as shown in Table \ref{tab:glitch_classes}. The No\_Glitch class represents glitch samples that lack significant traits or energy levels and do not fit in with the other classes morphologically. Hence, for our study, we do not consider this glitch class.
@@ -224,19 +226,17 @@ bottom=0.8in
 \end{table}
 
 \pagebreak
-\noindent Using the glitch GPS times, the time series information is obtained from the GWOSC database using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy. Here, a time window of 10 seconds is taken on either side of each of the GPS times with the glitch in the center, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second time window around the glitch for further use.
+\noindent Using the glitch GPS times, the time series information is obtained from the GWOSC database using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy. Here, a time window of 10 seconds is taken on either side of each of the GPS times with the glitch in the center for whitening, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second time window around the glitch for further use.
 
-\subsection{Clean Samples}\label{Cleandata}
+\subsection{The Clean Segment Acquisition Module}\label{Cleandata}
 
-\noindent The process of finding gaps of clean detector noise is done using \texttt{gwtrigfind}, a package developed to search for event triggers files from GW detectors, in conjunction with \texttt{EventTable}, provided by GWpy.
-
-\medskip
-\noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between the end and start times of successive events, we obtain the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch; and too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
+\noindent The \textbf{Clean Segment Acquisition Module} is used to find gaps of clean detector noise. This is done using \texttt{gwtrigfind}, a package developed to search for event triggers files from GW detectors, in conjunction with \texttt{EventTable}, provided by GWpy.
 
 \medskip
-\noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.95 are considered to be clean segments of data, and are used to obtain the corresponding TimeSeries data from GWpy. The TimeSeries data is then, similar to the glitch data, conditioned for statistical testing and cropped down to 1-second samples for further use.
+\noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between the end and start times of successive events, we obtain the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch. Additionally, a short time segment would affect the PSD calculation and subsequent preprocessing. Too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
 
-
+\medskip
+\noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.05 are considered to be clean segments of data, and are used to obtain the corresponding TimeSeries data from GWpy. The obtained TimeSeries data, similar to the glitch data, is then conditioned for statistical testing and cropped down to 1-second samples for further use.
 
 \subsection{Data Conditioning}\label{DataConditioning}
 
@@ -248,7 +248,7 @@ bottom=0.8in
 \end{equation}
 
 \medskip
-\noindent A lot of the preprocessing in this project involves the use of Fourier transforms. Given the signal $x(t)$ we get its corresponding Fourier transform as
+\noindent The preprocessing in this project, which is discussed in section \ref{Whitening}, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
 
 \begin{equation}
     \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
@@ -265,24 +265,25 @@ bottom=0.8in
 
 \subsubsection{Power Spectral Density and Amplitude Spectral Density}\label{PSD_ASD}
 
-\noindent In most cases, the noise in the GW detectors is stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are, for the most part, uncorrelated, hence keeping it Gaussian. As a result, the statistical properties of the noise can be described by an auto-correlation matrix described by
+% \noindent The noise in the GW detectors is approximated to be stationary \cite{collaboration_characterization_2016}, i.e. the characteristics of the noise do not change over time, and the components are, for the most part, uncorrelated, hence keeping it Gaussian. As a result, the statistical properties of the noise can be described by an auto-correlation matrix described by
 
-\begin{equation}
-    C_n(\tau) = \langle n_a(t+\tau) n_b(t) \rangle - \langle n_a(t+\tau) \rangle \langle n_b(t) \rangle,
-    \label{eq:autocorrelation}
-\end{equation}
+% $C_n(\tau)$
+% \begin{equation}
+%     C_n(\tau) = \langle n_a(t+\tau) n_b(t) \rangle - \langle n_a(t+\tau) \rangle \langle n_b(t) \rangle,
+%     \label{eq:autocorrelation}
+% \end{equation}
+
+% \medskip
+% \noindent Where $\langle \cdot \rangle$ represents the ensemble average The Wiener-Khinchin theorem \cite{chatfield1989analysis} states that the Fourier transform of the correlation matrix of a signal gives us the \textbf{power spectral density} (PSD) $S_n(f)$. This would give us the following equation:
+
+% \begin{equation}
+%   S_n(f) = 2 \int_{-\infty}^{\infty} C_n(\tau) e^{-2 \pi i f \tau} d\tau \\
+%   S_n(f) = 2 \tilde{C_n}(\tau) \\
+%   \label{eq:psd_autocorrelation}
+% \end{equation}
 
 \medskip
-\noindent The Wiener-Khinchin theorem \cite{chatfield1989analysis} states that the Fourier transform of the correlation matrix of a signal gives us the \textbf{power spectral density} (PSD) $S_n(f)$. This would give us the following equation:
-
-\begin{equation}
-  S_n(f) = 2 \int_{-\infty}^{\infty} C_n(\tau) e^{-2 \pi i f \tau} d\tau \\
-  S_n(f) = 2 \tilde{C_n}(\tau) \\
-  \label{eq:psd_autocorrelation}
-\end{equation}
-
-\medskip
-\noindent The PSD provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009, Li:2013lza}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Considering the frequency domain representation of the noise signal, the ensemble average of the auto-correlation can be expressed as
+\noindent The PSD provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009, Li:2013lza}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Considering the frequency domain representation of the noise signal $n(f)$, the PSD is given by the ensemble average of the auto-correlation, expressed as
 
 \begin{equation}
   \langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} \delta(f - f') S_n(f).
@@ -290,21 +291,21 @@ bottom=0.8in
 \end{equation}
 
 \medskip
-\noindent Here $\langle \cdot \rangle$ represents the ensemble average, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate. Aside from Power Spectral Density, another way to chartacterize the noise of a detector is with the \textbf{Amplitude Spectral Density (ASD)} values, given by $\sqrt{S_n(f)}$. The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
+\noindent Here, $\langle \cdot \rangle$ represents the ensemble average, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate. Aside from Power Spectral Density, another way to characterize the noise of a detector is with the \textbf{Amplitude Spectral Density (ASD)} values, given by $\sqrt{S_n(f)}$. The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{images/unwhitened_asd.pdf}
-  \caption{ASD plot for a Tomte Glitch.}
+  \caption{ASD plot for a Tomte Glitch. The grey dotted lines coincide with strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines. There is a big chance that these are of instrumental origin.}
   \label{fig:asdtomte}
 \end{figure}
 
 \medskip
-\noindent Figure \ref{fig:asdtomte} shows an example of the ASD plot of a Tomte glitch event. To obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. Observing the strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines, there is a big chance that these are of instrumental origin. The problem with this plot, however, is that it does not capture the glitch signal well because glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data and view its time-amplitude plot.
+\noindent From figure \ref{fig:asdtomte}, which shows an example ASD plot, to obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root.  The problem with this plot, however, is that it does not capture the glitch signal well because glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data and view its time-amplitude plot.
 
 \subsubsection{Whitening}\label{Whitening}
 
-\textbf{Whitening} is the process of supressing low-frequency and spectral line noise from the data to allow for a clearer view of the underlying signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and varies significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
+\textbf{Whitening} is the process of suppressing low-frequency and spectral line noise from the data to allow for a clearer view of the underlying signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and varies significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
 
 \medskip
 \noindent Whitening is done by taking the inverse of the ASD and multiplying it with the original time series data.
@@ -346,7 +347,7 @@ bottom=0.8in
   \label{fig:sampletomte}
 \end{figure}
 
-\section{Methods}\label{Methods}\label{Methods}
+\section{Methods}\label{Methods}
 
 Our main objective is to determine the Gaussianity of time series data obtained from the LIGO Livingston detector and use this as a criterion to determine the presence of a glitch in it. If a sample is found to be non-Gaussian, there is a high chance of a glitch being present. From the previous section, we have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
 
