@@ -117,15 +117,13 @@ bottom=0.8in
 % \noindent The number of clean samples obtained from this process is significantly lower than the number of glitch samples. This is because the LIGO detectors are highly sensitive and are often affected by noise events, leading to fewer segments of clean data to work.
 
 \medskip
-\noindent All the noise sources in a detector collectively produce time series signals which can be treated as stochastic processes with their corresponding joint probability distributions and statistical properties \cite{collaboration_guide_2020}. In gravitational wave data analysis the noise floor of the detectors is approximated to be stationary and Gaussian. In the event of a glitch, the noise has some structure with a high signal-to-noise ratio (SNR), making it \textit{non-Gaussian}.
+\noindent All the noise sources in a detector collectively produce time series signals which can be treated as stochastic processes with their corresponding joint probability distributions and statistical properties \cite{collaboration_guide_2020}. In gravitational wave data analysis the noise floor of the detectors is approximated to be stationary and Gaussian. In the event of a glitch, the noise has some structure with a high signal-to-noise ratio (SNR), making it \textit{non-Gaussian}. 
 
 \medskip
-\noindent We propose a pair of hypotheses to determine the presence of a glitch in a sample of data from the detector.
-
-The null hypothesis ($h_0$) in this project is that the sample distributions being studied are Gaussian, indicating that the signal is clean. The alternative hypothesis ($h_1$) is that the distribution is non-Gaussian. This study uses three tests of Gaussianity, namely, (1) the Shapiro-Wilk test, (2) the Kolmogorov-Smirnov test, and (3) the Anderson-Darling test on preprocessed samples of the L1 interferometer data to determine their normality and assess how well these tests differentiate between Gaussian and non-Gaussian samples. This experiment also includes studying the distributions, durations, and frequency ranges, with particular emphasis on failure points for each statistical test across various glitch types. Furthermore, considering the frequency bands at which each glitch type occurs, this study also examines how each statistical test performs under band-pass filtering at various frequency ranges.
+\noindent This study uses three tests of Gaussianity, namely, (1) the Shapiro-Wilk test, (2) the Kolmogorov-Smirnov test, and (3) the Anderson-Darling test on preprocessed samples of the L1 interferometer data to determine their normality and assess how well these tests differentiate between Gaussian and non-Gaussian samples. This experiment also includes studying the distributions, durations, and frequency ranges, with particular emphasis on failure points for each statistical test across various glitch types. Furthermore, considering the frequency bands at which each glitch type occurs, this study also examines how each statistical test performs under band-pass filtering at various frequency ranges.
 
 \medskip
-\noindent This project explores statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the time-frequency domain. Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive, slowing down the process of assessing of the signals for glitch activity. The more popular solutions incorporate the \textit{Q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. The Q-transform is used as inputs to statistical tests to obtain a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is much slower when scaled up to work on multiple samples. Figures \ref{fig:qtransform_vs_windowsize} and \ref{fig:qtransform_vs_samplecount} illustrate the time taken to compute the Q-transform while varying the sample window size and the number of samples respectively. 
+\noindent Another aspect of this project is the exploration of statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the time-frequency domain. Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive, slowing down the process of assessing of the signals for glitch activity. The more popular solutions incorporate the \textit{Q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. The Q-transform is used as inputs to statistical tests to obtain a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is much slower when scaled up to work on multiple samples. Figures \ref{fig:qtransform_vs_windowsize} and \ref{fig:qtransform_vs_samplecount} illustrate the time taken to compute the Q-transform while varying the sample window size and the number of samples respectively. 
 
 % TODO: Incomplete
 
@@ -240,7 +238,7 @@ The null hypothesis ($h_0$) in this project is that the sample distributions bei
 
 \subsection{Data Conditioning}\label{DataConditioning}
 
-\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
+\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out the characteristics of the noise such that it can be visually observed and studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
 
 \begin{equation}
     s(t) = n(t) + h(t)
@@ -248,7 +246,7 @@ The null hypothesis ($h_0$) in this project is that the sample distributions bei
 \end{equation}
 
 \medskip
-\noindent The preprocessing in this project, which is discussed in section \ref{Whitening}, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
+\noindent The preprocessing in this project, which is discussed in following sections, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
 
 \begin{equation}
     \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
@@ -282,8 +280,7 @@ The null hypothesis ($h_0$) in this project is that the sample distributions bei
 %   \label{eq:psd_autocorrelation}
 % \end{equation}
 
-\medskip
-\noindent The PSD provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009, Li:2013lza}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Considering the frequency domain representation of the noise signal $n(f)$, the PSD is given by the ensemble average of the auto-correlation, expressed as
+\noindent The first method that we attempted to use to study the glitch signal was the \textbf{Power Spectral Density (PSD)}. The PSD, provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Assuming the noise sources to be non-stationary and taking the frequency domain representation of the noise signal $n(f)$, the ensemble average of the Fourier components is given by \cite{Li:2013lza}
 
 \begin{equation}
   \langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} \delta(f - f') S_n(f).
@@ -291,24 +288,32 @@ The null hypothesis ($h_0$) in this project is that the sample distributions bei
 \end{equation}
 
 \medskip
-\noindent Here, $\langle \cdot \rangle$ represents the ensemble average, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, and $\cdot^\ast$ represents the complex conjugate. Aside from Power Spectral Density, another way to characterize the noise of a detector is with the \textbf{Amplitude Spectral Density (ASD)} values, given by $\sqrt{S_n(f)}$. The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
+\noindent Where, $\langle \cdot \rangle$ represents the ensemble average, $\tilde{\cdot}$ represents the Fourier transform from \ref{eq:fourier_transform}, $\cdot^\ast$ represents the complex conjugate, and $S_n(f)$ is the PSD. Aside from PSD, another way to characterize the noise of a detector is with the \textbf{Amplitude Spectral Density (ASD)} values, given by
+
+\begin{equation}
+  ASD(f) = \sqrt{S_n(f)}
+\end{equation}
+
+\noindent The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.6\textwidth]{images/unwhitened_asd.pdf}
-  \caption{ASD plot for a Tomte Glitch. The grey dotted lines coincide with strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines. There is a big chance that these are of instrumental origin.}
+  \caption{ASD plot for a Tomte Glitch. The gray dotted lines coincide with strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines. There is a big chance that these are of instrumental origin.}
   \label{fig:asdtomte}
 \end{figure}
 
 \medskip
-\noindent From figure \ref{fig:asdtomte}, which shows an example ASD plot, to obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root.  The problem with this plot, however, is that it does not capture the glitch signal well because glitches are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would need to \textbf{whiten} the data and view its time-amplitude plot.
+\noindent From figure \ref{fig:asdtomte}, which shows an example Tomte glitch ASD plot, to obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. The problem with ASD plots, however, is that it does not visually capture the glitch signal well enough because they are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would instead need to \textbf{whiten} the data and view it in the time-amplitude domain.
+
+% Todo: Add plots comparing glitch and clean ASD
 
 \subsubsection{Whitening}\label{Whitening}
 
-\textbf{Whitening} is the process of suppressing low-frequency and spectral line noise from the data to allow for a clearer view of the underlying signals at sensitive frequency ranges. Whitening is one of the first steps in astrophysical data analysis, especially when the noise is highly non-stationary and varies significantly over time. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
+\textbf{Whitening} is the process of suppressing low-frequency and spectral line noise from the data to allow for a clearer view of the underlying signals at sensitive frequency ranges. Whitening is one of the first steps in GW data analysis. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
 
 \medskip
-\noindent Whitening is done by taking the inverse of the ASD and multiplying it with the original time series data.
+\noindent Whitening is done by taking the inverse of the estimated ASD and multiplying it with the Fourier coefficients of the original time series data \cite{collaboration_guide_2020}.
 
 \begin{align}
     \tilde{n}_\text{whitened}(f) = \frac{\tilde{n}(f)}{ASD} = \frac{\tilde{n}(f)}{\sqrt{S_n(f)}} \\
@@ -325,45 +330,55 @@ The null hypothesis ($h_0$) in this project is that the sample distributions bei
 \medskip
 \noindent With this, the received signal can now be used for our statistical testing.
 
-\subsubsection{Scaling}\label{Scaling}
-
-\noindent Some of our statistical tests, particularly the Kolmogorov-Smirnov test, is highly affected by the values of the data. We need to ensure that the comparisons being done in these tests are not biased due to the absolute values of the data points. Hence, this requires for the data to be scaled down to the same range of a standard normal distribution. This is achieved by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
-
-\medskip
-\noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used. This module works by transposing the data to have a zero mean, calculates the standard deviation, and scales the data points down such that the standard deviation is 1. The \textbf{standard score} or \textbf{z-score} of a sample point, which tells us how many standard deviations it is from the mean, is given by
-
-\begin{equation}
-    z = \frac{x - \mu}{\sigma},
-    \label{eq:scaling_formula}
-\end{equation}
-
-\medskip
-\noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. The $z$ value obtained can be treated as the new data point after scaling and is particularly useful in this case as it does not change the position of the data point in its calculation.
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.53\textwidth]{images/sample_plot.pdf}
+  \includegraphics[width=0.6\textwidth]{images/sample_plot.pdf}
   \caption{Example of a Tomte glitch signal before and after whitening.}
   \label{fig:sampletomte}
 \end{figure}
 
 \section{Methods}\label{Methods}
 
-Our main objective is to determine the Gaussianity of time series data obtained from the LIGO Livingston detector and use this as a criterion to determine the presence of a glitch in it. If a sample is found to be non-Gaussian, there is a high chance of a glitch being present. From the previous section, we have seen how whitening the time series data brings out the glitch characteristics when plotted. Taking the same glitch example as before, if we were to treat this whitened data as a population of points, ignoring the temporal component, we notice that visually, they do not follow a Gaussian distribution. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution than the glitched signal. However, to quantify this, we need to apply certain statistical tests to the data.
+% We propose a  The null hypothesis ($h_0$) in this project is that the sample distributions being studied are Gaussian, indicating that the signal is clean. The alternative hypothesis ($h_1$) is that the distribution is non-Gaussian.
+
+Our main objective is to determine the Gaussianity of time series data obtained from L1 and use this as a criterion to determine the presence of a glitch in it. 
+
+\medskip
+\noindent If a sample is found to be non-Gaussian, this indicates an excess of power at certain frequencies due to which there is a high chance of a glitch being present. In the previous section, we have seen how whitening the time series data brings out the glitch characteristics. Taking the same example as before, if we were to treat this whitened data as a population of points and plot the distribution, we notice that it contains heavier tails, hence making it non-Gaussian. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution. Hence, we propose a pair of hypotheses to determine the presence of a glitch in a sample of data from the detector.
 
 % TODO: Add images for clean and glitched signal distributions. Also compare with normal distribution.
 
 \medskip
-\noindent To achieve this, we employ three statistical tests: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these tests have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. Each of these tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result.
+\noindent\fbox{
+  \begin{minipage}{0.97\textwidth}
+    \textbf{Null Hypothesis ($H_0$):}
+
+    Considering a sample of whitened time series detector data, if the distribution of the amplitudes is Gaussian, then the sample does not contain a glitch, i.e. the sample is clean.
+  \end{minipage}
+}
+\\
+\noindent\fbox{
+  \begin{minipage}{0.97\textwidth}
+    \textbf{Alternative Hypothesis ($H_1$):}
+
+    Considering a sample of whitened time series detector data, if the distribution of the amplitudes is non-Gaussian, then the sample contains a glitch.
+  \end{minipage}
+}
+
+\medskip
+\noindent We employ three statistical tests of normality to test these hypotheses: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. These tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result. The p-value tells us how strongly the statistic rejects the null hypothesis. For our tests, a low p-value indicates that the sample data is unlikely to be Gaussian, hence indicating the presence of a glitch. The significance level for our tests, $\alpha$, is set to 0.05, which tells us that if the p-value is less than 0.05, we reject the null hypothesis and accept the alternative hypothesis.
 
 % \medskip
 % \noindent For our use case, the null hypothesis $H_0$ is that the sample data contains a glitch non-Gaussian/ not normally distributed, while the alternative hypothesis $H_1$ is that the sample data is Gaussian. As we will see in the following sections, this is the inverse of the null hypothesis for the statistical tests being used This is so that we can determine the effectiveness of these tests as glitch detection tools.
 
 \subsection{The Shapiro-Wilk Test}\label{ShapiroWilk}
 
-The Shapiro-Wilk test is a parametric test, meaning that it assumes the data follows a specific distribution. The null hypothesis in this case is that the sample data is normally distributed. The original research paper \cite{Shapiro1965} does a good job of explaining how this test works. The idea is to calculate a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance. This was the first test that could detect departures from normality due to either the skewness or the kurtosis of the data. 
+The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it assumes the data follows a specific distribution. This parametric test follows the idea of calculating a test statistic $W$ based on the ratio of the best estimate of the sample data's variance to its actual variance. This was the first test that could detect departures from normality due to either the skewness or the kurtosis of the data.
 
 \medskip
+\noindent\textbf{Skewness} is a measure of asymmetry of a distribution. It indicates how much the data deviates either to the left or right from a symmetric distribution. A skewness of 0 indicates a perfectly symmetric distribution, while positive and negative values indicate a right and left skew respectively. \textbf{Kurtosis}, on the other hand, measures the tails of the distribution, indicating how much of the data is contained in the tails compared to a normal distribution. A kurtosis of 3 indicates a normal distribution, while values greater than 3 indicate heavier tails and values less than 3 indicate lighter tails.
+
+\pagebreak
 \noindent If we were to consider $x_1, x_2, \ldots, x_n$, to be a collection of ordered sample points from a population, ranked smallest to largest, with the sample mean $\bar{x}$ and $a_1, a_2, \ldots, a_n$ being constants computed from the expected values of the order statistics of a normal distribution, then the test statistic $W$ is given by:
 
 \begin{equation}
@@ -381,7 +396,7 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
 \end{align}
 
 \medskip
-\noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be normally distributed. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is not normally distributed.
+\noindent The test statistic $W$ lies in the range $[0, 1]$, with values closer to 1 indicating that the sample data is more likely to be Gaussian. The null hypothesis $H_0$ is rejected if $W$ is significantly less than 1, indicating that the sample data is non-Gaussian.
 
 \medskip
 \noindent The p-value of the statistic is usually used to determine the significance of the result. If the p-value is less than the significance level defined, the null hypothesis is rejected, indicating that the sample data is non-Gaussian and likely contains a glitch.
@@ -391,12 +406,12 @@ The Shapiro-Wilk test is a parametric test, meaning that it assumes the data fol
 
 \subsection{The Kolmogorov-Smirnov Test}\label{KolmogorovSmirnov}
 
-The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, that is used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. compare the empirical distribution function of a sample with another reference probability distribution . This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical  sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test to compare our detector data against a standard normal distribution.
+The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (EDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
 
 % TODO: Add EDF and CDF comparison image
 
 \medskip
-\noindent The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (EDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference normal distribution. Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the ECDF of the reference function, a normal distribution in this case, is given by
+\noindent  Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the ECDF of the reference function, a normal distribution in this case, is given by
 
 \begin{equation}
     F_N = \frac{n(i)}{N}
@@ -413,6 +428,21 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 
 \medskip
 \noindent If $D_n$ is significantly large, it indicates that the ECDF of the sample data significantly differs from the CDF of the normal distribution. A critical value is used to determine the significance of this result. The null hypothesis is rejected if $D_n$ is greater than the critical value, indicating that the sample data is not normally distributed.
+
+\subsubsection{Scaling}\label{Scaling}
+
+\noindent Some of our statistical tests, particularly the Kolmogorov-Smirnov test, is highly affected by the values of the data. We need to ensure that the comparisons being done in these tests are not biased due to the absolute values of the data points. Hence, this requires for the data to be scaled down to the same range of a standard normal distribution. This is achieved by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
+
+\medskip
+\noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used. This module works by transposing the data to have a zero mean, calculates the standard deviation, and scales the data points down such that the standard deviation is 1. The \textbf{standard score} or \textbf{z-score} of a sample point, which tells us how many standard deviations it is from the mean, is given by
+
+\begin{equation}
+    z = \frac{x - \mu}{\sigma},
+    \label{eq:scaling_formula}
+\end{equation}
+
+\medskip
+\noindent where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. The $z$ value obtained can be treated as the new data point after scaling and is particularly useful in this case as it does not change the position of the data point in its calculation.
 
 \subsection{The Anderson Darling test}\label{AndersonDarling}
 
