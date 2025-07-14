@@ -406,12 +406,12 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 
 \subsection{The Kolmogorov-Smirnov Test}\label{KolmogorovSmirnov}
 
-The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (EDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
+The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (ECDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
 
 % TODO: Add EDF and CDF comparison image
 
 \medskip
-\noindent  Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the ECDF of the reference function, a normal distribution in this case, is given by
+\noindent  Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the Empirical CDF of the sample, is given by
 
 \begin{equation}
     F_N = \frac{n(i)}{N}
@@ -419,7 +419,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 \end{equation}
 
 \medskip
-\noindent where $n(i)$ is the number of points less than or equal to $X_i$ in the sample. This is in the form of a step function increasing at steps of $1/N$ at each ordered point \cite{guthrie_nistsematech_2020}. Taking the CDF of the theoretical CDF of the distribution  being tested as $F$, and the Empirical the KS test statistic $D_n$ is defined as
+\noindent Where $n(i)$ is the number of points less than or equal to $X_i$ in the sample. This is in the form of a step function increasing at steps of $1/N$ at each ordered point \cite{guthrie_nistsematech_2020}. Taking the theoretical CDF of the distribution being tested as $F$s, a Gaussian distribution in our case, the KS test statistic $D_n$ is defined as
 
 \begin{equation}
     D_n = \sup_{1 \leq i \leq N} \left( F(X_i) - \frac{i - 1}{N} , \frac{i}{N} - F(X_i) \right)
@@ -427,11 +427,11 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 \end{equation}
 
 \medskip
-\noindent If $D_n$ is significantly large, it indicates that the ECDF of the sample data significantly differs from the CDF of the normal distribution. A critical value is used to determine the significance of this result. The null hypothesis is rejected if $D_n$ is greater than the critical value, indicating that the sample data is not normally distributed.
+\noindent Here,  $\text{sup}$ refers to the supremum of the differences between the theoretical CDF and the ECDF. If $D_n$ is significantly larger than the critical value, it indicates that the sample data significantly differs from a Gaussian distribution, hence rejecting the null Hypothesis.
 
-\subsubsection{Scaling}\label{Scaling}
+\subsubsection{Note: Scaling the data}\label{Scaling}
 
-\noindent Some of our statistical tests, particularly the Kolmogorov-Smirnov test, is highly affected by the values of the data. We need to ensure that the comparisons being done in these tests are not biased due to the absolute values of the data points. Hence, this requires for the data to be scaled down to the same range of a standard normal distribution. This is achieved by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
+\noindent The Kolmogorov-Smirnov test, is highly affected by the values of the data. We need to ensure that the comparisons being done in the test is not affected due to the absolute values of the data points. Hence, this requires for the data to be scaled down to the same range of a standard normal distribution. This is achieved by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
 
 \medskip
 \noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used. This module works by transposing the data to have a zero mean, calculates the standard deviation, and scales the data points down such that the standard deviation is 1. The \textbf{standard score} or \textbf{z-score} of a sample point, which tells us how many standard deviations it is from the mean, is given by
@@ -521,18 +521,8 @@ The implementation of the proposed statistical tests on the whitened detector Ti
 
 \section{Conclusions}\label{Conclusions}
 
-\section{Future Scope}\label{Future Scope}
 
 % The p-value is the probability of observing a test statistic as extreme as the one calculated, assuming that the null hypothesis is true. If the p-value is less than a predetermined significance level (commonly 0.05), we reject the null hypothesis and conclude that the sample data is not normally distributed.
-
-
-\section{Appendix}\label{Appendix}
-
-\subsection{P-values and Selecting a Threshold}\label{pvalues}
-
-\subsection{Selecting a Suitable Scaling Method}
-
-\subsection{Experimentation with Time Series Anomaly Detection}
 
 
 % Bibliography
