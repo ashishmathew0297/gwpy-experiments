@@ -409,6 +409,12 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (ECDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
 
 % TODO: Add EDF and CDF comparison image
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/cdf_comparison_glitch_gaussian.pdf}
+    \caption{The KS statistic calculation for a sample glitch against a Gaussian distribution. The black line is the maximum absolute difference between the sample glitch CDF and the Gaussian CDF, which is the KS statistic $D_n$.}
+    \label{fig:ecdf_cdf_comparison}
+\end{figure}
 
 \medskip
 \noindent  Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the Empirical CDF of the sample, is given by
@@ -427,7 +433,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 \end{equation}
 
 \medskip
-\noindent Here,  $\text{sup}$ refers to the supremum of the differences between the theoretical CDF and the ECDF. If $D_n$ is significantly larger than the critical value, it indicates that the sample data significantly differs from a Gaussian distribution, hence rejecting the null Hypothesis.
+\noindent Here,  $\text{sup}$ refers to the supremum or maximum of the differences between the theoretical CDF and the ECDF. If $D_n$ is significantly larger than the critical value, it indicates that the sample data significantly differs from a Gaussian distribution, hence rejecting the null Hypothesis.
 
 \subsubsection{Note: Scaling the data}\label{Scaling}
 
@@ -486,7 +492,6 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \medskip
 \noindent In the case of the mean and standard deviation of  the sample distribution being known with the distribution size, $n$ being greater than $5$, the significance levels are $1\%$, $2.5\%$, $5\%$, $10\%$ and $15\%$, with the critical values for each significant level being pre-computed through Monte-Carlo simulations. The null hypothesis is rejected if the calculated statistic is greater than the critical value at a selected significance level, indicating that the sample data is not normally distributed.
 
-\pagebreak
 \noindent For all the tests used here, the p-value obtained along with the calculated statistics are used to determine Gaussianity of our sample data as opposed to the statistics themselves. This allows us to better understand the results, as they provide a direct measure of their significance. For example, if we took the Kolmogorov-Smirnov test, the calculated statistic is a distance measure, which can be difficult to interpret in terms of the distribution being Gaussian or not. The p-value, on the other hand, gives us a direct measure of the probability of the test statistic being as extreme as calculated hence, eliminating the need to determine a critical value for each statistic. Additionally, setting different critical values for each test would lead to vastly different results, making it difficult to compare the results. The p-values standardize the results hence allowing for like-to-like comparison of the result.
 
 \medskip
