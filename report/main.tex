@@ -190,11 +190,11 @@ bottom=0.8in
 
 \medskip
 \noindent There are two main types of detector samples that we receive from the detectors: \textbf{Glitched detector data} and \textbf{Clean detector data} with separate modules used to obtain them.
-  
+
 \subsection{The Glitch Segment Acquisition Module}\label{Glitchdata}
 
 \medskip
-\noindent The \textbf{Glitch Segment Acquisition Module} uses GPS times of glitch occurrences obtained from \textit{Gravity Spy} \cite{Zevin_2017} to obtain our glitch samples. GravitySpy is a large-scale citizen-science project that combines astrophysics, machine learning, and human efforts to classify glitches in GW interferometer data. The \textit{Omicron} transient search algorithm is used by Gravity Spy to generate q-transform spectrograms and calculate SNR of the time series samples \cite{robinet_omicron_2020}. This algorithm is crucial in identifying the most useful samples for data classification and analysis. Based on the morphological characteristics from the spectrograms, a total of 22 glitch classes were identified with an SNR above 7.5 and peak frequencies between 10 Hz and 2048 Hz.
+\noindent The \textbf{Glitch Segment Acquisition Module} uses GPS times of glitch occurrences obtained from \textit{Gravity Spy} \cite{Zevin_2017} to fetch our glitch samples from the GWOSC database. GravitySpy is a large-scale citizen-science project that combines astrophysics, machine learning, and human efforts to classify glitches in GW interferometer data. The \textit{Omicron} transient search algorithm is used by Gravity Spy to generate q-transform spectrograms and calculate the SNR of the time series samples \cite{robinet_omicron_2020}. This algorithm is crucial in identifying the most useful samples for data classification and analysis. Based on the morphological characteristics from the spectrograms, a total of 22 glitch classes were identified with an SNR above 7.5 and peak frequencies between 10 Hz and 2048 Hz.
 
 \medskip
 \noindent In the O3a data for L1, Fast\_Scattering and Tomte glitches are the most prevalent, while Chirp, 1080Lines and Wandering\_line glitches have fewer samples, as shown in Table \ref{tab:glitch_classes}. The No\_Glitch class represents glitch samples that lack significant traits or energy levels and do not fit in with the other classes morphologically. Hence, for our study, we do not consider this glitch class.
@@ -223,31 +223,28 @@ bottom=0.8in
     \label{tab:glitch_classes}
 \end{table}
 
+\medskip
+\noindent The time series samples of the glitches are obtained using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy. When querying the API, a sample rate of 4096 Hz is used and a padding of 10 seconds is taken on either side of each of the glitch GPS time to obtain the beginning and end times of the window for preprocessing the glitch. This is done to ensure that the sample being used is large enough for data conditioning.
+
 \subsection{The Clean Segment Acquisition Module}\label{Cleandata}
 
-\noindent The \textbf{Clean Segment Acquisition Module} is used to find gaps of clean detector noise. This is done using \texttt{gwtrigfind}, a package developed to search for event triggers files from GW detectors, in conjunction with \texttt{EventTable}, provided by GWpy.
+\noindent The \textbf{Clean Segment Acquisition Module} is used to both, find the start and end times of the gaps of clean detector noise as well as obtain the corresponding time series data. This is done using \texttt{gwtrigfind}, a package developed to search for event triggers files from GW detectors, in conjunction with \texttt{EventTable} and \texttt{TimeSeries.fetch\_open\_data()}, provided by GWpy.
 
 \medskip
-\noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between the end and start times of successive events, we obtain the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch. Additionally, a short time segment would affect the PSD calculation and subsequent preprocessing. Too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
+\noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between the end and start times of successive events, we obtain the start and end times of the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch. Additionally, a short time segment would affect the PSD calculation and subsequent preprocessing. Too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
 
 \medskip
-\noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.05 are considered to be clean segments of data.
+\noindent The start and end GPS times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.05 are considered to be clean segments of data.
 
 \medskip
-\noindent The clean and glitched GPS times from the glitch and clean segment acquisition modules are saved as CSV files for use without having to reprocess the data.
-
-\subsection{Procuring Clean and Glitched Time Series Samples from GWOSC}\label{ProcuringSamples}
-
-The CSV files containing the glitch and clean sample GPS times for L1 during O3a from previous modules are used to fetch the corresponding time series samples from the GWOSC database at a sample rate of 4096 Hz. This is done using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy.
+\noindent To obtain the time series samples, similar to the glitch data, the GWOSC database is queried by taking the beginning and ending GPS times as the limits and a sample rate of 4096 Hz.
 
 \medskip
-\noindent In the case of the glitch GPS times, a time window of 10 seconds is taken on either side of each of the GPS time with the glitch occurrence positioned in the center.  for whitening, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second time window around the glitch for further use.
-
-and are used to obtain the corresponding TimeSeries data from GWpy. The obtained TimeSeries data, similar to the glitch data, is then conditioned for statistical testing and cropped down to 1-second samples for further use.
+\noindent The clean and glitched GPS times from the glitch and clean segment acquisition modules are saved as CSV files. This allows them to be used for procuring the time series samples from GWOSC without having to go through the acquisition of the segments again.
 
 \subsection{Data Preprocessing/Conditioning}\label{DataConditioning}
 
-\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out the characteristics of the noise such that it can be visually observed and studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
+\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out its characteristics such that it can be visually observed and studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
 
 \begin{equation}
     s(t) = n(t) + h(t)
@@ -255,7 +252,7 @@ and are used to obtain the corresponding TimeSeries data from GWpy. The obtained
 \end{equation}
 
 \medskip
-\noindent The preprocessing in this project, which is discussed in following sections, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
+\noindent The preprocessing in this project, which was mentioned in previous section, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
 
 \begin{equation}
     \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
@@ -337,7 +334,7 @@ and are used to obtain the corresponding TimeSeries data from GWpy. The obtained
 \noindent In figure \ref{fig:sampletomte} we see a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the time series data. However, after whitening the data, we can clearly see the glitch signal in the time-amplitude plot. The Q-transform allows a view of the non-stationary portion of the glitch signal, which shows a clear peak in the normalized energy coinciding with the glitch event. For a clean signal we would not see any significant peaks in the whitened time series or non-stationary parts in the Q-transform.
 
 \medskip
-\noindent With this, the received signal can now be used for our statistical testing.
+\noindent In this project, the data from the clean and glitch segment acquisition modules are whitened using the method. After whitening, the glitch samples are cropped to a 0.5 second time window around the GPS time of the glitch event, effectively giving us a 1 second glitch sample to work with. The clean data, in turn, is divided into 1 second segments, each being treated as a separate clean sample for statistical testing.
 
 \begin{figure}[H]
   \centering
@@ -375,7 +372,7 @@ Our main objective is to determine the Gaussianity of time series data obtained 
 }
 
 \medskip
-\noindent We employ three statistical tests of normality to test these hypotheses: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. These tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result. The p-value tells us how strongly the statistic rejects the null hypothesis. For our tests, a low p-value indicates that the sample data is unlikely to be Gaussian, hence indicating the presence of a glitch. The significance level for our tests, $\alpha$, is set to 0.05, which tells us that if the p-value is less than 0.05, we reject the null hypothesis and accept the alternative hypothesis.
+\noindent We employ three statistical tests of normality to test these hypotheses: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. These tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result. The p-value tells us how strongly the statistic rejects the null hypothesis. For our tests, a low p-value indicates that the sample data is unlikely to be Gaussian, hence indicating the presence of a glitch. The significance level for our tests, $\alpha$, is set to 0.05, which tells us that if the p-value is less than it, we reject the null hypothesis and accept the alternative hypothesis.
 
 % \noindent This allows us to better understand the results, as they provide a direct measure of their significance. For example, if we took the Kolmogorov-Smirnov test, the calculated statistic is a distance measure, which can be difficult to interpret in terms of the distribution being Gaussian or not. The p-value, on the other hand, gives us a direct measure of the probability of the test statistic being as extreme as calculated hence, eliminating the need to determine a critical value for each statistic. Additionally, setting different critical values for each test would lead to vastly different results, making it difficult to compare the results. The p-values standardize the results hence allowing for like-to-like comparison of the result.
 
@@ -425,7 +422,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 % TODO: Add EDF and CDF comparison image
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{images/cdf_comparison_glitch_gaussian.pdf}
+    \includegraphics[width=0.8\textwidth]{images/cdf_comparison_glitch_gaussian.pdf}
     \caption{The KS statistic calculation for a sample glitch against a Gaussian distribution. The black line is the maximum absolute difference between the sample glitch CDF and the Gaussian CDF, which is the KS statistic $D_n$.}
     \label{fig:ecdf_cdf_comparison}
 \end{figure}
