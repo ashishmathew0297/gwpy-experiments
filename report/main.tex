@@ -223,9 +223,6 @@ bottom=0.8in
     \label{tab:glitch_classes}
 \end{table}
 
-\pagebreak
-\noindent Using the glitch GPS times, the time series information is obtained from the GWOSC database using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy. Here, a time window of 10 seconds is taken on either side of each of the GPS times with the glitch in the center for whitening, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second time window around the glitch for further use.
-
 \subsection{The Clean Segment Acquisition Module}\label{Cleandata}
 
 \noindent The \textbf{Clean Segment Acquisition Module} is used to find gaps of clean detector noise. This is done using \texttt{gwtrigfind}, a package developed to search for event triggers files from GW detectors, in conjunction with \texttt{EventTable}, provided by GWpy.
@@ -234,9 +231,21 @@ bottom=0.8in
 \noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between the end and start times of successive events, we obtain the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch. Additionally, a short time segment would affect the PSD calculation and subsequent preprocessing. Too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
 
 \medskip
-\noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.05 are considered to be clean segments of data, and are used to obtain the corresponding TimeSeries data from GWpy. The obtained TimeSeries data, similar to the glitch data, is then conditioned for statistical testing and cropped down to 1-second samples for further use.
+\noindent The GPS start and end times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.05 are considered to be clean segments of data.
 
-\subsection{Data Conditioning}\label{DataConditioning}
+\medskip
+\noindent The clean and glitched GPS times from the glitch and clean segment acquisition modules are saved as CSV files for use without having to reprocess the data.
+
+\subsection{Procuring Clean and Glitched Time Series Samples from GWOSC}\label{ProcuringSamples}
+
+The CSV files containing the glitch and clean sample GPS times for L1 during O3a from previous modules are used to fetch the corresponding time series samples from the GWOSC database at a sample rate of 4096 Hz. This is done using the \texttt{TimeSeries.fetch\_open\_data()} API provided by GWpy.
+
+\medskip
+\noindent In the case of the glitch GPS times, a time window of 10 seconds is taken on either side of each of the GPS time with the glitch occurrence positioned in the center.  for whitening, sampled at a rate of 4096 Hz. The TimeSeries objects obtained are then conditioned for statistical testing and cropped down to a 1-second time window around the glitch for further use.
+
+and are used to obtain the corresponding TimeSeries data from GWpy. The obtained TimeSeries data, similar to the glitch data, is then conditioned for statistical testing and cropped down to 1-second samples for further use.
+
+\subsection{Data Preprocessing/Conditioning}\label{DataConditioning}
 
 \noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out the characteristics of the noise such that it can be visually observed and studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
 
@@ -368,6 +377,11 @@ Our main objective is to determine the Gaussianity of time series data obtained 
 \medskip
 \noindent We employ three statistical tests of normality to test these hypotheses: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. These tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result. The p-value tells us how strongly the statistic rejects the null hypothesis. For our tests, a low p-value indicates that the sample data is unlikely to be Gaussian, hence indicating the presence of a glitch. The significance level for our tests, $\alpha$, is set to 0.05, which tells us that if the p-value is less than 0.05, we reject the null hypothesis and accept the alternative hypothesis.
 
+% \noindent This allows us to better understand the results, as they provide a direct measure of their significance. For example, if we took the Kolmogorov-Smirnov test, the calculated statistic is a distance measure, which can be difficult to interpret in terms of the distribution being Gaussian or not. The p-value, on the other hand, gives us a direct measure of the probability of the test statistic being as extreme as calculated hence, eliminating the need to determine a critical value for each statistic. Additionally, setting different critical values for each test would lead to vastly different results, making it difficult to compare the results. The p-values standardize the results hence allowing for like-to-like comparison of the result.
+
+\medskip
+% \noindent If the p-value is less than a predetermined significance level, 0.05 in this case, we reject the null hypothesis and conclude that the sample data is not normally distributed, hence containing a glitch. Appendix \ref{pvalues} discusses p-values and the discourse and reasoning behind the selection of the 0.05 threshold.
+
 % \medskip
 % \noindent For our use case, the null hypothesis $H_0$ is that the sample data contains a glitch non-Gaussian/ not normally distributed, while the alternative hypothesis $H_1$ is that the sample data is Gaussian. As we will see in the following sections, this is the inverse of the null hypothesis for the statistical tests being used This is so that we can determine the effectiveness of these tests as glitch detection tools.
 
@@ -378,7 +392,7 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 \medskip
 \noindent\textbf{Skewness} is a measure of asymmetry of a distribution. It indicates how much the data deviates either to the left or right from a symmetric distribution. A skewness of 0 indicates a perfectly symmetric distribution, while positive and negative values indicate a right and left skew respectively. \textbf{Kurtosis}, on the other hand, measures the tails of the distribution, indicating how much of the data is contained in the tails compared to a normal distribution. A kurtosis of 3 indicates a normal distribution, while values greater than 3 indicate heavier tails and values less than 3 indicate lighter tails.
 
-\pagebreak
+\medskip
 \noindent If we were to consider $x_1, x_2, \ldots, x_n$, to be a collection of ordered sample points from a population, ranked smallest to largest, with the sample mean $\bar{x}$ and $a_1, a_2, \ldots, a_n$ being constants computed from the expected values of the order statistics of a normal distribution, then the test statistic $W$ is given by:
 
 \begin{equation}
@@ -455,15 +469,15 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov and Cramer-von Mises tests with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}.
 
 \medskip
-\noindent Similar to the Kolmogorov-Smirnov test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. Here, taking $n$ to be the number of elements in the sample and $w(x)$ to be the weighting function the squared area between the sample stepped CDF $F_n$ and the reference distribution $F$ is calculated as
+\noindent Similar to the Kolmogorov-Smirnov test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. Here, taking $n$ to be the number of elements in the sample and $w(x)$ to be the weighting function, the Anderson-Darling statistic distance $A^2$, given by the squared area between the sample ECDF $F_n(x)$ and the theoretical reference CDF $F(x)$, is calculated as
 
 \begin{equation}
-  n \int_{-\infty}^{\infty} \left( F_n(x) - F(x) \right)^2 w(x) dF(x)
+  A^2 = n \int_{-\infty}^{\infty} \left( F_n(x) - F(x) \right)^2 w(x) dF(x)
   \label{eq:ad_distance_function}
 \end{equation}
 
 \medskip
-\noindent The weighting function $w(x)$ is defined as
+\noindent Taking the weighting function $w(x)$ is defined as
 
 \begin{equation}
     w(x) = \frac{1}{F(x) (1 - F(x))}
@@ -471,7 +485,7 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \end{equation}
 
 \medskip
-\noindent Taking the above into consideration, the distance $A^2$ \cite{anderson1954test} is given by
+\noindent We get $A^2$ \cite{anderson1954test} as
 
 \begin{equation}
     A^2 = n \int_{-\infty}^{\infty} \frac{\left( F_n(x) - F(x) \right)^2}{F(x)(1 - F(x))} \; dF(x)
@@ -479,23 +493,33 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \end{equation}
 
 \medskip
-\noindent To obtain random samples from a distribution function, the CDF is to be calculated and random samples $x$ are to be taken from a uniform distribution $x \in [0, 1]$. Hence, the above equation can be rewritten as
+\noindent To obtain random samples from a distribution function, the CDF is to be calculated and random samples $x$ are to be taken from a uniform distribution $x \in [0, 1]$. Hence, the Anderson-Darling test statistic can be rewritten as
 
-\begin{align}
-    A^2 =& -n -S \\
-    A^2 =& -n - \frac{1}{n} \sum\limits_{i=1}^{n} \left( \frac{2i - 1}{N} \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right),
+\begin{equation}
+    A^2 = -N -S
     \label{eq:ad_statistic}
-\end{align}
-
-\noindent which is effectively a weighted cross-product of the samples, allowing for a comparison of the sample data with the reference distribution.
+\end{equation}
 
 \medskip
-\noindent In the case of the mean and standard deviation of  the sample distribution being known with the distribution size, $n$ being greater than $5$, the significance levels are $1\%$, $2.5\%$, $5\%$, $10\%$ and $15\%$, with the critical values for each significant level being pre-computed through Monte-Carlo simulations. The null hypothesis is rejected if the calculated statistic is greater than the critical value at a selected significance level, indicating that the sample data is not normally distributed.
+\noindent where $S$ is given by
 
-\noindent For all the tests used here, the p-value obtained along with the calculated statistics are used to determine Gaussianity of our sample data as opposed to the statistics themselves. This allows us to better understand the results, as they provide a direct measure of their significance. For example, if we took the Kolmogorov-Smirnov test, the calculated statistic is a distance measure, which can be difficult to interpret in terms of the distribution being Gaussian or not. The p-value, on the other hand, gives us a direct measure of the probability of the test statistic being as extreme as calculated hence, eliminating the need to determine a critical value for each statistic. Additionally, setting different critical values for each test would lead to vastly different results, making it difficult to compare the results. The p-values standardize the results hence allowing for like-to-like comparison of the result.
+\begin{equation}
+  S =  \frac{1}{N} \sum\limits_{i=1}^{N} \left( 2i - 1 \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right)
+  \label{eq:ad_statistic_full}
+\end{equation}
 
 \medskip
-\noindent If the p-value is less than a predetermined significance level, 0.05 in this case, we reject the null hypothesis and conclude that the sample data is not normally distributed, hence containing a glitch. Appendix \ref{pvalues} discusses p-values and the discourse and reasoning behind the selection of the 0.05 threshold.
+\noindent hence, giving us the final form of the Anderson-Darling statistic as
+
+\begin{equation}
+  A^2 = -N - \sum\limits_{i=1}^{N} \left( \frac{2i - 1}{N} \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right)
+  \label{eq:ad_statistic_full}
+\end{equation}
+
+\noindent This is effectively a weighted cross-product of the samples, allowing for a comparison of the sample data with the reference distribution.
+
+\medskip
+\noindent In the case of the mean and standard deviation of the sample distribution being known with the distribution size, $N$ being greater than $5$, the significance levels are $1\%$, $2.5\%$, $5\%$, $10\%$ and $15\%$, with the critical values for each significant level being pre-computed through Monte-Carlo simulations. The null hypothesis is rejected if the calculated statistic is greater than the critical value at a selected significance level, indicating that the sample data is not normally distributed.
 
 \medskip
 \noindent Along with studying how effective these tests are at determining the Gaussianity of GW detector data, we will also be validating the claim in \cite{razali2011power}, which states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test.
@@ -512,14 +536,20 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 
 \section{Experimentation}\label{Experimentation}
 
-The implementation of the proposed statistical tests on the whitened detector TimeSeries is fairly straightforward, with the \texttt{scipy.stats} package providing dedicated functions for each. Treating each point in the TimeSeries as a sample of a distribution, we can use the corresponding functions to obtain the relevant statistics and p-values. 
+The implementation of the proposed statistical tests on the whitened detector time series data is fairly straightforward, with the \texttt{scipy.stats} package providing dedicated functions for each. Once the time series data Treating each amplitude value in the preprocessed time series as a sample of a distribution, we directly use the array of whitened amplitudes as inputs to the following functions to obtain the relevant statistics and p-values.
+
+\begin{itemize}
+  \item \texttt{scipy.stats.shapiro()} for the Shapiro-Wilk test
+  \item \texttt{scipy.stats.ks\_1samp()} for the one-sample Kolmogorov-Smirnov test
+  \item \texttt{scipy.stats.anderson()} for the Anderson-Darling test
+\end{itemize}
 
 \medskip
 
 
 \subsection{Using the complete frequency range}\label{Experiment_1}
 
-\section{Experimentation with a band pass filter applied}\label{Experiment_2}
+\section{Using a band pass filter}\label{Experiment_2}
 % No of samples, how to recreate the tests we did
 
 % Jarque-Bera test
