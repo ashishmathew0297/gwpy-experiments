@@ -125,8 +125,6 @@ bottom=0.8in
 \medskip
 \noindent Another aspect of this project is the exploration of statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the time-frequency domain. Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive, slowing down the process of assessing of the signals for glitch activity. The more popular solutions incorporate the \textit{Q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. The Q-transform is used as inputs to statistical tests to obtain a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is much slower when scaled up to work on multiple samples. Figures \ref{fig:qtransform_vs_windowsize} and \ref{fig:qtransform_vs_samplecount} illustrate the time taken to compute the Q-transform while varying the sample window size and the number of samples respectively. 
 
-% TODO: Incomplete
-
 \begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.65\textwidth}
@@ -145,8 +143,7 @@ bottom=0.8in
   \caption{Illustrations of a basic Michelson interferometer \cite{Stannered_Interferometer_2007,wiredsense_michelson_guide} and what an interference pattern would look like.}
 \end{figure}
 
-\medskip
-\noindent This report is organized as follows: Section \ref{Data} discusses how interferometer data is obtained and describes the properties of the time series data used in this study. It also outlines the process of acquiring clean and glitched samples and the preprocessing applied. Section \ref{Methods} describes in detail the statistical tests of Gaussianity used to assess the sample data. The experimental procedures and results are presented in Sections \ref{Experiment_1} and \ref{Experiment_2}. Finally, Section \ref{Conclusions} summarizes the findings of our experiments, discussing the strengths and limitations of the methods, followed by the future scope in Section \ref{Future Scope}.
+\noindent This report is organized as follows: Section \ref{Data} discusses how interferometer data is obtained and describes the properties of the time series data used in this study. It also outlines the process of acquiring clean and glitched samples and the preprocessing applied. Section \ref{Methods} describes in detail the statistical tests of Gaussianity used to assess the sample data. The experimental procedures and results are presented in Sections \ref{Experiment_1} and \ref{Experiment_2}. Finally, Section \ref{Conclusions} summarizes the findings of our experiments, discussing the strengths and limitations of the methods.
 
 \pagebreak
 
@@ -530,10 +527,10 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 % Trispectrum test - 4th order cumulant
 % Coefficient of Variation Envelope
 
-
+\pagebreak
 \section{Experimentation}\label{Experimentation}
 
-The implementation of the proposed statistical tests on the whitened detector time series data is fairly straightforward, with the \texttt{scipy.stats} package providing dedicated functions for each. Once the time series data Treating each amplitude value in the preprocessed time series as a sample of a distribution, we directly use the array of whitened amplitudes as inputs to the following functions to obtain the relevant statistics and p-values.
+The implementation of our statistical tests on the whitened detector time series data is fairly straightforward, with the \texttt{scipy.stats} package providing dedicated functions for each. Once the time series data for the clean and glitch samples are obtained and conditioned, their amplitude values are directly used as inputs to the following functions to obtain the relevant statistics and p-values.
 
 \begin{itemize}
   \item \texttt{scipy.stats.shapiro()} for the Shapiro-Wilk test
@@ -542,16 +539,18 @@ The implementation of the proposed statistical tests on the whitened detector ti
 \end{itemize}
 
 \medskip
-
+\noindent The results of these tests are compared against the significance level of 0.05 to determine whether the null hypothesis is rejected or not.
 
 \subsection{Using the complete frequency range}\label{Experiment_1}
 
-\section{Using a band pass filter}\label{Experiment_2}
+\subsection{Using a band pass filter}\label{Experiment_2}
 % No of samples, how to recreate the tests we did
 
 % Jarque-Bera test
 
-\section{Conclusions}\label{Conclusions}
+%  TODO: Discussions
+
+\section{Conclusion}\label{Conclusions}
 
 
 % The p-value is the probability of observing a test statistic as extreme as the one calculated, assuming that the null hypothesis is true. If the p-value is less than a predetermined significance level (commonly 0.05), we reject the null hypothesis and conclude that the sample data is not normally distributed.
