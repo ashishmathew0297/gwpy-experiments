@@ -249,7 +249,7 @@ bottom=0.8in
 \end{equation}
 
 \medskip
-\noindent The preprocessing in this project, which was mentioned in previous section, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
+\noindent The preprocessing in this project, which was mentioned in previous section and will be discussed in sections \ref{PSD_ASD} and \ref{Whitening}, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
 
 \begin{equation}
     \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
@@ -283,7 +283,7 @@ bottom=0.8in
 %   \label{eq:psd_autocorrelation}
 % \end{equation}
 
-\noindent The first method that we attempted to use to study the glitch signal was the \textbf{Power Spectral Density (PSD)}. The PSD, provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Assuming the noise sources to be non-stationary and taking the frequency domain representation of the noise signal $n(f)$, the ensemble average of the Fourier components is given by \cite{Li:2013lza}
+\noindent One of the  methods to study the glitch signal is the \textbf{Power Spectral Density (PSD)}. The PSD, provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Assuming the noise sources to be non-stationary and taking the frequency domain representation of the noise signal $n(f)$, the ensemble average of the Fourier components is given by \cite{Li:2013lza}
 
 \begin{equation}
   \langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} \delta(f - f') S_n(f).
@@ -307,7 +307,7 @@ bottom=0.8in
 \end{figure}
 
 \medskip
-\noindent From figure \ref{fig:asdtomte}, which shows an example Tomte glitch ASD plot, to obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. The problem with ASD plots, however, is that it does not visually capture the glitch signal well enough because they are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would instead need to \textbf{whiten} the data and view it in the time-amplitude domain.
+\noindent From figure \ref{fig:asdtomte}, which shows an example Tomte glitch ASD plot, to obtain the root-mean-square strain noise at a given frequency band, we integrate over the squares of the ASD readings over the frequency band of interest and take its square root. The problem with ASD plots, however, is that it does not visually capture the glitch signal well enough because they are relatively weak, highly transient and easily overpowered by the instrument noise. To better visualize the glitch, we would instead choose to \textbf{whiten} the time series data and experiment with it in the time-amplitude domain.
 
 % Todo: Add plots comparing glitch and clean ASD
 
@@ -530,7 +530,7 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \pagebreak
 \section{Experimentation}\label{Experimentation}
 
-The implementation of our statistical tests on the whitened detector time series data is fairly straightforward, with the \texttt{scipy.stats} package providing dedicated functions for each. Once the time series data for the clean and glitch samples are obtained and conditioned, their amplitude values are directly used as inputs to the following functions to obtain the relevant statistics and p-values.
+The implementation of our statistical tests on the whitened time series data is fairly straightforward, with the \texttt{scipy.stats} package providing dedicated functions for each. Once the time series data for the clean and glitch samples are obtained and conditioned, their amplitude values are directly used as inputs to the following functions to obtain the relevant statistics and p-values.
 
 \begin{itemize}
   \item \texttt{scipy.stats.shapiro()} for the Shapiro-Wilk test
