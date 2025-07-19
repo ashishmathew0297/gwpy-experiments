@@ -212,24 +212,28 @@ def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "
 
     if per_glitch:
         title = f"Confusion Matrix of {stat_test} Test on {data.iloc[0]["label"]} Glitches"
-        filename = f"conf_matrix_{data.iloc[0]['label']}_{stat_test}.png"
+        filename = f"conf_matrix_{data.iloc[0]['label']}_{stat_test}.pdf"
     else:
         title = f"Confusion Matrix of {stat_test} Test"
-        filename = f"conf_matrix_{stat_test}.png"
+        filename = f"conf_matrix_{stat_test}.pdf"
     
-    disp = metrics.ConfusionMatrixDisplay(generate_confusion_matrix(data,stat_test, threshold), display_labels=["Glitch Present", "Glitch Not Present"])
+    plt.figure(figsize=(10, 6))
+    disp = metrics.ConfusionMatrixDisplay(generate_confusion_matrix(data,stat_test, threshold), display_labels=["Glitch Present", "Glitch Not Present"],)
     disp.plot()
     plt.grid(False)
     plt.title(title)
+    plt.tight_layout()
+    # set y tick rotation
+    plt.yticks(rotation=90, va="center")
     if save_img:
-        if not os.path.isdir("./confusion_matrices/"):
-            os.mkdir("./confusion_matrices/")
-        plt.savefig(f"./confusion_matrices/{filename}")
+        if not os.path.isdir("./outputs"):
+            os.mkdir("./outputs")
+        plt.savefig(f"./outputs/{filename}")
         plt.close()
     else:
         plt.show()
 
-def display_auc_roc(y_true: pd.DataFrame, data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", thresholds: list[float] = []) -> None:
+def display_auc_roc(y_true: pd.DataFrame, data: pd.DataFrame, stat_test: Literal["Shapiro", "KS", "Anderson"]="Shapiro", thresholds: list[float] = [], save_img: bool=False) -> None:
     '''
     Generate the ROC curve for the performance of the relevant statistical tests on the signal samples. The statistical tests being considered are
     - Shapiro-Wilks Test
@@ -292,7 +296,9 @@ def display_auc_roc(y_true: pd.DataFrame, data: pd.DataFrame, stat_test: Literal
 
         fpr = np.array(fpr).flatten()
         tpr = np.array(tpr).flatten()
-    
+
+    filename = f"auc_roc_{stat_test}.pdf"
+
     roc_auc = metrics.auc(fpr, tpr)
 
     # plotting the ROC curve
@@ -305,4 +311,10 @@ def display_auc_roc(y_true: pd.DataFrame, data: pd.DataFrame, stat_test: Literal
     plt.ylabel('True Positive Rate')
     plt.title(title)
     plt.legend(loc="lower right")
-    plt.show()
+    if save_img:
+        if not os.path.isdir("./outputs"):
+            os.mkdir("./outputs")
+        plt.savefig(f"./outputs/{filename}")
+        plt.close()
+    else:
+        plt.show()
