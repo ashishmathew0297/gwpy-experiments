@@ -228,7 +228,7 @@ bottom=0.8in
 \noindent The \textbf{Clean Segment Acquisition Module} is used to both, find the start and end times of the gaps of clean detector noise as well as obtain the corresponding time series data. This is done using \texttt{gwtrigfind}, a package developed to search for event triggers files from GW detectors, in conjunction with \texttt{EventTable} and \texttt{TimeSeries.fetch\_open\_data()}, provided by GWpy.
 
 \medskip
-\noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between the end and start times of successive events, we obtain the start and end times of the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch. Additionally, a short time segment would affect the PSD calculation and subsequent preprocessing. Too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
+\noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between successive events, we obtain the start and end times of the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch. Additionally, a short time segment would affect the PSD calculation and subsequent preprocessing. Too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
 
 \medskip
 \noindent The start and end GPS times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.05 are considered to be clean segments of data.
@@ -237,7 +237,7 @@ bottom=0.8in
 \noindent To obtain the time series samples, similar to the glitch data, the GWOSC database is queried by taking the beginning and ending GPS times as the limits and a sample rate of 4096 Hz.
 
 \medskip
-\noindent The clean and glitched GPS times from the glitch and clean segment acquisition modules are saved as CSV files. This allows them to be used for procuring the time series samples from GWOSC without having to go through the acquisition of the segments again.
+\noindent The clean GPS times from the clean segment acquisition module are saved in a CSV file, and the queried time series data is also stored locally. This allows them to be used for procuring the time series samples without having to query the GWOSC database during multiple stages of analysis.
 
 \subsection{Data Preprocessing/Conditioning}\label{DataConditioning}
 
@@ -249,7 +249,7 @@ bottom=0.8in
 \end{equation}
 
 \medskip
-\noindent The preprocessing in this project, which was mentioned in previous section and will be discussed in sections \ref{PSD_ASD} and \ref{Whitening}, involves the use of Fourier transforms. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
+\noindent The preprocessing in this project, which was mentioned in previous section and will be discussed in sections \ref{PSD_ASD} and \ref{Whitening}, involves the use of Fourier transforms to divide the signal into its frequency components. Given the signal $x(t)$ in the time domain we get its corresponding Fourier transform in the frequency domain $\tilde{x}(f)$ as
 
 \begin{equation}
     \tilde{x}(f) = \mathcal{F}\{ x(t) \} (f) = \int_{-\infty}^{\infty} x(t) e^{-2 \pi i f t} dt
@@ -541,14 +541,19 @@ The implementation of our statistical tests on the whitened time series data is 
 \medskip
 \noindent The results of these tests are compared against the significance level of 0.05 to determine whether the null hypothesis is rejected or not.
 
-\subsection{Using the complete frequency range}\label{Experiment_1}
+\medskip
+\noindent Some glitches, such as 1400 Ripples, 1080 Lines, and Scattered Light, occur at specific frequency ranges. Due to this, we also experiment with the effect of using a band pass filter between 10 Hz to 512 Hz and 512 Hz to 1024 Hz, and applying our statistical tests to this filtered data.
 
-\subsection{Using a band pass filter}\label{Experiment_2}
+\subsection{Experimenting on the complete frequency range}\label{Experiment_1}
+
+\subsection{Experimenting with a band pass filter between 10 Hz to 512 Hz}\label{Experiment_2}
+
+\subsection{Experimenting with a band pass filter between 512 Hz to 1024 Hz}\label{Experiment_3}
 % No of samples, how to recreate the tests we did
 
 % Jarque-Bera test
 
-%  TODO: Discussions
+\section{Discussions}\label{Discussions}
 
 \section{Conclusion}\label{Conclusions}
 
