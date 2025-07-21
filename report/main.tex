@@ -515,8 +515,12 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \medskip
 \noindent In the case of the mean and standard deviation of the sample distribution being known with the distribution size, $N$ being greater than $5$, the significance levels are $1\%$, $2.5\%$, $5\%$, $10\%$ and $15\%$, with the critical values for each significant level being pre-computed through Monte-Carlo simulations. The null hypothesis is rejected if the calculated statistic is greater than the critical value at a selected significance level, indicating that the sample data is not normally distributed.
 
+\subsection{Using the tests for glitch detection}\label{UsingTests}
+
+In our experiments, we treat the statistical tests as classifiers, where a positive class indicates the presence of a glitch in the sample, irrespective of the type, and a negative class represents a clean signal. This is an approach usually taken with machine learning models, which predict an outcome by learning patterns from the data. In this case, the statistical tests are based on fixed sets of criteria, hence forgoing the learning aspect and directly providing a result based on the input data. Looking at the evaluation metrics of the results, we determine the effectiveness of each test in identifying glitches.
+
 \medskip
-\noindent Along with studying how effective these tests are at determining the Gaussianity of GW detector data, we will also be validating the claim in \cite{razali2011power}, which states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test.
+\noindent Along with studying how effective these tests are at determining the presence of a glitch in detector data, we will also be validating the claim in \cite{razali2011power}, which states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test.
 
 
 % Cramer-Von Mises test (It is a part of the Anderson-Darling test so it might not be needed)
@@ -546,7 +550,7 @@ The implementation of our statistical tests on the whitened time series data is 
 
 \subsection{Experimenting on the complete frequency range}\label{Experiment_1}
 
-Taking the whole frequency range into account, we get the results in table \ref{tab:full_range_results} below.
+Taking the whole frequency range into account, we get the following results (table \ref{tab:full_range_results}).
 
 \begin{table}[H]
   \begin{tabular}{lccccccccc}
@@ -561,6 +565,8 @@ Taking the whole frequency range into account, we get the results in table \ref{
   \caption{Glitch detection results for the full frequency range.}
   \label{tab:full_range_results}
 \end{table}
+
+\noindent Here, TP is the number of true positives, that is, the number of samples the test correctly identified as being a glitch or clean signal. FN is the number of false negatives, which is the number of samples that were incorrectly identified as clean when they were actually glitches.  
 
 \begin{table}[H]
   \begin{tabular}{lccccccccc}
