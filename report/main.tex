@@ -538,17 +538,61 @@ The implementation of our statistical tests on the whitened time series data is 
   \item \texttt{scipy.stats.anderson()} for the Anderson-Darling test
 \end{itemize}
 
-\medskip
-\noindent The results of these tests are compared against the significance level of 0.05 to determine whether the null hypothesis is rejected or not.
+% \medskip
+% \noindent The results of these tests are compared against the significance level of 0.05 to determine whether the null hypothesis is rejected or not.
 
 \medskip
-\noindent Some glitches, such as 1400 Ripples, 1080 Lines, and Scattered Light, occur at specific frequency ranges. Due to this, we also experiment with using a band pass filter between 10 Hz to 512 Hz and 512 Hz to 1024 Hz, and applying our statistical tests to this filtered data.
+\noindent Some glitches, such as 1400 Ripples, 1080 Lines, and Scattered Light, occur at specific frequency ranges. Due to this, we also experiment with using a band pass filter on our data between 10 Hz to 512 Hz and 512 Hz to 1024 Hz, and applying our statistical tests to this filtered data.
 
 \subsection{Experimenting on the complete frequency range}\label{Experiment_1}
 
-Taking the whole frequency range into account, we get the following results.
+Taking the whole frequency range into account, we get the results in tables \ref{tab:full_range_results} and 2 below.
 
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Test & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  Shapiro & 913 & 856 & 83 & 1741 & 1 & 1 & 0 & 1 & 1 \\
+  KS & 491 & 1278 & 0 & 1824 & 1 & 0 & 0 & 1 & 0 \\
+  Anderson & 472 & 1297 & 0 & 1824 & 1 & 0 & 0 & 1 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Glitch detection results for the full frequency range.}
+  \label{tab:full_range_results}
+\end{table}
 
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 4 & 2 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  1400Ripples & 72 & 29 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Air\_Compressor & 7 & 94 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Blip & 97 & 4 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Blip\_Low\_Frequency & 15 & 86 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Chirp & 2 & 4 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Extremely\_Loud & 101 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Fast\_Scattering & 3 & 98 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Helix & 19 & 2 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Koi\_Fish & 99 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Light\_Modulation & 67 & 5 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Low\_Frequency\_Burst & 8 & 90 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Low\_Frequency\_Lines & 2 & 99 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Paired\_Doves & 43 & 58 & 0 & 0 & 0 & 0 & 0 & 1 & 1 \\
+  Power\_Line & 7 & 93 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Repeating\_Blips & 98 & 3 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Scattered\_Light & 10 & 91 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Scratchy & 8 & 37 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+  Tomte & 55 & 46 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Violin\_Mode & 86 & 15 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Wandering\_Line & 9 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Whistle & 101 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
+  Clean\_Signal & 0 & 0 & 83 & 1741 & 1 & 0 & 0 & 0 & 0 \\
+  \bottomrule
+  \end{tabular}
+\end{table}
 
 \subsection{Experimenting with a band pass filter between 10 Hz to 512 Hz}\label{Experiment_2}
 
