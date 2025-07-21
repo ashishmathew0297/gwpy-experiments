@@ -546,16 +546,16 @@ The implementation of our statistical tests on the whitened time series data is 
 
 \subsection{Experimenting on the complete frequency range}\label{Experiment_1}
 
-Taking the whole frequency range into account, we get the results in tables \ref{tab:full_range_results} and 2 below.
+Taking the whole frequency range into account, we get the results in table \ref{tab:full_range_results} below.
 
 \begin{table}[H]
   \begin{tabular}{lccccccccc}
   \toprule
   Test & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
   \midrule
-  Shapiro & 913 & 856 & 83 & 1741 & 1 & 1 & 0 & 1 & 1 \\
-  KS & 491 & 1278 & 0 & 1824 & 1 & 0 & 0 & 1 & 0 \\
-  Anderson & 472 & 1297 & 0 & 1824 & 1 & 0 & 0 & 1 & 0 \\
+  Shapiro & 913 & 856 & 83 & 1741 & 0.74 & 0.52 & 0.05 & 0.92 & 0.66 \\
+  KS & 491 & 1278 & 0 & 1824 & 0.64 & 0.28 & 0.00 & 1.00 & 0.43 \\
+  Anderson & 472 & 1297 & 0 & 1824 & 0.64 & 0.27 & 0.00 & 1.00 & 0.42 \\
   \bottomrule
   \end{tabular}
   \caption{Glitch detection results for the full frequency range.}
@@ -567,39 +567,341 @@ Taking the whole frequency range into account, we get the results in tables \ref
   \toprule
   Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
   \midrule
-  1080Lines & 4 & 2 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  1400Ripples & 72 & 29 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Air\_Compressor & 7 & 94 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Blip & 97 & 4 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Blip\_Low\_Frequency & 15 & 86 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Chirp & 2 & 4 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Extremely\_Loud & 101 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Fast\_Scattering & 3 & 98 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Helix & 19 & 2 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Koi\_Fish & 99 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Light\_Modulation & 67 & 5 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Low\_Frequency\_Burst & 8 & 90 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Low\_Frequency\_Lines & 2 & 99 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Paired\_Doves & 43 & 58 & 0 & 0 & 0 & 0 & 0 & 1 & 1 \\
-  Power\_Line & 7 & 93 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Repeating\_Blips & 98 & 3 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Scattered\_Light & 10 & 91 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Scratchy & 8 & 37 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-  Tomte & 55 & 46 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Violin\_Mode & 86 & 15 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Wandering\_Line & 9 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Whistle & 101 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1 \\
-  Clean\_Signal & 0 & 0 & 83 & 1741 & 1 & 0 & 0 & 0 & 0 \\
+  1080Lines & 4 & 2 & 0 & 0 & 0.67 & 0.67 & 0 & 1.00 & 0.80 \\
+  1400Ripples & 72 & 29 & 0 & 0 & 0.71 & 0.71 & 0 & 1.00 & 0.83 \\
+  Air\_Compressor & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.13 \\
+  Blip & 97 & 4 & 0 & 0 & 0.96 & 0.96 & 0 & 1.00 & 0.98 \\
+  Blip\_Low\_Frequency & 15 & 86 & 0 & 0 & 0.15 & 0.15 & 0 & 1.00 & 0.26 \\
+  Chirp & 2 & 4 & 0 & 0 & 0.33 & 0.33 & 0 & 1.00 & 0.50 \\
+  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Fast\_Scattering & 3 & 98 & 0 & 0 & 0.03 & 0.03 & 0 & 1.00 & 0.06 \\
+  Helix & 19 & 2 & 0 & 0 & 0.90 & 0.90 & 0 & 1.00 & 0.95 \\
+  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Light\_Modulation & 67 & 5 & 0 & 0 & 0.93 & 0.93 & 0 & 1.00 & 0.96 \\
+  Low\_Frequency\_Burst & 8 & 90 & 0 & 0 & 0.08 & 0.08 & 0 & 1.00 & 0.15  \\
+  Low\_Frequency\_Lines & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Paired\_Doves & 43 & 58 & 0 & 0 & 0.43 & 0.43 & 0 & 1.00 & 0.60 \\
+  Power\_Line & 7 & 93 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.13 \\
+  Repeating\_Blips & 98 & 3 & 0 & 0 & 0.97 & 0.97 & 0 & 1.00 & 0.98 \\
+  Scattered\_Light & 10 & 91 & 0 & 0 & 0.10 & 0.10 & 0 & 1.00 & 0.18 \\
+  Scratchy & 8 & 37 & 0 & 0 & 0.18 & 0.18 & 0 & 1.00 & 0.30 \\
+  Tomte & 55 & 46 & 0 & 0 & 0.54 & 0.54 & 0 & 1.00 & 0.71 \\
+  Violin\_Mode & 86 & 15 & 0 & 0 & 0.85 & 0.85 & 0 & 1.00 & 0.92 \\
+  Wandering\_Line & 9 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Whistle & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Clean\_Signal & 0 & 0 & 83 & 1741 & 0.95 & 0.00 & 0.05 & 0.00 & 0.00 \\
   \bottomrule
   \end{tabular}
+  \caption{Shapiro-Wilk test results for each glitch class at the full frequency range.}
+  \label{tab:shapiro_full_range_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Blip & 37 & 64 & 0 & 0 & 0.37 & 0.37 & 0 & 1.00 & 0.54 \\
+  Blip\_Low\_Frequency & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Helix & 12 & 9 & 0 & 0 & 0.57 & 0.57 & 0 & 1.00 & 0.73 \\
+  Koi\_Fish & 98 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 1.00 & 0.99 \\
+  Light\_Modulation & 60 & 12 & 0 & 0 & 0.83 & 0.83 & 0 & 1.00 & 0.91 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Paired\_Doves & 20 & 81 & 0 & 0 & 0.20 & 0.20 & 0 & 1.00 & 0.33 \\
+  Power\_Line & 1 & 99 & 0 & 0 & 0.01 & 0.01 & 0 & 1.00 & 0.02  \\
+  Repeating\_Blips & 62 & 39 & 0 & 0 & 0.61 & 0.61 & 0 & 1.00 & 0.76  \\
+  Scattered\_Light & 3 & 98 & 0 & 0 & 0.03 & 0.03 & 0 & 1.00 & 0.06 \\
+  Scratchy & 3 & 42 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.12 \\
+  Tomte & 14 & 87 & 0 & 0 & 0.14 & 0.14 & 0 & 1.00 & 0.24 \\
+  Violin\_Mode & 18 & 83 & 0 & 0 & 0.18 & 0.18 & 0 & 1.00 & 0.30 \\
+  Wandering\_Line & 5 & 4 & 0 & 0 & 0.56 & 0.56 & 0 & 1.00 & 0.71 \\
+  Whistle & 55 & 46 & 0 & 0 & 0.54 & 0.54 & 0 & 1.00 & 0.71 \\
+  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 0.00 & 0 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Kolmogorov-Smirnov test results for each glitch class at the full frequency range.}
+  \label{tab:ks_full_range_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Blip & 35 & 66 & 0 & 0 & 0.35 & 0.35 & 0 & 1.00 & 0.51 \\
+  Blip\_Low\_Frequency & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Helix & 8 & 13 & 0 & 0 & 0.38 & 0.38 & 0 & 1.00 & 0.55 \\
+  Koi\_Fish & 98 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 1.00 & 0.99 \\
+  Light\_Modulation & 58 & 14 & 0 & 0 & 0.81 & 0.81 & 0 & 1.00 & 0.89 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Paired\_Doves & 17 & 84 & 0 & 0 & 0.17 & 0.17 & 0 & 1.00 & 0.29 \\
+  Power\_Line & 1 & 99 & 0 & 0 & 0.01 & 0.01 & 0 & 1.00 & 0.02 \\
+  Repeating\_Blips & 60 & 41 & 0 & 0 & 0.59 & 0.59 & 0 & 1.00 & 0.75 \\
+  Scattered\_Light & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Scratchy & 3 & 42 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.12 \\
+  Tomte & 12 & 89 & 0 & 0 & 0.12 & 0.12 & 0 & 1.00 & 0.21 \\
+  Violin\_Mode & 17 & 84 & 0 & 0 & 0.17 & 0.17 & 0 & 1.00 & 0.29 \\
+  Wandering\_Line & 5 & 4 & 0 & 0 & 0.56 & 0.56 & 0 & 1.00 & 0.71 \\
+  Whistle & 53 & 48 & 0 & 0 & 0.52 & 0.52 & 0 & 1.00 & 0.69 \\
+  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 0.00 & 0 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Anderson-Darling test results for each glitch class at the full frequency range.}
+  \label{tab:ad_full_range_results}
 \end{table}
 
 \subsection{Experimenting with a band pass filter between 10 Hz to 512 Hz}\label{Experiment_2}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Test & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  Shapiro & 1252 & 517 & 735 & 1089 & 0.65 & 0.71 & 0.40 & 0.63 & 0.67 \\
+  KS & 630 & 1139 & 24 & 1800 & 0.68 & 0.36 & 0.01 & 0.96 & 0.52 \\
+  Anderson & 589 & 1180 & 0 & 1824 & 0.67 & 0.33 & 0.00 & 1.00 & 0.50 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Glitch detection results for a frequency range of 10 Hz to 512 Hz.}
+  \label{tab:low_frequency_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 3 & 3 & 0 & 0 & 0.50 & 0.50 & 0 & 1.00 & 0.67 \\
+  1400Ripples & 44 & 57 & 0 & 0 & 0.44 & 0.44 & 0 & 1.00 & 0.61 \\
+  Air\_Compressor & 54 & 47 & 0 & 0 & 0.53 & 0.53 & 0 & 1.00 & 0.70 \\
+  Blip & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Blip\_Low\_Frequency & 72 & 29 & 0 & 0 & 0.71 & 0.71 & 0 & 1.00 & 0.83 \\
+  Chirp & 5 & 1 & 0 & 0 & 0.83 & 0.83 & 0 & 1.00 & 0.91 \\
+  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Fast\_Scattering & 41 & 60 & 0 & 0 & 0.41 & 0.41 & 0 & 1.00 & 0.58 \\
+  Helix & 21 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Light\_Modulation & 71 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 1.00 & 0.99 \\
+  Low\_Frequency\_Burst & 43 & 55 & 0 & 0 & 0.44 & 0.44 & 0 & 1.00 & 0.61 \\
+  Low\_Frequency\_Lines & 51 & 50 & 0 & 0 & 0.50 & 0.50 & 0 & 1.00 & 0.67 \\
+  Paired\_Doves & 86 & 15 & 0 & 0 & 0.85 & 0.85 & 0 & 1.00 & 0.92 \\
+  Power\_Line & 68 & 32 & 0 & 0 & 0.68 & 0.68 & 0 & 1.00 & 0.81 \\
+  Repeating\_Blips & 98 & 3 & 0 & 0 & 0.97 & 0.97 & 0 & 1.00 & 0.98 \\
+  Scattered\_Light & 65 & 36 & 0 & 0 & 0.64 & 0.64 & 0 & 1.00 & 0.78 \\
+  Scratchy & 34 & 11 & 0 & 0 & 0.76 & 0.76 & 0 & 1.00 & 0.86 \\
+  Tomte & 96 & 5 & 0 & 0 & 0.95 & 0.95 & 0 & 1.00 & 0.97 \\
+  Violin\_Mode & 50 & 51 & 0 & 0 & 0.50 & 0.50 & 0 & 1.00 & 0.66 \\
+  Wandering\_Line & 3 & 6 & 0 & 0 & 0.33 & 0.33 & 0 & 1.00 & 0.50 \\
+  Whistle & 46 & 55 & 0 & 0 & 0.46 & 0.46 & 0 & 1.00 & 0.63 \\
+  Clean\_Signal & 0 & 0 & 735 & 1089 & 0.60 & 0.00 & 0.40 & 0.00 & 0.00 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Shapiro-Wilk test results for each glitch class at a frequency range of 10 Hz to 512 Hz.}
+  \label{tab:shapiro_low_frequency_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Air\_Compressor & 1 & 100 & 0 & 0 & 0.01 & 0.01 & 0 & 1.00 & 0.02 \\
+  Blip & 74 & 27 & 0 & 0 & 0.73 & 0.73 & 0 & 1.00 & 0.85 \\
+  Blip\_Low\_Frequency & 11 & 90 & 0 & 0 & 0.11 & 0.11 & 0 & 1.00 & 0.20 \\
+  Chirp & 2 & 4 & 0 & 0 & 0.33 & 0.33 & 0 & 1.00 & 0.50 \\
+  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Fast\_Scattering & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Helix & 18 & 3 & 0 & 0 & 0.86 & 0.86 & 0 & 1.00 & 0.92 \\
+  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Light\_Modulation & 66 & 6 & 0 & 0 & 0.92 & 0.92 & 0 & 1.00 & 0.96 \\
+  Low\_Frequency\_Burst & 3 & 95 & 0 & 0 & 0.03 & 0.03 & 0 & 1.00 & 0.06 \\
+  Low\_Frequency\_Lines & 6 & 95 & 0 & 0 & 0.06 & 0.06 & 0 & 1.00 & 0.11 \\
+  Paired\_Doves & 48 & 53 & 0 & 0 & 0.48 & 0.48 & 0 & 1.00 & 0.64 \\
+  Power\_Line & 2 & 98 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Repeating\_Blips & 95 & 6 & 0 & 0 & 0.94 & 0.94 & 0 & 1.00 & 0.97 \\
+  Scattered\_Light & 15 & 86 & 0 & 0 & 0.15 & 0.15 & 0 & 1.00 & 0.26 \\
+  Scratchy & 14 & 31 & 0 & 0 & 0.31 & 0.31 & 0 & 1.00 & 0.47 \\
+  Tomte & 52 & 49 & 0 & 0 & 0.51 & 0.51 & 0 & 1.00 & 0.68 \\
+  Violin\_Mode & 12 & 89 & 0 & 0 & 0.12 & 0.12 & 0 & 1.00 & 0.21 \\
+  Wandering\_Line & 0 & 9 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Whistle & 9 & 92 & 0 & 0 & 0.09 & 0.09 & 0 & 1.00 & 0.16 \\
+  Clean\_Signal & 0 & 0 & 24 & 1800 & 0.99 & 0.00 & 0.01 & 0.00 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Kolmogorov-Smirnov test results for each glitch class at a frequency range of 10 Hz to 512 Hz.}
+  \label{tab:ks_low_frequency_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Blip & 73 & 28 & 0 & 0 & 0.72 & 0.72 & 0 & 1.00 & 0.84 \\
+  Blip\_Low\_Frequency & 8 & 93 & 0 & 0 & 0.08 & 0.08 & 0 & 1.00 & 0.15 \\
+  Chirp & 1 & 5 & 0 & 0 & 0.17 & 0.17 & 0 & 1.00 & 0.29 \\
+  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Fast\_Scattering & 1 & 100 & 0 & 0 & 0.01 & 0.01 & 0 & 1.00 & 0.02 \\
+  Helix & 18 & 3 & 0 & 0 & 0.86 & 0.86 & 0 & 1.00 & 0.92 \\
+  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Light\_Modulation & 66 & 6 & 0 & 0 & 0.92 & 0.92 & 0 & 1.00 & 0.96 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Paired\_Doves & 47 & 54 & 0 & 0 & 0.47 & 0.47 & 0 & 1.00 & 0.64 \\
+  Power\_Line & 1 & 99 & 0 & 0 & 0.01 & 0.01 & 0 & 1.00 & 0.02 \\
+  Repeating\_Blips & 91 & 10 & 0 & 0 & 0.90 & 0.90 & 0 & 1.00 & 0.95 \\
+  Scattered\_Light & 10 & 91 & 0 & 0 & 0.10 & 0.10 & 0 & 1.00 & 0.18 \\
+  Scratchy & 8 & 37 & 0 & 0 & 0.18 & 0.18 & 0 & 1.00 & 0.30 \\
+  Tomte & 48 & 53 & 0 & 0 & 0.48 & 0.48 & 0 & 1.00 & 0.64 \\
+  Violin\_Mode & 10 & 91 & 0 & 0 & 0.10 & 0.10 & 0 & 1.00 & 0.18 \\
+  Wandering\_Line & 0 & 9 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Whistle & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.13 \\
+  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 0.00 & 0 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Anderson-Darling test results for each glitch class at a frequency range of 10 Hz to 512 Hz.}
+  \label{tab:ad_low_frequency_results}
+\end{table}
 
 \subsection{Experimenting with a band pass filter between 512 Hz to 1024 Hz}\label{Experiment_3}
 % No of samples, how to recreate the tests we did
 
 % Jarque-Bera test
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Test & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  Shapiro & 555 & 1214 & 67 & 1757 & 0.64 & 0.31 & 0.04 & 0.89 & 0.46 \\
+  KS & 279 & 1490 & 0 & 1824 & 0.59 & 0.16 & 0.00 & 1.00 & 0.27 \\
+  Anderson & 268 & 1501 & 0 & 1824 & 0.58 & 0.15 & 0.00 & 1.00 & 0.26 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Glitch detection results for a frequency range of 512 Hz to 1024 Hz.}
+  \label{tab:high_frequency_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 3 & 3 & 0 & 0 & 0.50 & 0.50 & 0 & 1.00 & 0.67 \\
+  1400Ripples & 6 & 95 & 0 & 0 & 0.06 & 0.06 & 0 & 1.00 & 0.11 \\
+  Air\_Compressor & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Blip & 47 & 54 & 0 & 0 & 0.47 & 0.47 & 0 & 1.00 & 0.64 \\
+  Blip\_Low\_Frequency & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.13 \\
+  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0.00 & 0.00 \\
+  Extremely\_Loud & 100 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 1.00 & 1.00 \\
+  Fast\_Scattering & 5 & 96 & 0 & 0 & 0.05 & 0.05 & 0 & 1.00 & 0.09 \\
+  Helix & 8 & 13 & 0 & 0 & 0.38 & 0.38 & 0 & 1.00 & 0.55 \\
+  Koi\_Fish & 82 & 17 & 0 & 0 & 0.83 & 0.83 & 0 & 1.00 & 0.91 \\
+  Light\_Modulation & 55 & 17 & 0 & 0 & 0.76 & 0.76 & 0 & 1.00 & 0.87 \\
+  Low\_Frequency\_Burst & 8 & 90 & 0 & 0 & 0.08 & 0.08 & 0 & 1.00 & 0.15 \\
+  Low\_Frequency\_Lines & 5 & 96 & 0 & 0 & 0.05 & 0.05 & 0 & 1.00 & 0.09 \\
+  Paired\_Doves & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.13 \\
+  Power\_Line & 7 & 93 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.13 \\
+  Repeating\_Blips & 58 & 43 & 0 & 0 & 0.57 & 0.57 & 0 & 1.00 & 0.73 \\
+  Scattered\_Light & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 1.00 & 0.04 \\
+  Scratchy & 4 & 41 & 0 & 0 & 0.09 & 0.09 & 0 & 1.00 & 0.16 \\
+  Tomte & 3 & 98 & 0 & 0 & 0.03 & 0.03 & 0 & 1.00 & 0.06 \\
+  Violin\_Mode & 55 & 46 & 0 & 0 & 0.54 & 0.54 & 0 & 1.00 & 0.71 \\
+  Wandering\_Line & 9 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 1.00 & 1.00 \\
+  Whistle & 82 & 19 & 0 & 0 & 0.81 & 0.81 & 0 & 1.00 & 0.90 \\
+  Clean\_Signal & 0 & 0 & 67 & 1757 & 0.96 & 0.00 & 0.04 & 0.00 & 0.00 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Shapiro-Wilk test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
+  \label{tab:shapiro_high_frequency_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Blip & 21 & 80 & 0 & 0 & 0.21 & 0.21 & 0 & 1.00 & 0.34 \\
+  Blip\_Low\_Frequency & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Extremely\_Loud & 97 & 4 & 0 & 0 & 0.96 & 0.96 & 0 & 1.00 & 0.98 \\
+  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Helix & 0 & 21 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Koi\_Fish & 66 & 33 & 0 & 0 & 0.67 & 0.67 & 0 & 1.00 & 0.80 \\
+  Light\_Modulation & 33 & 39 & 0 & 0 & 0.46 & 0.46 & 0 & 1.00 & 0.63 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Paired\_Doves & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Power\_Line & 0 & 100 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Repeating\_Blips & 31 & 70 & 0 & 0 & 0.31 & 0.31 & 0 & 1.00 & 0.47 \\
+  Scattered\_Light & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Scratchy & 2 & 43 & 0 & 0 & 0.04 & 0.04 & 0 & 1.00 & 0.09 \\
+  Tomte & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Violin\_Mode & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 1.00 & 0.13 \\
+  Wandering\_Line & 7 & 2 & 0 & 0 & 0.78 & 0.78 & 0 & 1.00 & 0.88 \\
+  Whistle & 15 & 86 & 0 & 0 & 0.15 & 0.15 & 0 & 1.00 & 0.26 \\
+  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 0.00 & 0 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Kolmogorov-Smirnov test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
+  \label{tab:ks_high_frequency_results}
+\end{table}
+
+\begin{table}[H]
+  \begin{tabular}{lccccccccc}
+  \toprule
+  Label & TP & FN & FP & TN & Accuracy & Recall/TPR & FPR & Precision & F1 Score \\
+  \midrule
+  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Blip & 20 & 81 & 0 & 0 & 0.20 & 0.20 & 0 & 1.00 & 0.33 \\
+  Blip\_Low\_Frequency & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Extremely\_Loud & 96 & 5 & 0 & 0 & 0.95 & 0.95 & 0 & 1.00 & 0.97 \\
+  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Helix & 0 & 21 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Koi\_Fish & 65 & 34 & 0 & 0 & 0.66 & 0.66 & 0 & 1.00 & 0.79 \\
+  Light\_Modulation & 33 & 39 & 0 & 0 & 0.46 & 0.46 & 0 & 1.00 & 0.63 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Paired\_Doves & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Power\_Line & 0 & 100 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Repeating\_Blips & 31 & 70 & 0 & 0 & 0.31 & 0.31 & 0 & 1.00 & 0.47 \\
+  Scattered\_Light & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Scratchy & 2 & 43 & 0 & 0 & 0.04 & 0.04 & 0 & 1.00 & 0.09 \\
+  Tomte & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 0 \\
+  Violin\_Mode & 6 & 95 & 0 & 0 & 0.06 & 0.06 & 0 & 1.00 & 0.11 \\
+  Wandering\_Line & 6 & 3 & 0 & 0 & 0.67 & 0.67 & 0 & 1.00 & 0.80 \\
+  Whistle & 9 & 92 & 0 & 0 & 0.09 & 0.09 & 0 & 1.00 & 0.16 \\
+  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 0.00 & 0 & 0 \\
+  \bottomrule
+  \end{tabular}
+  \caption{Anderson-Darling test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
+  \label{tab:ad_high_frequency_results}
+\end{table}
 
 \section{Discussions}\label{Discussions}
 
