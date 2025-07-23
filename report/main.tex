@@ -140,7 +140,7 @@ bottom=0.8in
     \caption{Interference pattern}
     \label{fig:qtransform_vs_samplecount}
   \end{subfigure}
-  \caption{Illustrations of a basic Michelson interferometer \cite{Stannered_Interferometer_2007,wiredsense_michelson_guide} and what an interference pattern would look like.}
+  \caption{Plots showing how the time taken to compute the Q-transform scales with the sample window size and the number of samples.}
 \end{figure}
 
 \noindent This report is organized as follows: Section \ref{Data} discusses how interferometer data is obtained and describes the properties of the time series data used in this study. It also outlines the process of acquiring clean and glitched samples and the preprocessing applied. Section \ref{Methods} describes in detail the statistical tests of Gaussianity used to assess the sample data. The experimental procedures and results are presented in Sections \ref{Experiment_1} and \ref{Experiment_2}. Finally, Section \ref{Conclusions} summarizes the findings of our experiments, discussing the strengths and limitations of the methods.
@@ -297,11 +297,11 @@ bottom=0.8in
   ASD(f) = \sqrt{S_n(f)}
 \end{equation}
 
-\noindent The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. The ASD is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
+\noindent The ASD measures the amplitude of the signal at each frequency, and it is often used to compare the noise levels of different detectors or to assess a detector's sensitivity to specific frequencies. It is normally plotted on a logarithmic scale, with frequency on the x-axis and the ASD on the y-axis, allowing for easy identification of noise peaks and their corresponding frequencies.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\textwidth]{images/unwhitened_asd.pdf}
+  \includegraphics[width=0.55\textwidth]{images/unwhitened_asd.pdf}
   \caption{ASD plot for a Tomte Glitch. The gray dotted lines coincide with strong spectral lines at around the 300, 512, and 1024 Hz ranges, marked by dotted lines. There is a big chance that these are of instrumental origin.}
   \label{fig:asdtomte}
 \end{figure}
@@ -517,7 +517,42 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 
 \subsection{Using the tests for glitch detection}\label{UsingTests}
 
-In our experiments, we treat the statistical tests as classifiers, where a positive class indicates the presence of a glitch in the sample, irrespective of the type, and a negative class represents a clean signal. This is an approach usually taken with machine learning models, which predict an outcome by learning patterns from the data. In this case, the statistical tests are based on fixed sets of criteria, hence forgoing the learning aspect and directly providing a result based on the input data. Looking at the evaluation metrics of the results, we determine the effectiveness of each test in identifying glitches.
+In our experiments, we treat the statistical tests as classifiers, where a positive class indicates the presence of a glitch in the sample, irrespective of the type, and a negative class represents a clean signal. This is an approach usually taken with machine learning models, which predict an outcome by learning patterns from the data. In our case, the statistical tests are based on fixed sets of criteria, hence forgoing the learning aspect and directly providing a result based on the input data. This provides a straightforward way of evaluating the performance of each test through the evaluation metrics of the results.
+
+\medskip
+\noindent The evaluation metrics used in this project are based on the following definitions:
+
+\begin{itemize}
+  \item \textbf{True Positives (TP)}: The number of samples correctly identified as glitches by the test.
+  \item \textbf{False Negatives (FN)}: The number of samples incorrectly identified to be clean/Gaussian when they contained glitches.
+  \item \textbf{False Positives (FP)}: The number of samples incorrectly identified as glitches when they were actually clean.
+  \item \textbf{True Negatives (TN)}: The number of samples correctly identified as clean by the test.
+\end{itemize}
+
+\noindent The following evaluation metrics are what we consider for our tests:
+
+\begin{itemize}
+  \item \textbf{Accuracy}: The number of correct predictions out of the total number of samples. This is the most common metric used to determine the overall performance of the model or test being studied. However, it can be misleading when taken at face value as it does not account for dataset imbalances or model/test bias.
+    \begin{equation}
+      \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+    \end{equation}
+  \item \textbf{Recall} or \textbf{True Positive Rate (TPR)}: The number of actual positive samples correctly identified as positive over the total number of actual positive samples gives us the \textit{Recall}. This tells us how trustworthy the positive predictions made by the test are.
+    \begin{equation}
+      \text{Recall} = \frac{TP}{TP + FN}
+    \end{equation}
+  \item \textbf{False Positive Rate} (FPR): This is the number of actual negative samples incorrectly identified as positive over the total number of actual negative samples. It is ideal to keep this value low to ensure that our tests do not incorrectly label clean signals as glitches.
+    \begin{equation}
+      \text{FPR} = \frac{FP}{FP + TN}
+    \end{equation}
+  \item \textbf{Precision}: The number of predicted positive samples that were actually positive over the total number of predicted positive samples gives us the \textit{Precision}. The precision tells us how trustworthy the positive predictions made by the test are.
+    \begin{equation}
+      \text{Precision} = \frac{TP}{TP + FP}
+    \end{equation}
+  \item \textbf{F1 Score}: This is another measure of accuracy which makes use of the Precision and Recall. As opposed to Accuracy, which computes how many times the model makes a correct prediction, it sees how well the model performs on each class. Learning models play a balancing act between the Precision and Recall, as the precision places more emphasis on getting the positive predictions right, while recall focuses on getting as many positive predictions as possible. Getting both these values high would be an indicator that the model or test is performing well. The F1 score combines precision and recall into a single metric by taking their harmonic mean to ensure that both maximized.
+    \begin{equation}
+      \text{F1 Score} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+    \end{equation}
+\end{itemize}
 
 \medskip
 \noindent Along with studying how effective these tests are at determining the presence of a glitch in detector data, we will also be validating the claim in \cite{razali2011power}, which states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test.
@@ -542,6 +577,9 @@ The implementation of our statistical tests on the whitened time series data is 
   \item \texttt{scipy.stats.anderson()} for the Anderson-Darling test
 \end{itemize}
 
+\medskip
+\noindent For our experimentation we take up to 101 samples of each glitch type.
+
 % \medskip
 % \noindent The results of these tests are compared against the significance level of 0.05 to determine whether the null hypothesis is rejected or not.
 
@@ -550,7 +588,7 @@ The implementation of our statistical tests on the whitened time series data is 
 
 \subsection{Experimenting on the complete frequency range}\label{Experiment_1}
 
-Taking the whole frequency range into account, we get the following results (table \ref{tab:full_range_results}).
+Taking the whole frequency range into account, we get the following results (Table \ref{tab:full_range_results}).
 
 \begin{table}[H]
   \begin{tabular}{lccccccccc}
@@ -566,7 +604,8 @@ Taking the whole frequency range into account, we get the following results (tab
   \label{tab:full_range_results}
 \end{table}
 
-\noindent Here, TP is the number of true positives, that is, the number of samples the test correctly identified as being a glitch or clean signal. FN is the number of false negatives, which is the number of samples that were incorrectly identified as clean when they were actually glitches.  
+\medskip
+\noindent Here, we see that the Shapiro-Wilk test has the best accuracy and F1-score, with a recall of 0.52.
 
 \begin{table}[H]
   \begin{tabular}{lccccccccc}
