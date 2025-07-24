@@ -578,13 +578,35 @@ The implementation of our statistical tests on the whitened time series data is 
 \end{itemize}
 
 \medskip
-\noindent For our experimentation we take up to 101 samples of each glitch type and 700 samples of clean signals, which after querying and preprocessing gives us.
+\noindent For our experiment we take up to 101 GPS times for each glitch type and 700 GPS time pairs of clean signals, which after querying and preprocessing gives us the following sample counts.
 
-% \medskip
-% \noindent The results of these tests are compared against the significance level of 0.05 to determine whether the null hypothesis is rejected or not.
+\begin{table}[H]
+  \centering
+  \begin{tabular}{lr|lr}
+    \toprule
+    Glitch Class & Count & Glitch Class & Count \\
+    \midrule
+    Clean\_Signal & 1824 & Repeating\_Blips & 101 \\
+    1400Ripples & 101 & Scattered\_Light & 101 \\
+    Air\_Compressor & 101 & Power\_Line & 100 \\
+    Blip\_Low\_Frequency & 101 & Koi\_Fish & 99 \\
+    Blip & 101 & Low\_Frequency\_Burst & 98 \\
+    Fast\_Scattering & 101 & Light\_Modulation & 72 \\
+    Extremely\_Loud & 101 & Scratchy & 45 \\
+    Whistle & 101 & Helix & 21 \\
+    Violin\_Mode & 101 & Wandering\_Line & 9 \\
+    Low\_Frequency\_Lines & 101 & Chirp & 6 \\
+    Paired\_Doves & 101 & 1080Lines & 6 \\
+    Tomte & 101 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Count of the clean and glitch samples taken for the experiment.}
+  \label{tab:label_counts}
+\end{table}
 
-\medskip
-\noindent Some glitches, such as 1400 Ripples, 1080 Lines, and Scattered Light, occur at specific frequency ranges. Due to this, we also experiment with using a band pass filter on our data between 10 Hz to 512 Hz and 512 Hz to 1024 Hz, and applying our statistical tests to this filtered data.
+\noindent It is evident that due to the variation in the number of glitches, the data we are dealing with is skewed. Due to this we will need to study how each of our tests perform when detecting each type of glitch. Additionally, some glitches, such as 1400 Ripples, 1080 Lines, and Scattered Light, occur at specific frequency ranges. Due to this, we also experiment with using a band pass filter on our data between 10 Hz to 512 Hz and 512 Hz to 1024 Hz, and applying our statistical tests to this filtered data.
+
+\pagebreak
 
 \subsection{Experimenting on the complete frequency range}\label{Experiment_1}
 
@@ -605,7 +627,10 @@ Taking the whole frequency range into account, we get the following results (Tab
 \end{table}
 
 \medskip
-\noindent Here, we see that the Shapiro-Wilk test has the best accuracy and F1-score, with a recall of 0.52.
+\noindent At a first glance, the Shapiro-Wilk test has the best accuracy of the three at 0.74, with the accuracies of the Kolmogorov-Smirnov and Anderson Darling tests being approximately 10\% lower than it. The False Positives being low in all three of the tests tells us that they, for the most part, excel at determining whether a sample is clean. The recall of 0.52 tells us that the Shapiro-Wilk test is able to capture slightly more than half of the cases where a glitch is present whereas the Kolmogorov-Smirnov and Anderson-Darling tests struggle in the same. Looking at the False Negatives tells us a completely different story.
+
+\medskip
+\noindent In the case of the Shapiro-Wilk test, 
 
 \begin{table}[H]
   \begin{tabular}{lccccccccc}
