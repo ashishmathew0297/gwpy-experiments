@@ -207,9 +207,10 @@ def generate_evaluation_metrics(confusion_matrix):
     accuracy = (TP + TN) / (TP + TN + FP + FN)
     recall = TP / (TP + FN) if (TP + FN) != 0 else 0
     specificity = TN / (TN + FP) if (TN + FP) != 0 else 0
-    fpr = FP / (FP + TN) if (FP + TN) != 0 else 0
+    fpr = FP / (TN + FP) if (TN + FP) != 0 else 0
+    fnr = FN / (FN + TP) if (FN + TP) != 0 else 0
     precision = TP / (TP + FP) if (TP + FP) != 0 else 0
     f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) != 0 else 0
     
     # Print metrics
-    return accuracy, recall, specificity, fpr, precision, f1_score
+    return accuracy, recall, specificity, fpr, fnr, precision, f1_score
