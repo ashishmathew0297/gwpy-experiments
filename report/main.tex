@@ -671,15 +671,12 @@ Taking the whole frequency range into account, we get the following results (Tab
   \label{tab:shapiro_full_range_results}
 \end{table}
 
-\noindent Looking at the Shapiro-Wilk results on a per-glitch level in table \ref{tab:shapiro_full_range_results}, we see that the test's performance varies significantly across each of the glitch classes. This test achieves perfect accuracy and F1 Scores for Extremely\_Loud glitches. In the examples of Blip, Koi\_fish, and Wandering\_Line glitches, the Shapiro-Wilk test outperforms the Kolmogorov-Smrinov test as seen in table \ref{tab:ks_full_range_results} and the Anderson-Darling test results in \ref{tab:ad_full_range_results}. On studying the distributions for a few examples of these glitches, we can clearly see that they diverge from a Gaussian distribution, which has been perfectly captured by all the three tests.
+\noindent Looking at the results on a per-glitch level in tables \ref{tab:shapiro_full_range_results}, \ref{tab:ks_full_range_results}, and \ref{tab:ad_full_range_results}, we see that the tests' performances vary significantly across each of the glitch classes. All the three tests achieve perfect accuracy and F1 Scores for Extremely\_Loud glitches, which is to be expected due to these glitches being highly distinctive over a large frequency range with a high SNR. In the case of the Blip, Repeating\_Blips, whistle and Violin\_Mode glitches, the Shapiro-Wilk test far surpasses the other two tests, with a fixed pattern of the Shapiro-Wilk being the best, followed by the Kolmogorov-Smirnov test and then the Anderson-Darling test. In a few unique cases, such as 1400Ripples, Air\_Compressor and Fast\_Scattering glitches, the Shapiro-Wilk test is able to detect a few of the glitch samples, while the other two tests fail to detect any glitches at all.
 
-% All struggle: Blip low frequency, Air Compressor, Low Frequency Lines, Low Frequency Burst, Power Line, Paired Doves, Fast Scattering, Scattered Light, Scratchy
-% Comparable: Blip, Helix, Light Modulation, Repeating Blips, Tomte, Violin Mode, Whistle
-% Shapiro wilks outperforms better: 1080 Lines, 1400 Ripples, Chirp,
-
-% TODO: Add images of the distributions for these glitches
 \medskip
-\noindent In the case of the 1400\_Ripples, 
+\noindent When looking at the results for clean signals the Shapiro-Wilk test has a slightly higher number of false positives than the other two tests, which is to be expected due to its sensitivity to the distribution of the data. The Kolmogorov-Smirnov and Anderson-Darling tests have no false positives, indicating that they are able to effectively identify clean signals without misclassifying them as glitches.
+
+% TODO: Add images of the distributions for some of these glitches
 
 \begin{table}[H]
   \centering
