@@ -610,7 +610,7 @@ The implementation of our statistical tests on the whitened time series data is 
 
 \subsection{Experimenting on the complete frequency range}\label{Experiment_1}
 
-Taking the whole frequency range into account, we get the following results (Table \ref{tab:full_range_results}).
+Taking the whole frequency range into account, we get the following results for the tests (Table \ref{tab:full_range_results}).
 
 \begin{table}[H]
   \centering
@@ -628,7 +628,7 @@ Taking the whole frequency range into account, we get the following results (Tab
 \end{table}
 
 % \medskip
-\noindent At a first glance, the Shapiro-Wilk test has the best accuracy of the three at 0.74, with the accuracies of the Kolmogorov-Smirnov and Anderson Darling tests being approximately 10\% lower than it. This is also seen in the F1 score for the Shapiro-Wilk test being higher than the other two tests. The false positives being low for all three of the tests tells us that all of them excel at determining whether a sample is clean. The recall of 0.52 tells us that the Shapiro-Wilk test is able to capture slightly more than half of the cases where a glitch is present whereas the Kolmogorov-Smirnov and Anderson-Darling tests struggle with the same. Looking at the number of false negatives and the false negative rates tells us a completely different story.
+\noindent At a first glance, the Shapiro-Wilk test has the best accuracy of the three at 0.74, with the accuracies of the Kolmogorov-Smirnov and Anderson Darling tests being approximately 10\% lower than it. This is also seen in the F1 score for the Shapiro-Wilk test being higher than the other two tests. The false positives being low for the Shapiro-Wilk test and zero for the other two tests tells us that all of them excel at determining whether a sample is clean. The recall of 0.52 tells us that the Shapiro-Wilk test is able to capture slightly more than half of the cases where a glitch is present whereas the Kolmogorov-Smirnov and Anderson-Darling tests struggle with the same. Looking at the number of false negatives and the false negative rates gives us more insight into their performance.
 
 \medskip
 \noindent The Shapiro-Wilk test has a false negative rate and true positive rate that are almost equal, indicating that though it is able to effectively identify glitches, it also has a significant number of false negatives which would give reason to question its reliability. The Kolmogorov-Smirnov and Anderson-Darling tests in comparison have an even higher number of False Negatives, hence making them much less effective for glitch detection.
@@ -757,7 +757,7 @@ Taking the whole frequency range into account, we get the following results (Tab
 
 \subsection{Experimenting with a band pass filter between 10 Hz to 512 Hz}\label{Experiment_2}
 
-We now perform the same analysis as before while applying a band pass filter to the time series data between 10 Hz and 512 Hz. The results of the tests on this filtered data are shown in Table \ref{tab:low_frequency_results}.
+We now perform the same analysis as before on the time series data with a band pass filter applied between 10 Hz and 512 Hz before the preprocessing and conditioning steps. The results of the tests on this filtered data are shown in Table \ref{tab:low_frequency_results}.
 
 \begin{table}[H]
   \centering
@@ -899,10 +899,7 @@ We now perform the same analysis as before while applying a band pass filter to 
 \subsection{Experimenting with a band pass filter between 512 Hz to 1024 Hz}\label{Experiment_3}
 % No of samples, how to recreate the tests we did
 
-% Jarque-Bera test
-
-
-
+\noindent Similar to the previous experiments we now perform the same tests on the time series data with a band pass filter between 512 Hz and 1024 Hz applied to it prior to the preprocessing and conditioning steps. The results of the tests on this filtered data are shown in Table \ref{tab:high_frequency_results}.
 
 \begin{table}[H]
   \centering
@@ -918,6 +915,8 @@ We now perform the same analysis as before while applying a band pass filter to 
   \caption{Glitch detection results for a frequency range of 512 Hz to 1024 Hz.}
   \label{tab:high_frequency_results}
 \end{table}
+
+\noindent Here, we see that the accuracies and F1 scores of all the three tests are at their lowest compared to the previous two experiments. This suggests that the tests perform the worst due to there being lesser high frequency content in the data. We, again, notice a small spike in the false positive rate for the Shapiro-Wilk test, comparable to the full frequency range, while the Kolmogorov-Smirnov and Anderson-Darling tests have no false positives. The Shapiro-Wilk test has the highest true positive rate, followed by the Kolmogorov-Smirnov and Anderson-Darling tests respectively, which is consistent with the results from the previous experiments.
 
 \begin{table}[H]
   \begin{tabular}{lcccccccccc}
@@ -952,6 +951,14 @@ We now perform the same analysis as before while applying a band pass filter to 
   \caption{Shapiro-Wilk test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
   \label{tab:shapiro_high_frequency_results}
 \end{table}
+
+\noindent Looking at the per-glitch results in tables \ref{tab:shapiro_high_frequency_results}, \ref{tab:ks_high_frequency_results}, and \ref{tab:ad_high_frequency_results}, we finally see a deviation in the results of the tests for Extremely\_Loud glitches compared to the previous two experiments. We observe a slight decrease in the true positives for the Kolmogorov-Smirnov and Anderson-Darling tests, with the Shapiro-Wilk test still being able to detect most of the samples. This points to the fact that the Extremely\_Loud glitch has a significant amount of power in both the lower and higher frequency ranges, hence making it easier to detect. On the other hand, in a lot of the cases such as those of Scattered\_Light and Tomte glitches, the detection is at a much lower rate by the Shapiro-Wilk test, while not being detected at all by the other two tests. This indicates that these glitches have a significant amount of content across the frequency spectrum, which makes them harder to detect in this frequency range.
+
+\medskip
+\noindent The Shapiro-Wilk test is able to detect all the samples of the Wandering\_Line glitch, similar to the experiment with the full frequency range, while the other two tests detect a slightly larger number of samples than before. Similarly, the Koi\_Fishand Violin\_Mode glitches also show better detection rates across all tests at a higher frequency range than . This points to the possibility that the Wandering\_Line glitch has a significant amount of high frequency content, which makes it easier to detect in this frequency range.
+
+\medskip
+\noindent In a lot of cases
 
 \begin{table}[H]
   \begin{tabular}{lcccccccccc}
