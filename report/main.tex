@@ -952,13 +952,10 @@ We now perform the same analysis as before on the time series data with a band p
   \label{tab:shapiro_high_frequency_results}
 \end{table}
 
-\noindent Looking at the per-glitch results in tables \ref{tab:shapiro_high_frequency_results}, \ref{tab:ks_high_frequency_results}, and \ref{tab:ad_high_frequency_results}, we finally see a deviation in the results of the tests for Extremely\_Loud glitches compared to the previous two experiments. We observe a slight decrease in the true positives for the Kolmogorov-Smirnov and Anderson-Darling tests, with the Shapiro-Wilk test still being able to detect most of the samples. This points to the fact that the Extremely\_Loud glitch has a significant amount of power in both the lower and higher frequency ranges, hence making it easier to detect. On the other hand, in a lot of the cases such as those of Scattered\_Light and Tomte glitches, the detection is at a much lower rate by the Shapiro-Wilk test, while not being detected at all by the other two tests. This indicates that these glitches have a significant amount of content across the frequency spectrum, which makes them harder to detect in this frequency range.
+\noindent Looking at the per-glitch results in tables \ref{tab:shapiro_high_frequency_results}, \ref{tab:ks_high_frequency_results}, and \ref{tab:ad_high_frequency_results}, we finally see a deviation in the results of the tests for Extremely\_Loud glitches compared to the previous two experiments. We observe a slight decrease in the true positives for the Kolmogorov-Smirnov and Anderson-Darling tests, with the Shapiro-Wilk test still being able to detect most of the samples. This points to the fact that the Extremely\_Loud glitch has a significant amount of power in both the lower and higher frequency ranges, hence making it the easiest to detect over a wide range of frequencies. On the other hand, in some the cases such as those of, Scattered\_Light and Tomte glitches, the detection is at a lower rate by the Shapiro-Wilk test, while almost not being detected at all by the other two tests at higher frequencies. The Kolmogorov-Smirnov and Anderson-Darling tests have similar true positive rates to one another at high frequencies in the case of Koi\_Fish, Light\_Modulation, and Repeating\_Blips glitches. However, their true positive rates are lower compared to the Shapiro-Wilk test.
 
-\medskip
-\noindent The Shapiro-Wilk test is able to detect all the samples of the Wandering\_Line glitch, similar to the experiment with the full frequency range, while the other two tests detect a slightly larger number of samples than before. Similarly, the Koi\_Fishand Violin\_Mode glitches also show better detection rates across all tests at a higher frequency range than . This points to the possibility that the Wandering\_Line glitch has a significant amount of high frequency content, which makes it easier to detect in this frequency range.
-
-\medskip
-\noindent In a lot of cases
+\pagebreak
+\noindent The Shapiro-Wilk test is able to detect all the samples of the Wandering\_Line glitch, similar to the experiment with the full frequency range, while the other two tests detect a slightly larger number of samples than at the lower frequency range. The Whistle and Violin\_Mode glitches show a decent number of detections in the case of the Shapiro-Wilk test, but a lower number for the other two tests at both higher and lower frequency ranges. This suggests that all of these glitches have a significant amount content in both the high and low frequency bands, with the Shapiro-Wilk test being the most effective of the three at detecting them.
 
 \begin{table}[H]
   \begin{tabular}{lcccccccccc}
@@ -993,6 +990,8 @@ We now perform the same analysis as before on the time series data with a band p
   \caption{Kolmogorov-Smirnov test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
   \label{tab:ks_high_frequency_results}
 \end{table}
+
+\noindent Overall, the Shapiro-Wilk test continues to show the best performance in terms of true positives and F1 score followed by the Kolmogorov-Smirnov and Anderson-Darling tests. The effectiveness of these tests are highly dependent on the specific characteristics of each glitch class, including their frequency content and the amount of noise present in the signal.
 
 \begin{table}[H]
   \begin{tabular}{lcccccccccc}
@@ -1029,6 +1028,12 @@ We now perform the same analysis as before on the time series data with a band p
 \end{table}
 
 \section{Discussions}\label{Discussions}
+
+\noindent From the experiments conducted, we can conclude that the Shapiro-Wilk test is the most effective at detecting glitches across the full frequency range of 10 Hz to 1024 Hz. It consistently shows the highest true positive rates and F1 scores, a fairly high level of robustness in identifying glitches. However, its overall accuracy being in the 64\% to 74\% range and F1 scores being in the 0.46 to 0.66 range indicate that there is still room for improvement. The Kolmogorov-Smirnov and Anderson-Darling tests perform similarly to one another, with the Kolmogorov-Smirnov test outperforming the Anderson-Darling test, but they are generally less effective than the Shapiro-Wilk test.
+
+\noindent At lower frequencies, the Shapiro-Wilk test is able to detect a larger number of glitches, while at higher frequencies, its performance is slightly reduced but still superior to the other two tests. The Kolmogorov-Smirnov and Anderson-Darling tests show a similar trend, with their true positive rates decreasing at higher frequencies.
+
+\noindent The results also indicate that the effectiveness of these tests is highly dependent on the specific characteristics of each glitch class, including their frequency content and the amount of noise present in the signal. For example, glitches such as Extremely\_Loud and Koi\_Fish are consistently detected across all frequency ranges, while others like Scattered\_Light and Tomte show varying detection rates depending on the frequency range.
 
 \section{Conclusion}\label{Conclusions}
 
