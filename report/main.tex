@@ -555,7 +555,7 @@ In our experiments, we treat the statistical tests as classifiers, where a posit
 \end{itemize}
 
 \medskip
-\noindent Along with studying how effective these tests are at determining the presence of a glitch in detector data, we will also be validating the claim in \cite{razali2011power}, which states that the Shapiro-Wilks test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test.
+\noindent Along with studying how effective these tests are at determining the presence of a glitch in detector data, we will also be validating the claim in \cite{razali2011power}, which states that the Shapiro-Wilk test is the most powerful, followed by the Anderson darling test and the Kolmogorov-Smirnov test.
 
 
 % Cramer-Von Mises test (It is a part of the Anderson-Darling test so it might not be needed)
@@ -1029,11 +1029,16 @@ We now perform the same analysis as before on the time series data with a band p
 
 \section{Discussions}\label{Discussions}
 
-\noindent From the experiments conducted, we can conclude that the Shapiro-Wilk test is the most effective at detecting glitches across the full frequency range of 10 Hz to 1024 Hz. It consistently shows the highest true positive rates and F1 scores, a fairly high level of robustness in identifying glitches. However, its overall accuracy being in the 64\% to 74\% range and F1 scores being in the 0.46 to 0.66 range indicate that there is still room for improvement. The Kolmogorov-Smirnov and Anderson-Darling tests perform similarly to one another, with the Kolmogorov-Smirnov test outperforming the Anderson-Darling test, but they are generally less effective than the Shapiro-Wilk test.
+\noindent To reiterate upon the criteria for our tests, we have considered the detection of a glitch in the sample to be a positive instance, while the absence of a glitch is considered to be a negative instance. A glitch is considered to be detected if the test returns a p-value less than 0.05, indicating that the sample is non-Gaussian.
 
-\noindent At lower frequencies, the Shapiro-Wilk test is able to detect a larger number of glitches, while at higher frequencies, its performance is slightly reduced but still superior to the other two tests. The Kolmogorov-Smirnov and Anderson-Darling tests show a similar trend, with their true positive rates decreasing at higher frequencies.
+\medskip
+\noindent The experiments conducted suggest that the Shapiro-Wilk test is the most effective at detecting glitches across the full frequency range of 10 Hz to 1024 Hz. At the lower and higher frequencies the performance of all the three tests vary depending on the glitch classes and their characteristics. The Shapiro-Wilk test consistently shows the highest true positive rates and F1 scores, indicating a fairly high level of robustness in identifying glitches. The Kolmogorov-Smirnov and Anderson-Darling tests perform similarly to one another, with the Kolmogorov-Smirnov test outperforming the Anderson-Darling test, but they are generally less effective than the Shapiro-Wilk test. The Shapiro-Wilk and Kolmogorov-Smirnov tests show a significant number of false positives, particularly at lower frequencies, while the Anderson-Darling test fails to capture a substantial number of glitches. This is a cause for concern in terms of reliability of their sole use in practical applications.
 
-\noindent The results also indicate that the effectiveness of these tests is highly dependent on the specific characteristics of each glitch class, including their frequency content and the amount of noise present in the signal. For example, glitches such as Extremely\_Loud and Koi\_Fish are consistently detected across all frequency ranges, while others like Scattered\_Light and Tomte show varying detection rates depending on the frequency range.
+\medskip
+\noindent The results also indicate that the effectiveness of these tests is highly dependent on the specific characteristics of each glitch class, including their frequency content and the amount of noise present in the signal. For example, glitches such as Extremely\_Loud and Koi\_Fish are well detected in all the experiments due to their high amplitudes across the frequency spectrum, while others like Scattered\_Light and Tomte show varying detection rates depending on the frequency range. Some glitches, such as Violin\_Mode, Wandering\_Line and Whistle, are detected more effectively by the Shapiro-Wilk test compared to the other two tests, while others like Repeating\_Blips show a more balanced performance across all three tests.
+
+\medskip
+\noindent Despite being the best of the three tests at detecting glitches, the overall accuracy of the Shapiro-Wilk test being in the 64\% to 74\% range and F1 scores being in the 0.46 to 0.66 range alongside a significant number of false positives indicate that there is still room for improvement. However, due to these being statistical tests, there is no idea of "training" unlike Machine Learning or Deep Learning models. These tests are inherently limited by the nature of the data and the assumptions made about the distribution of the samples.
 
 \section{Conclusion}\label{Conclusions}
 
