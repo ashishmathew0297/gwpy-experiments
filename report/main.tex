@@ -418,7 +418,6 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 
 The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (ECDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
 
-% TODO: Add EDF and CDF comparison image
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{images/cdf_comparison_glitch_gaussian.pdf}
@@ -673,12 +672,11 @@ Taking the whole frequency range into account, we get the following results for 
   \label{tab:shapiro_full_range_results}
 \end{table}
 
-\noindent Looking at the results on a per-glitch level in tables \ref{tab:shapiro_full_range_results}, \ref{tab:ks_full_range_results}, and \ref{tab:ad_full_range_results}, we see that the tests' performances vary significantly across each of the glitch classes. All the three tests achieve perfect accuracy and F1 Scores for Extremely\_Loud glitches, which is to be expected due to these glitches being highly distinctive over a large frequency range with a high SNR. In the case of the Blip, Repeating\_Blips, whistle and Violin\_Mode glitches, the Shapiro-Wilk test far surpasses the other two tests, with a fixed pattern of the Shapiro-Wilk being the best, followed by the Kolmogorov-Smirnov test and then the Anderson-Darling test. In a few unique cases, such as 1400Ripples, Air\_Compressor and Fast\_Scattering glitches, the Shapiro-Wilk test is able to detect a few of the glitch samples, while the other two tests fail to detect any glitches at all. Some example glitch amplitude distributions for these glitches are shown in Figure .
+\noindent Looking at the results on a per-glitch level in tables \ref{tab:shapiro_full_range_results}, \ref{tab:ks_full_range_results}, and \ref{tab:ad_full_range_results}, we see that the tests' performances vary significantly across each of the glitch classes. All the three tests achieve perfect accuracy and F1 Scores for Extremely\_Loud glitches, which is to be expected due to these glitches being highly distinctive over a large frequency range with a high SNR. In the case of the Blip, Repeating\_Blips, whistle and Violin\_Mode glitches, the Shapiro-Wilk test far surpasses the other two tests, with a fixed pattern of the Shapiro-Wilk being the best, followed by the Kolmogorov-Smirnov test and then the Anderson-Darling test. In a few unique cases, such as 1400Ripples, Air\_Compressor and Fast\_Scattering glitches, the Shapiro-Wilk test is able to detect a few of the glitch samples, while the other two tests completely fail at detecting these glitches.
 
 \medskip
 \noindent When looking at the results for clean signals the Shapiro-Wilk test has a slightly higher number of false positives than the other two tests, which is to be expected due to its sensitivity to the distribution of the data. The Kolmogorov-Smirnov and Anderson-Darling tests have no false positives, indicating that they are able to effectively identify clean signals without misclassifying them as glitches.
 
-% TODO: Add images of the distributions for some of these glitches
 
 \begin{table}[H]
   \centering
