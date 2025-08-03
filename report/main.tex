@@ -349,9 +349,26 @@ bottom=0.8in
 Our main objective is to determine the Gaussianity of time series data obtained from L1 and use this as a criterion to determine the presence of a glitch in it. 
 
 \medskip
-\noindent If a sample is found to be non-Gaussian, this indicates an excess of power at certain frequencies due to which there is a high chance of a glitch being present. In the previous section, we have seen how whitening the time series data brings out the glitch characteristics. Taking the same example as before, if we were to treat this whitened data as a population of points and plot the distribution, we notice that it contains heavier tails, hence making it non-Gaussian. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution. Hence, we propose a pair of hypotheses to determine the presence of a glitch in a sample of data from the detector.
+\noindent If a sample is found to be non-Gaussian, this indicates an excess of power at certain frequencies due to which there is a high chance of a glitch being present. In the previous section, we have seen how whitening the time series data brings out the glitch characteristics. Taking an example of a random Blip glitch, if we were to treat its whitened amplitude values as a population of points and plot the distribution, we notice that it contains heavier tails, hence making it non-Gaussian \ref{fig:glitch_vs_normal_distribution}. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution \ref{fig:clean_signal_vs_gaussian}. Hence, we propose a pair of hypotheses to determine the presence of a glitch in a sample of data from the detector.
 
 % TODO: Add images for clean and glitched signal distributions. Also compare with normal distribution.
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.68 \textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/glitch_vs_normal_distribution.pdf}
+    \caption{}
+    \label{fig:glitch_vs_normal_distribution}
+  \end{subfigure}
+  \hspace{25px}
+  \begin{subfigure}[t]{0.68\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/clean_signal_vs_gaussian.pdf}
+    \caption{}
+    \label{fig:clean_signal_vs_gaussian}
+  \end{subfigure}
+  \caption{The distributions of standardized amplitudes for (a) a glitch and (b) a clean signal compared to Gaussian distributions.}
+\end{figure}
 
 \medskip
 \noindent\fbox{
@@ -416,14 +433,14 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 
 \subsection{The Kolmogorov-Smirnov Test}\label{KolmogorovSmirnov}
 
-The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (ECDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/cdf_comparison_glitch_gaussian.pdf}
+    \includegraphics[width=0.78\textwidth]{images/cdf_comparison_glitch_gaussian.pdf}
     \caption{The KS statistic calculation for a sample glitch against a Gaussian distribution. The black line is the maximum absolute difference between the sample glitch CDF and the Gaussian CDF, which is the KS statistic $D_n$.}
     \label{fig:ecdf_cdf_comparison}
 \end{figure}
+
+\noindent The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (ECDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution \ref{fig:ecdf_cdf_comparison}. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
 
 \medskip
 \noindent  Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the Empirical CDF of the sample, is given by
@@ -442,7 +459,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 \end{equation}
 
 \medskip
-\noindent Here,  $\text{sup}$ refers to the supremum or maximum of the differences between the theoretical CDF and the ECDF. If $D_n$ is significantly larger than the critical value, it indicates that the sample data significantly differs from a Gaussian distribution, hence rejecting the null Hypothesis.
+\noindent Here,  $\text{sup}$ refers to the supremum or maximum of the differences between the theoretical CDF and the ECDF. If $D_n$ is significantly larger than the defined significance level, it indicates that the sample data significantly differs from a Gaussian distribution, hence rejecting the null Hypothesis. In our implementation, we use the p-value of the statistic to determine the significance of the result as it is directly proportional to $D_n$.
 
 \subsubsection{Note: Scaling the data}\label{Scaling}
 
@@ -459,6 +476,7 @@ The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed i
 \medskip
 \noindent Where $x$ is the original data point, $\mu$ is the mean, and $\sigma$ is the standard deviation of the data. The $z$ value obtained can be treated as the new data point after scaling and is particularly useful in this case as it does not change the position of the data point in its calculation.
 
+\pagebreak
 \subsection{The Anderson Darling test}\label{AndersonDarling}
 
 The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov and Cramer-von Mises tests with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}.
@@ -860,7 +878,7 @@ We now perform the same analysis as before on the time series data with a band p
   \label{tab:ks_low_frequency_results}
 \end{table}
 
-\noindent When looking at the clean signal samples, we see that the Shapiro-Wilk test has the highest number of false positives which may indicate that it is more sensitive to certain types of noise or artifacts in the data. The Kolmogorov-Smirnov test has a lower number of false positives, and the Anderson-Darling test shows no false positives to be present, indicating that it is the most effective at identifying clean signals at lower frequencies compared to the other tests.
+\noindent When looking at the clean signal samples, we see that the Shapiro-Wilk test has the highest number of false positives, which may indicate that it is more sensitive to certain types of noise or artifacts in the data. The Kolmogorov-Smirnov test has a lower number of false positives, and the Anderson-Darling test shows no false positives to be present, indicating that it is the most effective at identifying clean signals at lower frequencies compared to the other tests.
 
 \begin{table}[H]
   \begin{tabular}{lcccccccccc}
@@ -1077,7 +1095,7 @@ We now perform the same analysis as before on the time series data with a band p
 
 \section{Conclusion}\label{Conclusions}
 
-\noindent In this project, we proposed a framework to detect glitches in gravitational wave detector data using statistical tests of Gaussianity on the time-amplitude domain. For our analyses, we utilized data taken from the L1 detector during the O3a run \cite{abbott_gwtc-2_2021}. We studied the effectiveness of three statistical tests of Gaussianity, namely the Shapiro-Wilk \cite{Shapiro1965}, Kolmogorov-Smirnov \cite{Kolmogorov_1951}, and Anderson-Darling \cite{anderson1954test} tests, in detecting glitches in the time-amplitude domain, as opposed to the frequency-amplitude domain, which is a common approach taken in GW data analysis and glitch studies \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}. We developed a preprocessing pipeline to condition the data for the tests, which included obtaining time series data for the clean and glitched data from the GWOSC database, preprocessing and conditioning the data, and applying band pass filters prior to our experiments. We then applied the three statistical tests on the preprocessed data and evaluated their performance in terms of accuracy, true positive rate, false positive rate, and F1 score.
+\noindent In this project, we proposed a framework to detect glitches in gravitational wave detector data using statistical tests of Gaussianity on the time-amplitude domain. For our analyses, we utilized data taken from the L1 detector during the O3a run \cite{abbott_gwtc-2_2021}. We studied the effectiveness of three statistical tests of Gaussianity, namely the Shapiro-Wilk \cite{Shapiro1965}, Kolmogorov-Smirnov \cite{Kolmogorov_1951}, and Anderson-Darling \cite{anderson1954test} at a c, in detecting glitches in the time-amplitude domain, as opposed to the frequency-amplitude domain, which is a common approach taken in GW data analysis and glitch studies \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}. We developed a preprocessing pipeline to condition the data for the tests, which included obtaining time series data for the clean and glitched data from the GWOSC database, preprocessing and conditioning the data, and applying band pass filters prior to our experiments. We then applied the three statistical tests on the preprocessed data and evaluated their performance in terms of accuracy, true positive rate, false positive rate, and F1 score.
 
 \medskip
 \noindent The results of our experiments has shown that the Shapiro-Wilk test is the most effective at detecting glitches across the full frequency range of 10 Hz to 1024 Hz with an accuracy of 74\% (0.74) and an F1 score of 0.66, followed by the Kolmogorov-Smirnov test at an accuracy of 64\% (0.64) and F1 score of 0.43, and finally, the Anderson-Darling test at an accuracy of 64\% (0.64) and F1 score of 0.42.
@@ -1093,7 +1111,7 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent This research project was conducted with the support of Dr. Sarah Caudill from the University of Massachusetts Dartmouth, and Dr. Melissa Lopez from the National Institute for Subatomic Physics (Nikhef). I am deeply grateful for their constant guidance and feedback, which was invaluable in helping me understand the nuances of not just this project but also the broader field of work I will be involved in as an aspiring PhD student. I also extend my gratitude to the faculty and staff at the University of Massachusetts Dartmouth for providing me with the resources and support to conduct this research.
 
 \medskip
-\noindent This work extensively utilized computing resources from the LIGO Data Grid (LDG) and tools from the Gravitational Wave Open Science Center (https://www.gw-openscience.org), both being services provided by the LIGO Scientific Collaboration (LSC) and the Virgo Collaboration. I would like to thank the LSC and Virgo for making their data publicly available, which made this project possible.
+\noindent This work extensively utilized computing resources from the LIGO Data Grid (LDG) and tools from the Gravitational Wave Open Science Center (\href{https://www.gw-openscience.org}{https://www.gw-openscience.org}), both being services provided by the LIGO Scientific Collaboration (LSC) and the Virgo Collaboration. I would like to thank the LSC and Virgo for making their data publicly available, which made this project possible.
 
 \medskip
 \noindent A special thank you to my family for their constant encouragement and belief in me throughout this journey. I am the person I am today because of them, and I am forever grateful for it. Finally, I appreciate the support of my friends and peers who have been here for me through the ups and downs not only as a student, but also as someone trying to find their place in the world far away from home.
