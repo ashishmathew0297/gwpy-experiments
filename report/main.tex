@@ -324,7 +324,10 @@ bottom=0.8in
 
 \subsubsection{Whitening}\label{Whitening}
 
-\textbf{Whitening} is the process of suppressing low-frequency and spectral line noise from the data to allow for a clearer view of the underlying signals at sensitive frequency ranges. Whitening is one of the first steps in GW data analysis. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
+% \textbf{Whitening} is the process of suppressing low-frequency and spectral line noise from the data to allow for a clearer view of the underlying signals at sensitive frequency ranges. Whitening is one of the first steps in GW data analysis. By whitening the data, we effectively reduce the impact of noise on our analysis, improving the sensitivity of our detection methods.
+
+Since the detector noise $n(t)$ comes from a combination of sources from both, the detector and the environment, the signals that we want to study are buried under coloured detector noise \cite{Li:2013lza}. This makes the calculation of the PSD difficult. The process of \textbf{whitening} helps with this issue. Whitening makes the data Gaussian-like with a uniform variance and no correlation of the noise \cite{Li:2013lza}.
+
 
 \medskip
 \noindent Whitening is done by taking the inverse of the estimated ASD and multiplying it with the Fourier coefficients of the original time series data \cite{collaboration_guide_2020}.
@@ -342,11 +345,11 @@ bottom=0.8in
 \noindent In figure \ref{fig:sampletomte} we see a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the time series data. However, after whitening the data, we can clearly see the glitch signal in the time-amplitude plot. The Q-transform allows a view of the non-stationary portion of the glitch signal, which shows a clear peak in the normalized energy coinciding with the glitch event. For a clean signal we would not see any significant peaks in the whitened time series or non-stationary parts in the Q-transform.
 
 \medskip
-\noindent In this project, the data from the clean and glitch segment acquisition modules are whitened using the method. After whitening, the glitch samples are cropped to a 0.5 second time window around the GPS time of the glitch event, effectively giving us a 1 second glitch sample to work with. The clean data, in turn, is divided into 1 second segments, each being treated as a separate clean sample for statistical testing.
+\noindent In this project, the data from the clean and glitch segment acquisition modules are whitened using the method. After whitening, the glitch samples are cropped to a 0.5-second time window around the GPS time of the glitch event, effectively giving us a 1-second glitch sample to work with. The clean data, in turn, is divided into 1-second segments, each being treated as a separate clean sample for statistical testing. The 1-second time frame is selected, as it provides us 4096 data points to work with, ensuring that the tests give us the most reliable results possible.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.51\textwidth]{images/sample_plot.pdf}
+  \includegraphics[width=0.48\textwidth]{images/sample_plot.pdf}
   \caption{Example of a Tomte glitch signal before and after whitening.}
   \label{fig:sampletomte}
 \end{figure}
