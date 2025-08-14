@@ -93,7 +93,7 @@ bottom=0.8in
 \noindent Nearly a century after Einstein's prediction of the existence of gravitational waves (GWs) in 1916, the first direct gravitational wave detection was achieved by the Advanced Laser Interferometer Gravitational-Wave Observatory (aLIGO) \cite{Abbott_LIGO_2016} and Virgo \cite{Accadia_virgo_2012} interferometers during the binary black hole merger event GW150914 on September 14, 2015. The LIGO Livingston (L1) interferometer underwent several upgrades following this run - effectively a massive redesign - enhancing its sensitivity by 15\% to 25\% \cite{grant_advanced_2016}. This improvement was evident during the O2 observing run during which L1, in conjunction with its Hanford (H1) counterpart and Virgo (V1), detected eleven new gravitational wave signals \cite{collaboration_gwtc-1_2019}. Subsequently, during the O3 run, all three detectors operated at their best possible sensitivity, leading to the first single-detector GW detection, GW190425, achieved by LIGO Livingston \cite{abbott_gwtc-2_2021}. There have been over 90 GW events recorded at a high level of confidence since the LIGO-Virgo collaboration's inception to date \cite{collaboration_gwtc-3_2023}.
 
 \medskip
-\noindent A consequence of these detectors' sensitivities is their susceptibility to noise. During observation runs, various noise sources, such as seismic noise, suspension thermal noise, and sensing noise, affect the data collected by the interferometers. Among these, the most problematic are \textbf{glitches}: transient events caused by non-astrophysical phenomena such as anthropogenic noise, weather conditions, or instrument malfunctions \cite{collaboration_guide_2020, collaboration_characterization_2016}. Glitches manifest as localized bursts of excess power in interferometer time series data and often do not have well-defined sources. They can occur at energy levels and frequencies that overlap with GW signals, thereby mimicking them and increasing the number of false positive detections. During the first half of the third observing run (O3a) H1 and L1 recorded glitches rates of $0.29\text{ min}^{-1}$ and $1.10\text{ min}^{-1}$ respectively, which rose to $0.32\text{ min}^{-1}$ and $1.17\text{ min}^{-1}$ during the second half (O3b) \cite{collaboration_gwtc-3_2023}. A notable example of glitches posing such an issue was during the binary neutron star merger event GW170817 \cite{collaboration_gw170817_2017}, during which instrumental noise transients were detected before the event's coalescence time, complicating its detection and subsequent analysis.
+\noindent A consequence of these detectors' sensitivities is their susceptibility to noise. During observation runs, various noise sources, such as seismic noise, suspension thermal noise, and sensing noise, affect the data collected by the interferometers \cite{Li:2013lza}. Among these, the most problematic are \textbf{glitches}: transient events caused by non-astrophysical phenomena such as anthropogenic noise, weather conditions, or instrument malfunctions \cite{collaboration_guide_2020, collaboration_characterization_2016}. Glitches manifest as localized bursts of excess power in interferometer time series data and often do not have well-defined sources. They can occur at energy levels and frequencies that overlap with GW signals, thereby mimicking them and increasing the number of false positive detections. During the first half of the third observing run (O3a) H1 and L1 recorded glitches rates of $0.29\text{ min}^{-1}$ and $1.10\text{ min}^{-1}$ respectively, which rose to $0.32\text{ min}^{-1}$ and $1.17\text{ min}^{-1}$ during the second half (O3b) \cite{collaboration_gwtc-3_2023}. A notable example of glitches posing such an issue was during the detection of GW170817 \cite{collaboration_gw170817_2017}, where instrumental noise transients during the signal's detection time complicated its identification and subsequent analysis.
 
 \medskip
 \noindent This project aims to develop a tool to check if the amplitudes of detector noise in a sample of data from the detector show the presence of a glitch through tests of \textbf{Gaussianity}. Gaussianity is the property of a sample distribution of data being normally distributed, also known as a Gaussian distribution. A normal/Gaussian distribution is a continuous probability distribution for a random variable where most of the data points are located around the mean, with lesser amounts of data further away. The Gaussian distribution is symmetric about the mean $\mu$, which is equal to zero, with the standard deviation $\sigma$ being equal to 1. This distribution is important as it can approximate many real world phenomena, such as the distribution of heights and weights of a country's population. It is also the basis for many statistical tests and methods. Any variation from this distribution is considered non-Gaussian. Figure \ref{fig:gaussian_distribution} shows an example of a Gaussian distribution.
@@ -145,7 +145,7 @@ bottom=0.8in
   \caption{Plots showing how the time taken to compute the Q-transform scales with the sample window size and the number of samples.}
 \end{figure}
 
-\noindent This report is organized as follows: Section \ref{Data} discusses how interferometer data is obtained and describes the properties of the time series data used in this study. It also outlines the process of acquiring clean and glitched samples and the preprocessing applied. Section \ref{Methods} describes in detail the statistical tests of Gaussianity used to assess the sample data. The experimental procedures and results are presented in section \ref{Experimentation}, followed by section \ref{Discussion} which discusses the implications of our findings. Finally, Section \ref{Conclusions} summarizes the results of our experiments, discussing the strengths and limitations of the methods used.
+\noindent This report is organized as follows: Section \ref{Data} discusses how interferometer data is obtained and describes the properties of the time series data used in this study. It also outlines the process of acquiring clean and glitched samples and the preprocessing applied. Section \ref{Methods} describes in detail the statistical tests of Gaussianity used to assess the sample data. The experimental procedures and results are presented in section \ref{Experimentation}, followed by section \ref{Discussion} which discusses the implications of our findings. Finally, Section \ref{Conclusions} summarizes the results of our experiments, discussing the strengths and limitations of the methods used. The link to this project can be found at \url{https://github.com/ashishmathew0297/gwpy-experiments}
 
 \pagebreak
 
@@ -155,7 +155,7 @@ bottom=0.8in
 \noindent The Advanced LIGO and Virgo interferometers are large-scale, heavily modified versions of the Michelson interferometer (Figure \ref{fig:interferometer}), originally invented by American physicist Albert A. Michelson in 1887 \cite{weiss_report_1972,collaboration_gwtc-3_2023}. LIGO operates in a vacuum, using a laser beam of light split into two orthogonal parts with the help of a half-silvered mirror mounted on horizontal seismometer suspensions. The orthogonally split beams are then sent through two arms of the interferometer, known as Fabry-Pérot cavities. Each of these arms is 4 kilometers long, consisting of mirrors at each end. The first of the mirrors is fixed in place, while the second one is movable with the help of precise micrometer drives. The laser beams, when reflected by the mirrors on either end of the arms, are combined again at the beam splitter and sent to photoelectric detectors.
 
 \medskip
-\noindent The advanced LIGO interferometer is designed such that if the beams travel equal distances, the recombination would lead to a destructive interference pattern, resulting in no light coming out of the instrument \cite{ligo_what_interferometer}. When a disturbance of either astrophysical or terrestrial origin is detected, an infinitesimally small change occurs in lengths of the detector arms, in the order of $10^{-8}m$ \cite{ghonge_assessing_2024}. One of the arms is stretched, and the other arm is compressed in the perpendicular direction, altering the lengths of the reflected and combined beams, misaligning them and resulting in an interference pattern (Figure \ref{fig:sinusoidal_fringes}). This interference pattern, coupled with results from several other sensors, provides detailed information on the \textit{strain} of the GW or glitch event being observed.
+\noindent The advanced LIGO interferometer is designed such that if the beams travel equal distances, the recombination would lead to a destructive interference pattern, resulting in no light coming out of the instrument \cite{ligo_what_interferometer}. When a disturbance of either astrophysical or terrestrial origin is detected, an infinitesimally small change occurs in lengths of the detector arms, in the order of $10^{-8}m$ \cite{ghonge_assessing_2024}. One of the arms is stretched, and the other arm is compressed in the perpendicular direction, altering the lengths of the reflected and combined beams, misaligning them and resulting in an interference pattern (Figure \ref{fig:sinusoidal_fringes}). This interference pattern, coupled with results from several other sensors, provides detailed information on the \textit{strain} of the GW detector.
 
 \begin{figure}[H]
   \centering
@@ -233,17 +233,26 @@ bottom=0.8in
 \noindent Taking the start and end GPS times of the O3a run, gwtrigfind is used to find the file path containing Omicron triggers from the \textit{L1:GDS-CALIB\_STRAIN} channel of the L1 detector. EventTable is then used to load all the trigger data, containing information on the start and end GPS times of the events. Taking the time frames between successive events, we obtain the start and end times of the gaps between glitches/GW triggers, which do not have a significant amount of noise activity. The sizes of the gaps are clamped between 7 and 30 seconds because too short of a gap could lead to the inclusion of glitches in the sample, as the time series data may not have enough time to stabilize after a glitch. Additionally, a short time segment would affect the PSD calculation and subsequent preprocessing. Too long of a time gap could be indicative of detector malfunction or a period of time when it is not operational.
 
 \medskip
-\noindent The start and end GPS times of the clean segments are then used to calculate their Q-transform and corresponding p-values. The GPS time intervals with a p-value greater than 0.05 are considered to be clean segments of data.
+\noindent The start and end GPS times of the clean segments are then used to fetch the time series data from the GWOSC database at a sample rate of 4096 Hz. Then their Q-grams, and subsequently, the p-values of each of them are computed \cite{vazsonyi_identifying_2023}.
 
 \medskip
-\noindent To obtain the time series samples, similar to the glitch data, the GWOSC database is queried by taking the beginning and ending GPS times as the limits and a sample rate of 4096 Hz.
+\noindent The p-value calculation is done by taking the energy values from the Q-grams, dividing them into $N$ bins and fitting a monotonic logarithmic curve to the maximum values of the bins $\epsilon_0$ to obtain the parameters $A$ and $t$. Then the p-value is calculated with the given formula.
+
+\begin{equation}
+    P(\text{Q-gram max } \epsilon = \epsilon_0) = 1 - \exp\left[ -\frac{AN}{t} e^{-\epsilon_0 t} \right]
+    \label{eq:qgram_pvalue}
+\end{equation}
+
+\medskip
+\noindent The samples with a p-value greater than 0.05 are considered to be clean segments of data.
 
 \medskip
 \noindent The clean GPS times from the clean segment acquisition module are saved in a CSV file, and the queried time series data is also stored locally. This allows them to be used for procuring the time series samples without having to query the GWOSC database during multiple stages of analysis.
 
-\subsection{Data Preprocessing/Conditioning}\label{DataConditioning}
+\pagebreak
+\subsection{Data Preprocessing \& Conditioning}\label{DataConditioning}
 
-\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out its characteristics such that it can be visually observed and studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible signal received, the GW detector output is given by:
+\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out its characteristics such that it can be visually observed and studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible GW signal received, the GW detector output is given by:
 
 \begin{equation}
     s(t) = n(t) + h(t)
@@ -285,7 +294,7 @@ bottom=0.8in
 %   \label{eq:psd_autocorrelation}
 % \end{equation}
 
-\noindent One of the  methods to study the glitch signal is the \textbf{Power Spectral Density (PSD)}. The PSD, provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Assuming the noise sources to be non-stationary and taking the frequency domain representation of the noise signal $n(f)$, the ensemble average of the Fourier components is given by \cite{Li:2013lza}
+\noindent One of the  methods to study the detector noise is the \textbf{Power Spectral Density (PSD)}. The PSD, provides a representation of how power is distributed across different frequency bands in a noise signal\cite{Oppenheim_2009}, allowing for the identification of dominant frequency components and their corresponding amplitudes. Assuming the noise sources to be non-stationary and taking the frequency domain representation of the noise signal $n(f)$, the ensemble average of the Fourier components is given by \cite{Li:2013lza}
 
 \begin{equation}
   \langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} \delta(f - f') S_n(f).
@@ -337,7 +346,7 @@ bottom=0.8in
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\textwidth]{images/sample_plot.pdf}
+  \includegraphics[width=0.51\textwidth]{images/sample_plot.pdf}
   \caption{Example of a Tomte glitch signal before and after whitening.}
   \label{fig:sampletomte}
 \end{figure}
