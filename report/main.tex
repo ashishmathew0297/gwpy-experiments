@@ -125,24 +125,24 @@ bottom=0.8in
 \noindent This study uses three tests of Gaussianity, namely, (1) the Shapiro-Wilk, (2) Kolmogorov-Smirnov, and (3) Anderson-Darling tests on preprocessed samples of the L1 interferometer data to determine their normality and assess how well they differentiate between Gaussian and non-Gaussian samples. This experiment also includes studying the performance of these tests at different frequency ranges, with particular emphasis on their effectiveness across various glitch types.
 
 \medskip
-\noindent The main motivation for this project is to gauge the use of statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the time-frequency domain. Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive, slowing down the process of assessing of the signals for glitch activity. The more popular solutions incorporate the \textit{Q-transform} \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}, a modification of the standard Fourier transform where the analysis window scales inversely with frequency. The Q-transform is used as inputs to statistical tests to obtain a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is much slower when scaled up to work on multiple samples. Figures \ref{fig:qtransform_vs_windowsize} and \ref{fig:qtransform_vs_samplecount} illustrate the time taken to compute the Q-transform while varying the sample window size and the number of samples respectively. 
+\noindent The main motivation for this project is to gauge the use of statistical hypothesis testing on time-amplitude domain data as a faster alternative to the current glitch detection methods working in the time-frequency domain. Detecting and mitigating the effects of glitches in interferometric strain data remains an active area of research within astrophysical data analysis, with several techniques proposed and implemented for the same \cite{robinet_omicron_2020, MACLEOD2021100657, davis_subtracting_2022}. However, many of these are computationally expensive, slowing down the process of assessing of the signals for glitch activity. A lot of work around GW and glitch analysis makes use of the \textit{Q-transform} \cite{chatterji_multiresolution_2004,Zevin_2017,soni2023qoqqtransformbasedtest} and modifications of it such as the Q-gram \cite{vazsonyi_identifying_2023}. The Q-transform is a modification of the standard Fourier transform where the analysis window scales inversely with frequency. It is used as inputs to statistical tests to obtain a p-value depicting the statistical significance of excess power in the data. Assuming the background data to be Gaussian, the excess power that does not follow a Gaussian distribution suggests the presence of a glitch. While this method is effective for post-detection run analysis, it is much slower when scaled up to work on multiple samples. Figures \ref{fig:qtransform_vs_windowsize} and \ref{fig:qtransform_vs_samplecount} illustrate the time taken to compute the Q-transform while varying the sample window size and the number of samples respectively. 
 
 \begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.65\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/q_transform_time_vs_window_size.pdf}
-    \caption{A plot of the Q-transform calculation time against the sample window for a single  }
+    \caption{A plot of the Q-transform calculation time against the sample window for a single sample.}
     \label{fig:qtransform_vs_windowsize}
   \end{subfigure}
   \hspace{25px}
   \begin{subfigure}[t]{0.65\textwidth}
     \centering
     \includegraphics[width=\textwidth]{images/q_transform_time_vs_sample_count.pdf}
-    \caption{Interference pattern}
+    \caption{A plot of the Q-transform calculation time against the sample count for fixed window size.}
     \label{fig:qtransform_vs_samplecount}
   \end{subfigure}
-  \caption{Plots showing how the time taken to compute the Q-transform scales with the sample window size and the number of samples.}
+  \caption{Plots showing how the time taken to compute the Q-transform scales with variation of the sample window size and the number of samples.}
 \end{figure}
 
 \noindent This report is organized as follows: Section \ref{Data} discusses how interferometer data is obtained and describes the properties of the time series data used in this study. It also outlines the process of acquiring clean and glitched samples and the preprocessing applied. Section \ref{Methods} describes in detail the statistical tests of Gaussianity used to assess the sample data. The experimental procedures and results are presented in section \ref{Experimentation}, followed by section \ref{Discussion} which discusses the implications of our findings. Finally, Section \ref{Conclusions} summarizes the results of our experiments, discussing the strengths and limitations of the methods used. The link to this project can be found at \url{https://github.com/ashishmathew0297/gwpy-experiments}
@@ -236,7 +236,7 @@ bottom=0.8in
 \noindent The start and end GPS times of the clean segments are then used to fetch the time series data from the GWOSC database at a sample rate of 4096 Hz. Then their Q-grams, and subsequently, the p-values of each of them are computed \cite{vazsonyi_identifying_2023}.
 
 \medskip
-\noindent The p-value calculation is done by taking the energy values from the Q-grams, dividing them into $N$ bins and fitting a monotonic logarithmic curve to the maximum values of the bins $\epsilon_0$ to obtain the parameters $A$ and $t$. Then the p-value is calculated with the given formula.
+\noindent The p-value calculation is done by taking the energy values from the Q-grams, dividing them into $N$ bins and fitting a monotonic logarithmic curve to the maximum energy values of the bins $\epsilon_0$ to obtain the parameters $A$ and $t$. Then the p-value is calculated as follows
 
 \begin{equation}
     P(\text{Q-gram max } \epsilon = \epsilon_0) = 1 - \exp\left[ -\frac{AN}{t} e^{-\epsilon_0 t} \right]
@@ -252,7 +252,7 @@ bottom=0.8in
 \pagebreak
 \subsection{Data Preprocessing \& Conditioning}\label{DataConditioning}
 
-\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out its characteristics such that it can be visually observed and studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible GW signal received, the GW detector output is given by:
+\noindent The strain readings obtained from a GW detector are usually a combination of the GW signal and detector noise \cite{cutler_gravitational_1994, moore_gravitational-wave_2015, Li:2013lza}. Given our focus on the noise, it is important to bring out its characteristics such that it can be studied. Considering the strain output to be $s(t)$ with $n(t)$ as the noise and $h(t)$ being the possible GW signal received, the detector output is given by:
 
 \begin{equation}
     s(t) = n(t) + h(t)
@@ -330,7 +330,7 @@ Since the detector noise $n(t)$ comes from a combination of sources from both, t
 
 
 \medskip
-\noindent Whitening is done by taking the inverse of the estimated ASD and multiplying it with the Fourier coefficients of the original time series data \cite{collaboration_guide_2020}.
+\noindent Whitening is done by dividing the Fourier coefficients of the original time series data by the estimated ASD \cite{collaboration_guide_2020}.
 
 \begin{align}
     \tilde{n}_\text{whitened}(f) = \frac{\tilde{n}(f)}{ASD} = \frac{\tilde{n}(f)}{\sqrt{S_n(f)}} \\
@@ -339,7 +339,7 @@ Since the detector noise $n(t)$ comes from a combination of sources from both, t
 \end{align}
 
 \medskip
-\noindent This effectively flattens the power across all frequencies, allowing for a clearer view of the glitch signal. The resulting whitened data can then be used for further analysis, such as statistical testing or machine learning classification.
+\noindent This data from this process allows for a clearer view of the glitch signal, and can be used for further analysis, such as statistical testing or machine learning classification.
 
 \medskip
 \noindent In figure \ref{fig:sampletomte} we see a Tomte glitch signal before and after whitening. In the first plot we do not clearly see the effects of the glitch on the time series data. However, after whitening the data, we can clearly see the glitch signal in the time-amplitude plot. The Q-transform allows a view of the non-stationary portion of the glitch signal, which shows a clear peak in the normalized energy coinciding with the glitch event. For a clean signal we would not see any significant peaks in the whitened time series or non-stationary parts in the Q-transform.
@@ -361,25 +361,14 @@ Since the detector noise $n(t)$ comes from a combination of sources from both, t
 Our main objective is to determine the Gaussianity of time series data obtained from L1 and use this as a criterion to determine the presence of a glitch in it. 
 
 \medskip
-\noindent If a sample is found to be non-Gaussian, this indicates an excess of power at certain frequencies due to which there is a high chance of a glitch being present. In the previous section, we have seen how whitening the time series data brings out the glitch characteristics. Taking an example of a random Blip glitch, if we were to treat its whitened amplitude values as a population of points and plot the distribution, we notice that it contains heavier tails, hence making it non-Gaussian \ref{fig:glitch_vs_normal_distribution}. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution \ref{fig:clean_signal_vs_gaussian}. Hence, we propose a pair of hypotheses to determine the presence of a glitch in a sample of data from the detector.
+\noindent If a sample is found to be non-Gaussian, this indicates an excess of power at certain frequencies due to which there is a high chance of a glitch being present. In the previous section, we have seen how whitening the time series data brings out the glitch characteristics. Taking an example of a random Blip glitch, if we were to treat its whitened amplitude values as a population of points and plot the distribution, we notice that it contains heavier tails and a higher peak, hence making it non-Gaussian \ref{fig:clean_signal_vs_gaussian}. Similarly, when observing a sample of clean data, the signal is closer to that of a Gaussian distribution. Hence, we propose a pair of hypotheses to determine the presence of a glitch in a sample of data from the detector.
 
 % TODO: Add images for clean and glitched signal distributions. Also compare with normal distribution.
 \begin{figure}[H]
-  \centering
-  \begin{subfigure}[t]{0.68 \textwidth}
     \centering
-    \includegraphics[width=\textwidth]{images/glitch_vs_normal_distribution.pdf}
-    \caption{}
-    \label{fig:glitch_vs_normal_distribution}
-  \end{subfigure}
-  \hspace{25px}
-  \begin{subfigure}[t]{0.68\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{images/clean_signal_vs_gaussian.pdf}
-    \caption{}
+    \includegraphics[width=0.8\textwidth]{images/clean_signal_vs_gaussian.pdf}
+    \caption{The distributions of standardized amplitudes for a glitch and a clean signal compared to Gaussian distributions.}
     \label{fig:clean_signal_vs_gaussian}
-  \end{subfigure}
-  \caption{The distributions of standardized amplitudes for (a) a glitch and (b) a clean signal compared to Gaussian distributions.}
 \end{figure}
 
 \medskip
@@ -387,7 +376,14 @@ Our main objective is to determine the Gaussianity of time series data obtained 
   \begin{minipage}{0.97\textwidth}
     \textbf{Null Hypothesis ($H_0$):}
 
-    Considering a sample of whitened time series detector data, the distribution of the amplitude values is Gaussian, hence it does not contain a glitch, i.e. it is considered to be clean.
+    Considering a sample distribution $D$ of whitened time series detector data, we assume the distribution of the amplitude values to be Gaussian
+    
+    \begin{equation*}
+      D = \mathcal{N}(\mu, \sigma^2)
+      \label{eq:gaussian_distribution}
+    \end{equation*}
+
+    Hence, the sample does not contain a glitch, i.e. it is considered to be clean.
   \end{minipage}
 }
 \\
@@ -395,12 +391,20 @@ Our main objective is to determine the Gaussianity of time series data obtained 
   \begin{minipage}{0.97\textwidth}
     \textbf{Alternative Hypothesis ($H_1$):}
 
-    Considering a sample of whitened time series detector data, the distribution of the amplitudes is non-Gaussian, hence it contains a glitch.
+    Considering a sample distribution $D$ of whitened time series detector data, we find that the distribution of the amplitudes is non-Gaussian,
+    
+    \begin{equation*}
+      D \neq \mathcal{N}(\mu, \sigma^2)
+      \label{eq:non_gaussian_distribution}
+    \end{equation*}
+    
+    Hence, the sample contains a glitch.
+
   \end{minipage}
 }
 
 \medskip
-\noindent We employ three statistical tests of normality to test these hypotheses: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these have their own strengths and weaknesses, and are used to assess the normality of the data in different ways. These tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result. The p-value tells us how strongly the statistic rejects the null hypothesis. For our tests, a low p-value tells us that the sample data is unlikely to be Gaussian, hence indicating the presence of a glitch. The significance level for our tests, $\alpha$, is set to 0.05, which tells us that if the p-value is less than it, we reject the null hypothesis and accept the alternative hypothesis.
+\noindent We employ three statistical tests of normality to test these hypotheses: the Shapiro-Wilk test, the Kolmogorov-Smirnov test, and the Anderson-Darling test. Each of these have their own strengths and limitations, and are used to assess the normality of the data in different ways. These tests give us a statistic along with a p-value, the latter of which will be used to determine the significance of the result. The p-value tells us how strongly the statistic rejects the null hypothesis based on a significance level $\alpha$. For our tests, we have the significance level at 0.05. If the p-value computed by our tests is less than 0.05, we reject the null hypothesis and conclude that the sample data is non-Gaussian, hence containing a glitch. Any samples with a p-value greater than or equal to 0.05 are considered to be clean.
 
 % \noindent This allows us to better understand the results, as they provide a direct measure of their significance. For example, if we took the Kolmogorov-Smirnov test, the calculated statistic is a distance measure, which can be difficult to interpret in terms of the distribution being Gaussian or not. The p-value, on the other hand, gives us a direct measure of the probability of the test statistic being as extreme as calculated hence, eliminating the need to determine a critical value for each statistic. Additionally, setting different critical values for each test would lead to vastly different results, making it difficult to compare the results. The p-values standardize the results hence allowing for like-to-like comparison of the result.
 
@@ -452,10 +456,10 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
     \label{fig:ecdf_cdf_comparison}
 \end{figure}
 
-\noindent The Kolmogorov-Smirnov (KS) test is a non-parametric test, originally proposed in the 1930s, used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (ECDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a Gaussian distribution \ref{fig:ecdf_cdf_comparison}. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
+\noindent The Kolmogorov-Smirnov (KS) test is a non-parametric test, which means that it does not have any assumption that our distribution follows a specific probability distribution. Originally proposed in the 1930s, this test is used to decide whether a sample comes from a particular type of distribution \cite{Kolmogorov_1951, chakravarti1967}. The idea of this test is to check the difference in shape between the distributions being studied, which is done by measuring the maximum vertical distance between the \textbf{empirical cumulative distribution function (ECDF)} of the sample and the \textbf{cumulative distribution function (CDF)} of the reference distribution, which in this case is a random Gaussian distribution \ref{fig:ecdf_cdf_comparison}. This test has two versions: the \textbf{one-sample KS test} which is used to compare an empirical sample distribution with a reference theoretical distribution, and the \textbf{two-sample KS test} which compares the empirical distributions of two samples. We use the one-sample KS test in this project.
 
 \medskip
-\noindent  Taking a sample of ordered points $X_1, X_2, \ldots, X_N$ as $N$ ordered points from a population, the Empirical CDF of the sample, is given by
+\noindent  Taking a sample of ordered points $x_1, x_2, \ldots, x_N$ as $N$ ordered points from a population, the Empirical CDF of the sample, is given by
 
 \begin{equation}
     F_N = \frac{n(i)}{N}
@@ -463,10 +467,10 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 \end{equation}
 
 \medskip
-\noindent Where $n(i)$ is the number of points less than or equal to $X_i$ in the sample. This is in the form of a step function increasing at steps of $1/N$ at each ordered point \cite{guthrie_nistsematech_2020}. Taking the theoretical CDF of the distribution being tested as $F$s, a Gaussian distribution in our case, the KS test statistic $D_n$ is defined as
+\noindent Where $n(i)$ is the number of points less than or equal to $x_i$ in the sample. This is in the form of a step function increasing at steps of $1/N$ at each ordered point \cite{guthrie_nistsematech_2020}. Taking the theoretical CDF of the distribution being tested as $F(x)$, a Gaussian distribution in our case, the KS test statistic $D_n$ is defined as
 
 \begin{equation}
-    D_n = \sup_{1 \leq i \leq N} \left( F(X_i) - \frac{i - 1}{N} , \frac{i}{N} - F(X_i) \right)
+    D_n = \sup_{1 \leq i \leq N} \left( F(x_i) - \frac{i - 1}{N} , \frac{i}{N} - F(x_i) \right)
     \label{eq:ks_statistic}
 \end{equation}
 
@@ -475,7 +479,7 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 
 \subsubsection{Note: Scaling the data}\label{Scaling}
 
-\noindent The Kolmogorov-Smirnov test, is highly affected by the values of the data. We need to ensure that the comparisons being done in the test are not affected by the absolute values of the data points. Hence, this requires for the data to be scaled down to the same range of a standard normal distribution. This is achieved by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
+\noindent The Kolmogorov-Smirnov test is highly affected by the values of the data. We need to ensure that the comparisons being done in the test are not affected by the absolute values of the data points. Hence, this requires for the data to be scaled down to the same range of a standard normal distribution. This is achieved by scaling the data to have a mean of 0 and a standard deviation of 1. This is also known as \textbf{standardization} or \textbf{z-score normalization}.
 
 \medskip
 \noindent To achieve this the \texttt{StandardScaler} class from the \texttt{sklearn.preprocessing} module is used. This module works by transposing the data to have a zero mean, calculates the standard deviation, and scales the data points down such that the standard deviation is 1. The \textbf{standard score} or \textbf{z-score} of a sample point, which tells us how many standard deviations it is from the mean, is given by
@@ -491,7 +495,7 @@ The Shapiro-Wilk test \cite{Shapiro1965} is a parametric test, meaning that it a
 \pagebreak
 \subsection{The Anderson Darling test}\label{AndersonDarling}
 
-The Anderson-Darling (AD) test is a goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov and Cramer-von Mises tests with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}.
+The Anderson-Darling (AD) test is a non-parametric goodness-of-fit test used to determine whether a sample of data is drawn from a specific distribution, most commonly a normal distribution. It is a modification of the Kolmogorov-Smirnov and Cramer-von Mises tests with more sensitivity to differences in the tails of the distribution \cite{guthrie_nistsematech_2020, Michael_2025_statsref}.
 
 \medskip
 \noindent Similar to the Kolmogorov-Smirnov test, this test compares the ECDF of the sample data with the CDF of a theoretical reference distribution by taking a distance function between them. The main difference here is that the full range of the data is used to calculate the distance function rather than just the largest distance value \cite{Michael_2025_statsref}. Here, taking $n$ to be the number of elements in the sample and $w(x)$ to be the weighting function, the Anderson-Darling statistic distance $A^2$, given by the squared area between the sample ECDF $F_n(x)$ and the theoretical reference CDF $F(x)$, is calculated as
@@ -529,7 +533,7 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \noindent where $S$ is given by
 
 \begin{equation}
-  S =  \frac{1}{N} \sum\limits_{i=1}^{N} \left( 2i - 1 \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right)
+  S =  \frac{1}{N} \sum\limits_{i=1}^{N} \left( 2i - 1 \right) \left( \ln F(x_i) + \ln (1 - F(x_{N-i+1})) \right)
   \label{eq:ad_statistic_full}
 \end{equation}
 
@@ -537,7 +541,7 @@ The Anderson-Darling (AD) test is a goodness-of-fit test used to determine wheth
 \noindent hence, giving us the final form of the Anderson-Darling statistic as
 
 \begin{equation}
-  A^2 = -N - \sum\limits_{i=1}^{N} \left( \frac{2i - 1}{N} \right) \left( \ln F(X_i) + \ln (1 - F(X_{N-i+1})) \right)
+  A^2 = -N - \sum\limits_{i=1}^{N} \left( \frac{2i - 1}{N} \right) \left( \ln F(x_i) + \ln (1 - F(x_{N-i+1})) \right)
   \label{eq:ad_statistic_full}
 \end{equation}
 
@@ -571,7 +575,15 @@ In our experiments, we treat the statistical tests as classifiers, where a posit
     \begin{equation}
       \text{Recall} = \frac{TP}{TP + FN}
     \end{equation}
-  \item \textbf{False Positive Rate} (FPR): This is the number of actual negative samples incorrectly identified as positive over the total number of actual negative samples. It is ideal to keep this value low to ensure that our tests do not incorrectly label clean signals as glitches.
+  \item \textbf{False Negative Rate (FNR)}: This is the number of actual positive samples incorrectly identified as negative over the total number of actual positive samples. We would ideally want this value to be low to ensure not missing out on identifying glitches in our noise samples.
+    \begin{equation}
+      \text{FNR} = \frac{FN}{TP + FN}
+    \end{equation}
+  \item \textbf{Specificity} or \textbf{True Negative Rate (TNR)}: This is the number of actual negative samples correctly identified as negative over the total number of actual negative samples. This tells us how trustworthy the negative predictions made by the test are.
+    \begin{equation}
+      \text{Specificity} = \frac{TN}{TN + FP}
+    \end{equation}
+  \item \textbf{False Positive Rate (FPR)}: This is the number of actual negative samples incorrectly identified as positive over the total number of actual negative samples. It is ideal to keep this value low to ensure that our tests do not incorrectly label clean signals as glitches.
     \begin{equation}
       \text{FPR} = \frac{FP}{FP + TN}
     \end{equation}
@@ -669,33 +681,32 @@ Taking the whole frequency range into account, we get the following results for 
 
 \begin{table}[H]
   \centering
-  \begin{tabular}{lcccccccccc}
+  \begin{tabular}{lccccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 4 & 2 & 0 & 0 & 0.67 & 0.67 & 0 & 0 & 0.33 & 0.80 \\
-  1400Ripples & 72 & 29 & 0 & 0 & 0.71 & 0.71 & 0 & 0 & 0.29 & 0.83 \\
-  Air\_Compressor & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.13 \\
-  Blip & 97 & 4 & 0 & 0 & 0.96 & 0.96 & 0 & 0 & 0.04 & 0.98 \\
-  Blip\_Low\_Frequency & 15 & 86 & 0 & 0 & 0.15 & 0.15 & 0 & 0 & 0.85 & 0.26 \\
-  Chirp & 2 & 4 & 0 & 0 & 0.33 & 0.33 & 0 & 0 & 0.67 & 0.50 \\
-  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Fast\_Scattering & 3 & 98 & 0 & 0 & 0.03 & 0.03 & 0 & 0 & 0.97 & 0.06 \\
-  Helix & 19 & 2 & 0 & 0 & 0.90 & 0.90 & 0 & 0 & 0.10 & 0.95 \\
-  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Light\_Modulation & 67 & 5 & 0 & 0 & 0.93 & 0.93 & 0 & 0 & 0.07 & 0.96 \\
-  Low\_Frequency\_Burst & 8 & 90 & 0 & 0 & 0.08 & 0.08 & 0 & 0 & 0.92 & 0.15 \\
-  Low\_Frequency\_Lines & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Paired\_Doves & 43 & 58 & 0 & 0 & 0.43 & 0.43 & 0 & 0 & 0.57 & 0.60 \\
-  Power\_Line & 7 & 93 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.13 \\
-  Repeating\_Blips & 98 & 3 & 0 & 0 & 0.97 & 0.97 & 0 & 0 & 0.03 & 0.98 \\
-  Scattered\_Light & 10 & 91 & 0 & 0 & 0.10 & 0.10 & 0 & 0 & 0.90 & 0.18 \\
-  Scratchy & 8 & 37 & 0 & 0 & 0.18 & 0.18 & 0 & 0 & 0.82 & 0.30 \\
-  Tomte & 55 & 46 & 0 & 0 & 0.54 & 0.54 & 0 & 0 & 0.46 & 0.71 \\
-  Violin\_Mode & 86 & 15 & 0 & 0 & 0.85 & 0.85 & 0 & 0 & 0.15 & 0.92 \\
-  Wandering\_Line & 9 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Whistle & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Clean\_Signal & 0 & 0 & 83 & 1741 & 0.95 & 0.00 & 0.95 & 0.05 & 0.00 & 0.00 \\
+  1080Lines & 4 & 2 & 0.67 & 0.33 \\
+  1400Ripples & 72 & 29 & 0.71 & 0.29 \\
+  Air\_Compressor & 7 & 94 & 0.07 & 0.93 \\
+  Blip & 97 & 4 & 0.96 & 0.04 \\
+  Blip\_Low\_Frequency & 15 & 86 & 0.15 & 0.85 \\
+  Chirp & 2 & 4 & 0.33 & 0.67 \\
+  Extremely\_Loud & 101 & 0 & 1.00 & 0.00 \\
+  Fast\_Scattering & 3 & 98 & 0.03 & 0.97 \\
+  Helix & 19 & 2 & 0.90 & 0.10 \\
+  Koi\_Fish & 99 & 0 & 1.00 & 0.00 \\
+  Light\_Modulation & 67 & 5 & 0.93 & 0.07 \\
+  Low\_Frequency\_Burst & 8 & 90 & 0.08 & 0.92 \\
+  Low\_Frequency\_Lines & 2 & 99 & 0.02 & 0.98 \\
+  Paired\_Doves & 43 & 58 & 0.43 & 0.57 \\
+  Power\_Line & 7 & 93 & 0.07 & 0.93 \\
+  Repeating\_Blips & 98 & 3 & 0.97 & 0.03 \\
+  Scattered\_Light & 10 & 91 & 0.10 & 0.90 \\
+  Scratchy & 8 & 37 & 0.18 & 0.82 \\
+  Tomte & 55 & 46 & 0.54 & 0.46 \\
+  Violin\_Mode & 86 & 15 & 0.85 & 0.15 \\
+  Wandering\_Line & 9 & 0 & 1.00 & 0.00 \\
+  Whistle & 101 & 0 & 1.00 & 0.00 \\
   \bottomrule
   \end{tabular}
   \caption{Shapiro-Wilk test results for each glitch class at the full frequency range from 10 Hz to 1024Hz.}
@@ -710,33 +721,32 @@ Taking the whole frequency range into account, we get the following results for 
 
 \begin{table}[H]
   \centering
-  \begin{tabular}{lcccccccccc}
+  \begin{tabular}{lccccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Blip & 37 & 64 & 0 & 0 & 0.37 & 0.37 & 0 & 0 & 0.63 & 0.54 \\
-  Blip\_Low\_Frequency & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Helix & 12 & 9 & 0 & 0 & 0.57 & 0.57 & 0 & 0 & 0.43 & 0.73 \\
-  Koi\_Fish & 98 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 0 & 0.01 & 0.99 \\
-  Light\_Modulation & 60 & 12 & 0 & 0 & 0.83 & 0.83 & 0 & 0 & 0.17 & 0.91 \\
-  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Paired\_Doves & 20 & 81 & 0 & 0 & 0.20 & 0.20 & 0 & 0 & 0.80 & 0.33 \\
-  Power\_Line & 1 & 99 & 0 & 0 & 0.01 & 0.01 & 0 & 0 & 0.99 & 0.02 \\
-  Repeating\_Blips & 62 & 39 & 0 & 0 & 0.61 & 0.61 & 0 & 0 & 0.39 & 0.76 \\
-  Scattered\_Light & 3 & 98 & 0 & 0 & 0.03 & 0.03 & 0 & 0 & 0.97 & 0.06 \\
-  Scratchy & 3 & 42 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.12 \\
-  Tomte & 14 & 87 & 0 & 0 & 0.14 & 0.14 & 0 & 0 & 0.86 & 0.24 \\
-  Violin\_Mode & 18 & 83 & 0 & 0 & 0.18 & 0.18 & 0 & 0 & 0.82 & 0.30 \\
-  Wandering\_Line & 5 & 4 & 0 & 0 & 0.56 & 0.56 & 0 & 0 & 0.44 & 0.71 \\
-  Whistle & 55 & 46 & 0 & 0 & 0.54 & 0.54 & 0 & 0 & 0.46 & 0.71 \\
-  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0 \\
+  1080Lines & 0 & 6 & 0.00 & 1.00 \\
+  1400Ripples & 0 & 101 & 0.00 & 1.00 \\
+  Air\_Compressor & 0 & 101 & 0.00 & 1.00 \\
+  Blip & 37 & 64 & 0.37 & 0.63 \\
+  Blip\_Low\_Frequency & 2 & 99 & 0.02 & 0.98 \\
+  Chirp & 0 & 6 & 0.00 & 1.00 \\
+  Extremely\_Loud & 101 & 0 & 1.00 & 0.00 \\
+  Fast\_Scattering & 0 & 101 & 0.00 & 1.00 \\
+  Helix & 12 & 9 & 0.57 & 0.43 \\
+  Koi\_Fish & 98 & 1 & 0.99 & 0.01 \\
+  Light\_Modulation & 60 & 12 & 0.83 & 0.17 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0.00 & 1.00 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0.00 & 1.00 \\
+  Paired\_Doves & 20 & 81 & 0.20 & 0.80 \\
+  Power\_Line & 1 & 99 & 0.01 & 0.99 \\
+  Repeating\_Blips & 62 & 39 & 0.61 & 0.39 \\
+  Scattered\_Light & 3 & 98 & 0.03 & 0.97 \\
+  Scratchy & 3 & 42 & 0.07 & 0.93 \\
+  Tomte & 14 & 87 & 0.14 & 0.86 \\
+  Violin\_Mode & 18 & 83 & 0.18 & 0.82 \\
+  Wandering\_Line & 5 & 4 & 0.56 & 0.44 \\
+  Whistle & 55 & 46 & 0.54 & 0.46 \\
   \bottomrule
   \end{tabular}
   \caption{Kolmogorov-Smirnov test results for each glitch class at the full frequency range from 10 Hz to 1024Hz.}
@@ -745,33 +755,32 @@ Taking the whole frequency range into account, we get the following results for 
 
 \begin{table}[H]
   \centering
-  \begin{tabular}{lcccccccccc}
+  \begin{tabular}{lcccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Blip & 35 & 66 & 0 & 0 & 0.35 & 0.35 & 0 & 0 & 0.65 & 0.51 \\
-  Blip\_Low\_Frequency & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Helix & 8 & 13 & 0 & 0 & 0.38 & 0.38 & 0 & 0 & 0.62 & 0.55 \\
-  Koi\_Fish & 98 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 0 & 0.01 & 0.99 \\
-  Light\_Modulation & 58 & 14 & 0 & 0 & 0.81 & 0.81 & 0 & 0 & 0.19 & 0.89 \\
-  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Paired\_Doves & 17 & 84 & 0 & 0 & 0.17 & 0.17 & 0 & 0 & 0.83 & 0.29 \\
-  Power\_Line & 1 & 99 & 0 & 0 & 0.01 & 0.01 & 0 & 0 & 0.99 & 0.02 \\
-  Repeating\_Blips & 60 & 41 & 0 & 0 & 0.59 & 0.59 & 0 & 0 & 0.41 & 0.75 \\
-  Scattered\_Light & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Scratchy & 3 & 42 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.12 \\
-  Tomte & 12 & 89 & 0 & 0 & 0.12 & 0.12 & 0 & 0 & 0.88 & 0.21 \\
-  Violin\_Mode & 17 & 84 & 0 & 0 & 0.17 & 0.17 & 0 & 0 & 0.83 & 0.29 \\
-  Wandering\_Line & 5 & 4 & 0 & 0 & 0.56 & 0.56 & 0 & 0 & 0.44 & 0.71 \\
-  Whistle & 53 & 48 & 0 & 0 & 0.52 & 0.52 & 0 & 0 & 0.48 & 0.69 \\
-  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0 \\
+  1080Lines & 0 & 6 & 0.00 & 1.00 \\
+  1400Ripples & 0 & 101 & 0.00 & 1.00 \\
+  Air\_Compressor & 0 & 101 & 0.00 & 1.00 \\
+  Blip & 35 & 66 & 0.35 & 0.65 \\
+  Blip\_Low\_Frequency & 2 & 99 & 0.02 & 0.98 \\
+  Chirp & 0 & 6 & 0.00 & 1.00 \\
+  Extremely\_Loud & 101 & 0 & 1.00 & 0.00 \\
+  Fast\_Scattering & 0 & 101 & 0.00 & 1.00 \\
+  Helix & 8 & 13 & 0.38 & 0.62 \\
+  Koi\_Fish & 98 & 1 & 0.99 & 0.01 \\
+  Light\_Modulation & 58 & 14 & 0.81 & 0.19 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0.00 & 1.00 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0.00 & 1.00 \\
+  Paired\_Doves & 17 & 84 & 0.17 & 0.83 \\
+  Power\_Line & 1 & 99 & 0.01 & 0.99 \\
+  Repeating\_Blips & 60 & 41 & 0.59 & 0.41 \\
+  Scattered\_Light & 2 & 99 & 0.02 & 0.98 \\
+  Scratchy & 3 & 42 & 0.07 & 0.93  \\
+  Tomte & 12 & 89 & 0.12 & 0.88  \\
+  Violin\_Mode & 17 & 84 & 0.17 & 0.83 \\
+  Wandering\_Line & 5 & 4 & 0.56 & 0.44 \\
+  Whistle & 53 & 48 & 0.52 & 0.48 \\
   \bottomrule
   \end{tabular}
   \caption{Anderson-Darling test results for each glitch class at the full frequency range from 10 Hz to 1024Hz.}
@@ -815,33 +824,33 @@ We now perform the same analysis as before on the time series data with a band p
 % TODO: Add sample distributions of glitch and clean signal before and after band pass filtering. Add ref above
 
 \begin{table}[H]
-  \begin{tabular}{lcccccccccc}
+  \centering
+  \begin{tabular}{lcccccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 3 & 3 & 0 & 0 & 0.50 & 0.50 & 0 & 0 & 0.50  & 0.67 \\
-  1400Ripples & 44 & 57 & 0 & 0 & 0.44 & 0.44 & 0 & 0 & 0.56  & 0.61 \\
-  Air\_Compressor & 54 & 47 & 0 & 0 & 0.53 & 0.53 & 0 & 0 & 0.47  & 0.70 \\
-  Blip & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00  & 1.00 \\
-  Blip\_Low\_Frequency & 72 & 29 & 0 & 0 & 0.71 & 0.71 & 0 & 0 & 0.29  & 0.83 \\
-  Chirp & 5 & 1 & 0 & 0 & 0.83 & 0.83 & 0 & 0 & 0.17  & 0.91 \\
-  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00  & 1.00 \\
-  Fast\_Scattering & 41 & 60 & 0 & 0 & 0.41 & 0.41 & 0 & 0 & 0.59  & 0.58 \\
-  Helix & 21 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00  & 1.00 \\
-  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00  & 1.00 \\
-  Light\_Modulation & 71 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 0 & 0.01  & 0.99 \\
-  Low\_Frequency\_Burst & 43 & 55 & 0 & 0 & 0.44 & 0.44 & 0 & 0 & 0.56  & 0.61 \\
-  Low\_Frequency\_Lines & 51 & 50 & 0 & 0 & 0.50 & 0.50 & 0 & 0 & 0.50  & 0.67 \\
-  Paired\_Doves & 86 & 15 & 0 & 0 & 0.85 & 0.85 & 0 & 0 & 0.15  & 0.92 \\
-  Power\_Line & 68 & 32 & 0 & 0 & 0.68 & 0.68 & 0 & 0 & 0.32  & 0.81 \\
-  Repeating\_Blips & 98 & 3 & 0 & 0 & 0.97 & 0.97 & 0 & 0 & 0.03  & 0.98 \\
-  Scattered\_Light & 65 & 36 & 0 & 0 & 0.64 & 0.64 & 0 & 0 & 0.36  & 0.78 \\
-  Scratchy & 34 & 11 & 0 & 0 & 0.76 & 0.76 & 0 & 0 & 0.24  & 0.86 \\
-  Tomte & 96 & 5 & 0 & 0 & 0.95 & 0.95 & 0 & 0 & 0.05 & 0.97 \\
-  Violin\_Mode & 50 & 51 & 0 & 0 & 0.50 & 0.50 & 0 & 0 & 0.50 & 0.66 \\
-  Wandering\_Line & 3 & 6 & 0 & 0 & 0.33 & 0.33 & 0 & 0 & 0.67 & 0.50 \\
-  Whistle & 46 & 55 & 0 & 0 & 0.46 & 0.46 & 0 & 0 & 0.54 & 0.63 \\
-  Clean\_Signal & 0 & 0 & 735 & 1089 & 0.60 & 0.00 & 0.60 & 0.40 & 0.00 & 0.00 \\
+  1080Lines & 3 & 3 & 0.50 & 0.50 \\
+  1400Ripples & 44 & 57 & 0.44 & 0.56 \\
+  Air\_Compressor & 54 & 47 & 0.53 & 0.47 \\
+  Blip & 101 & 0 & 1.00 & 0.00 \\
+  Blip\_Low\_Frequency & 72 & 29 & 0.71 & 0.29 \\
+  Chirp & 5 & 1 & 0.83 & 0.17 \\
+  Extremely\_Loud & 101 & 0 & 1.00 & 0.00 \\
+  Fast\_Scattering & 41 & 60 & 0.41 & 0.59 \\
+  Helix & 21 & 0 & 1.00 & 0.00 \\
+  Koi\_Fish & 99 & 0 & 1.00 & 0.00 \\
+  Light\_Modulation & 71 & 1 & 0.99 & 0.01 \\
+  Low\_Frequency\_Burst & 43 & 55 & 0.44 & 0.56 \\
+  Low\_Frequency\_Lines & 51 & 50 & 0.50 & 0.50 \\
+  Paired\_Doves & 86 & 15 & 0.85 & 0.15 \\
+  Power\_Line & 68 & 32 & 0.68 & 0.32 \\
+  Repeating\_Blips & 98 & 3 & 0.97 & 0.03 \\
+  Scattered\_Light & 65 & 36 & 0.64 & 0.36 \\
+  Scratchy & 34 & 11 & 0.76 & 0.24 \\
+  Tomte & 96 & 5 & 0.95 & 0.05 \\
+  Violin\_Mode & 50 & 51 & 0.50 & 0.50 \\
+  Wandering\_Line & 3 & 6 & 0.33 & 0.67 \\
+  Whistle & 46 & 55 & 0.46 & 0.54 \\
   \bottomrule
   \end{tabular}
   \caption{Shapiro-Wilk test results for each glitch class at a frequency range of 10 Hz to 512 Hz.}
@@ -857,33 +866,33 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent The performance of the all the three tests have decreased in the case of Whistle, Violin\_Mode and Wandering\_Line glitches. This suggests a possibility that these glitches have a significant amount of high frequency content which is filtered out in this analysis, hence making them harder to detect. On the other hand, for glitches such as Blip, Blip\_Low\_Frequency, Helix, and Repeating\_Blips, the tests have a significant amount of low frequency content, hence making them easier to detect.
 
 \begin{table}[H]
-  \begin{tabular}{lcccccccccc}
+  \centering
+  \begin{tabular}{lcccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
 \midrule
-  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Air\_Compressor & 1 & 100 & 0 & 0 & 0.01 & 0.01 & 0 & 0 & 0.99 & 0.02 \\
-  Blip & 74 & 27 & 0 & 0 & 0.73 & 0.73 & 0 & 0 & 0.27 & 0.85 \\
-  Blip\_Low\_Frequency & 11 & 90 & 0 & 0 & 0.11 & 0.11 & 0 & 0 & 0.89 & 0.20 \\
-  Chirp & 2 & 4 & 0 & 0 & 0.33 & 0.33 & 0 & 0 & 0.67 & 0.50 \\
-  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Fast\_Scattering & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Helix & 18 & 3 & 0 & 0 & 0.86 & 0.86 & 0 & 0 & 0.14 & 0.92 \\
-  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Light\_Modulation & 66 & 6 & 0 & 0 & 0.92 & 0.92 & 0 & 0 & 0.08 & 0.96 \\
-  Low\_Frequency\_Burst & 3 & 95 & 0 & 0 & 0.03 & 0.03 & 0 & 0 & 0.97 & 0.06 \\
-  Low\_Frequency\_Lines & 6 & 95 & 0 & 0 & 0.06 & 0.06 & 0 & 0 & 0.94 & 0.11 \\
-  Paired\_Doves & 48 & 53 & 0 & 0 & 0.48 & 0.48 & 0 & 0 & 0.52 & 0.64 \\
-  Power\_Line & 2 & 98 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Repeating\_Blips & 95 & 6 & 0 & 0 & 0.94 & 0.94 & 0 & 0 & 0.06 & 0.97 \\
-  Scattered\_Light & 15 & 86 & 0 & 0 & 0.15 & 0.15 & 0 & 0 & 0.85 & 0.26 \\
-  Scratchy & 14 & 31 & 0 & 0 & 0.31 & 0.31 & 0 & 0 & 0.69 & 0.47 \\
-  Tomte & 52 & 49 & 0 & 0 & 0.51 & 0.51 & 0 & 0 & 0.49 & 0.68 \\
-  Violin\_Mode & 12 & 89 & 0 & 0 & 0.12 & 0.12 & 0 & 0 & 0.88 & 0.21 \\
-  Wandering\_Line & 0 & 9 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Whistle & 9 & 92 & 0 & 0 & 0.09 & 0.09 & 0 & 0 & 0.91 & 0.16 \\
-  Clean\_Signal & 0 & 0 & 24 & 1800 & 0.99 & 0.00 & 0.99 & 0.01 & 0.00 & 0 \\
+  1080Lines & 0 & 6 & 0.00 & 1.00 \\
+  1400Ripples & 0 & 101 & 0.00 & 1.00 \\
+  Air\_Compressor & 1 & 100 & 0.01 & 0.99 \\
+  Blip & 74 & 27 & 0.73 & 0.27 \\
+  Blip\_Low\_Frequency & 11 & 90 & 0.11 & 0.89 \\
+  Chirp & 2 & 4 & 0.33  & 0.67 \\
+  Extremely\_Loud & 101 & 0 & 1.00 & 0.00 \\
+  Fast\_Scattering & 2 & 99 & 0.02 & 0.98 \\
+  Helix & 18 & 3 & 0.86 & 0.14 \\
+  Koi\_Fish & 99 & 0 & 1.00 & 0.00 \\
+  Light\_Modulation & 66 & 6 & 0.92 & 0.08 \\
+  Low\_Frequency\_Burst & 3 & 95 & 0.03 & 0.97 \\
+  Low\_Frequency\_Lines & 6 & 95 & 0.06 & 0.94 \\
+  Paired\_Doves & 48 & 53 & 0.48 & 0.52 \\
+  Power\_Line & 2 & 98 & 0.02 & 0.98 \\
+  Repeating\_Blips & 95 & 6 & 0.94 & 0.06 \\
+  Scattered\_Light & 15 & 86 & 0.15 & 0.85 \\
+  Scratchy & 14 & 31 & 0.31 & 0.69 \\
+  Tomte & 52 & 49 & 0.51 & 0.49 \\
+  Violin\_Mode & 12 & 89 & 0.12 & 0.88 \\
+  Wandering\_Line & 0 & 9 & 0.00 & 1.00 \\
+  Whistle & 9 & 92 & 0.09 & 0.91 \\
   \bottomrule
   \end{tabular}
   \caption{Kolmogorov-Smirnov test results for each glitch class at a frequency range of 10 Hz to 512 Hz.}
@@ -893,33 +902,33 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent When looking at the clean signal samples, we see that the Shapiro-Wilk test has the highest number of false positives, which may indicate that it is more sensitive to certain types of noise or artifacts in the data. The Kolmogorov-Smirnov test has a lower number of false positives, and the Anderson-Darling test shows no false positives to be present, indicating that it is the most effective at identifying clean signals at lower frequencies compared to the other tests.
 
 \begin{table}[H]
-  \begin{tabular}{lcccccccccc}
+  \centering
+  \begin{tabular}{lcccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Blip & 73 & 28 & 0 & 0 & 0.72 & 0.72 & 0 & 0 & 0.28 & 0.84 \\
-  Blip\_Low\_Frequency & 8 & 93 & 0 & 0 & 0.08 & 0.08 & 0 & 0 & 0.92 & 0.15 \\
-  Chirp & 1 & 5 & 0 & 0 & 0.17 & 0.17 & 0 & 0 & 0.83 & 0.29 \\
-  Extremely\_Loud & 101 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Fast\_Scattering & 1 & 100 & 0 & 0 & 0.01 & 0.01 & 0 & 0 & 0.99 & 0.02 \\
-  Helix & 18 & 3 & 0 & 0 & 0.86 & 0.86 & 0 & 0 & 0.14 & 0.92 \\
-  Koi\_Fish & 99 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Light\_Modulation & 66 & 6 & 0 & 0 & 0.92 & 0.92 & 0 & 0 & 0.08 & 0.96 \\
-  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Paired\_Doves & 47 & 54 & 0 & 0 & 0.47 & 0.47 & 0 & 0 & 0.53 & 0.64 \\
-  Power\_Line & 1 & 99 & 0 & 0 & 0.01 & 0.01 & 0 & 0 & 0.99 & 0.02 \\
-  Repeating\_Blips & 91 & 10 & 0 & 0 & 0.90 & 0.90 & 0 & 0 & 0.10 & 0.95 \\
-  Scattered\_Light & 10 & 91 & 0 & 0 & 0.10 & 0.10 & 0 & 0 & 0.90 & 0.18 \\
-  Scratchy & 8 & 37 & 0 & 0 & 0.18 & 0.18 & 0 & 0 & 0.82 & 0.30 \\
-  Tomte & 48 & 53 & 0 & 0 & 0.48 & 0.48 & 0 & 0 & 0.52 & 0.64 \\
-  Violin\_Mode & 10 & 91 & 0 & 0 & 0.10 & 0.10 & 0 & 0 & 0.90 & 0.18 \\
-  Wandering\_Line & 0 & 9 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Whistle & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.13 \\
-  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0 \\
+  1080Lines & 0 & 6 & 0.00 & 1.00 \\
+  1400Ripples & 0 & 101 & 0.00 & 1.00 \\
+  Air\_Compressor & 0 & 101 & 0.00 & 1.00 \\
+  Blip & 73 & 28 & 0.72 & 0.28 \\
+  Blip\_Low\_Frequency & 8 & 93 & 0.08 & 0.92 \\
+  Chirp & 1 & 5 & 0.17 & 0.83 \\
+  Extremely\_Loud & 101 & 0 & 1.00 & 0.00 \\
+  Fast\_Scattering & 1 & 100 & 0.01 & 0.99 \\
+  Helix & 18 & 3 & 0.86 & 0.14 \\
+  Koi\_Fish & 99 & 0 & 1.00 & 0.00 \\
+  Light\_Modulation & 66 & 6 & 0.92 & 0.08 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0.00 & 1.00 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0.00 & 1.00 \\
+  Paired\_Doves & 47 & 54 & 0.47 & 0.53 \\
+  Power\_Line & 1 & 99 & 0.01 & 0.99 \\
+  Repeating\_Blips & 91 & 10 & 0.90 & 0.10 \\
+  Scattered\_Light & 10 & 91 & 0.10 & 0.90  \\
+  Scratchy & 8 & 37 & 0.18 & 0.82  \\
+  Tomte & 48 & 53 & 0.48 & 0.52 \\
+  Violin\_Mode & 10 & 91 & 0.10 & 0.90 \\
+  Wandering\_Line & 0 & 9 & 0.00 & 1.00 \\
+  Whistle & 7 & 94 & 0.07 & 0.93 \\
   \bottomrule
   \end{tabular}
   \caption{Anderson-Darling test results for each glitch class at a frequency range of 10 Hz to 512 Hz.}
@@ -949,33 +958,33 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent Here, we see that the accuracies and F1 scores of all the three tests are at their lowest in contrast with the previous two experiments. This suggests that the tests perform the worst due to there being lesser high frequency content in the data. We, again, notice a small spike in the false positive rate for the Shapiro-Wilk test, comparable to the full frequency range, while the Kolmogorov-Smirnov and Anderson-Darling tests have no false positives. The Shapiro-Wilk test has the highest true positive rate, followed by the Kolmogorov-Smirnov and Anderson-Darling tests respectively, which is consistent with the results from the previous experiments.
 
 \begin{table}[H]
-  \begin{tabular}{lcccccccccc}
+  \centering
+  \begin{tabular}{lcccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 3 & 3 & 0 & 0 & 0.50 & 0.50 & 0 & 0 & 0.50 & 0.67 \\
-  1400Ripples & 6 & 95 & 0 & 0 & 0.06 & 0.06 & 0 & 0 & 0.94 & 0.11 \\
-  Air\_Compressor & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Blip & 47 & 54 & 0 & 0 & 0.47 & 0.47 & 0 & 0 & 0.53 & 0.64 \\
-  Blip\_Low\_Frequency & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.13 \\
-  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0.00 \\
-  Extremely\_Loud & 100 & 1 & 0 & 0 & 0.99 & 0.99 & 0 & 0 & 0.01 & 1.00 \\
-  Fast\_Scattering & 5 & 96 & 0 & 0 & 0.05 & 0.05 & 0 & 0 & 0.95 & 0.09 \\
-  Helix & 8 & 13 & 0 & 0 & 0.38 & 0.38 & 0 & 0 & 0.62 & 0.55 \\
-  Koi\_Fish & 82 & 17 & 0 & 0 & 0.83 & 0.83 & 0 & 0 & 0.17 & 0.91 \\
-  Light\_Modulation & 55 & 17 & 0 & 0 & 0.76 & 0.76 & 0 & 0 & 0.24 & 0.87 \\
-  Low\_Frequency\_Burst & 8 & 90 & 0 & 0 & 0.08 & 0.08 & 0 & 0 & 0.92 & 0.15 \\
-  Low\_Frequency\_Lines & 5 & 96 & 0 & 0 & 0.05 & 0.05 & 0 & 0 & 0.95 & 0.09 \\
-  Paired\_Doves & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.13 \\
-  Power\_Line & 7 & 93 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.13 \\
-  Repeating\_Blips & 58 & 43 & 0 & 0 & 0.57 & 0.57 & 0 & 0 & 0.43 & 0.73 \\
-  Scattered\_Light & 2 & 99 & 0 & 0 & 0.02 & 0.02 & 0 & 0 & 0.98 & 0.04 \\
-  Scratchy & 4 & 41 & 0 & 0 & 0.09 & 0.09 & 0 & 0 & 0.91 & 0.16 \\
-  Tomte & 3 & 98 & 0 & 0 & 0.03 & 0.03 & 0 & 0 & 0.97 & 0.06 \\
-  Violin\_Mode & 55 & 46 & 0 & 0 & 0.54 & 0.54 & 0 & 0 & 0.46 & 0.71 \\
-  Wandering\_Line & 9 & 0 & 0 & 0 & 1.00 & 1.00 & 0 & 0 & 0.00 & 1.00 \\
-  Whistle & 82 & 19 & 0 & 0 & 0.81 & 0.81 & 0 & 0 & 0.19 & 0.90 \\
-  Clean\_Signal & 0 & 0 & 67 & 1757 & 0.96 & 0.00 & 0.96 & 0.04 & 0.00 & 0.00 \\
+  1080Lines & 3 & 3 & 0.50 & 0.50 \\
+  1400Ripples & 6 & 95 & 0.06 & 0.94 \\
+  Air\_Compressor & 2 & 99 & 0.02 & 0.98 \\
+  Blip & 47 & 54 & 0.47 & 0.53 \\
+  Blip\_Low\_Frequency & 7 & 94 & 0.07 & 0.93 \\
+  Chirp & 0 & 6 & 0.00 & 1.00 \\
+  Extremely\_Loud & 100 & 1 & 0.99 & 0.01 \\
+  Fast\_Scattering & 5 & 96 & 0.05 & 0.95 \\
+  Helix & 8 & 13 & 0.38 & 0.62 \\
+  Koi\_Fish & 82 & 17 & 0.83 & 0.17 \\
+  Light\_Modulation & 55 & 17 & 0.76 & 0.24 \\
+  Low\_Frequency\_Burst & 8 & 90 & 0.08 & 0.92 \\
+  Low\_Frequency\_Lines & 5 & 96 & 0.05 & 0.95 \\
+  Paired\_Doves & 7 & 94 & 0.07 & 0.93 \\
+  Power\_Line & 7 & 93 & 0.07 & 0.93 \\
+  Repeating\_Blips & 58 & 43 & 0.57 & 0.43 \\
+  Scattered\_Light & 2 & 99 & 0.02 & 0.98 \\
+  Scratchy & 4 & 41 & 0.09 & 0.91 \\
+  Tomte & 3 & 98 & 0.03 & 0.97 \\
+  Violin\_Mode & 55 & 46 & 0.54 & 0.46 \\
+  Wandering\_Line & 9 & 0 & 1.00 & 0.00 \\
+  Whistle & 82 & 19 & 0.81 & 0.19 \\
   \bottomrule
   \end{tabular}
   \caption{Shapiro-Wilk test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
@@ -988,33 +997,33 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent The Shapiro-Wilk test is able to detect all the samples of the Wandering\_Line glitch, similar to the experiment with the full frequency range, while the other two tests detect a slightly larger number of samples than at the lower frequency range. The Whistle and Violin\_Mode glitches show a decent number of detections in the case of the Shapiro-Wilk test, but a lower number for the other two tests at both higher and lower frequency ranges. This suggests that all of these glitches have a significant amount content in both the high and low frequency bands, with the Shapiro-Wilk test being the most effective of the three at detecting them.
 
 \begin{table}[H]
-  \begin{tabular}{lcccccccccc}
+  \centering
+  \begin{tabular}{lcccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Blip & 21 & 80 & 0 & 0 & 0.21 & 0.21 & 0 & 0 & 0.79 & 0.34 \\
-  Blip\_Low\_Frequency & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Extremely\_Loud & 97 & 4 & 0 & 0 & 0.96 & 0.96 & 0 & 0 & 0.04 & 0.98 \\
-  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Helix & 0 & 21 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Koi\_Fish & 66 & 33 & 0 & 0 & 0.67 & 0.67 & 0 & 0 & 0.33 & 0.80 \\
-  Light\_Modulation & 33 & 39 & 0 & 0 & 0.46 & 0.46 & 0 & 0 & 0.54 & 0.63 \\
-  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Paired\_Doves & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Power\_Line & 0 & 100 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Repeating\_Blips & 31 & 70 & 0 & 0 & 0.31 & 0.31 & 0 & 0 & 0.69 & 0.47 \\
-  Scattered\_Light & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Scratchy & 2 & 43 & 0 & 0 & 0.04 & 0.04 & 0 & 0 & 0.96 & 0.09 \\
-  Tomte & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Violin\_Mode & 7 & 94 & 0 & 0 & 0.07 & 0.07 & 0 & 0 & 0.93 & 0.13 \\
-  Wandering\_Line & 7 & 2 & 0 & 0 & 0.78 & 0.78 & 0 & 0 & 0.22 & 0.88 \\
-  Whistle & 15 & 86 & 0 & 0 & 0.15 & 0.15 & 0 & 0 & 0.85 & 0.26 \\
-  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0 \\
+  1080Lines & 0 & 6 & 0.00 & 1.00 \\
+  1400Ripples & 0 & 101 & 0.00 & 1.00 \\
+  Air\_Compressor & 0 & 101 & 0.00 & 1.00 \\
+  Blip & 21 & 80 & 0.21 & 0.79 \\
+  Blip\_Low\_Frequency & 0 & 101 & 0.00 & 1.00 \\
+  Chirp & 0 & 6 & 0.00 & 1.00 \\
+  Extremely\_Loud & 97 & 4 & 0.96 & 0.04 \\
+  Fast\_Scattering & 0 & 101 & 0.00 & 1.00 \\
+  Helix & 0 & 21 & 0.00 & 1.00 \\
+  Koi\_Fish & 66 & 33 & 0.67 & 0.33 \\
+  Light\_Modulation & 33 & 39 & 0.46 & 0.54 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0.00 & 1.00 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0.00 & 1.00 \\
+  Paired\_Doves & 0 & 101 & 0.00 & 1.00 \\
+  Power\_Line & 0 & 100 & 0.00 & 1.00 \\
+  Repeating\_Blips & 31 & 70 & 0.31 & 0.69 \\
+  Scattered\_Light & 0 & 101 & 0.00 & 1.00 \\
+  Scratchy & 2 & 43 & 0.04 & 0.96 \\
+  Tomte & 0 & 101 & 0.00 & 1.00 \\
+  Violin\_Mode & 7 & 94 & 0.07 & 0.93 \\
+  Wandering\_Line & 7 & 2 & 0.78 & 0.22 \\
+  Whistle & 15 & 86 & 0.15 & 0.85 \\
   \bottomrule
   \end{tabular}
   \caption{Kolmogorov-Smirnov test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
@@ -1024,33 +1033,33 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent Overall, the Shapiro-Wilk test continues to show the best performance in terms of true positives and F1 score followed by the Kolmogorov-Smirnov and Anderson-Darling tests. The effectiveness of these tests are depend on the specific characteristics of each glitch class, including their frequency content and the amount of noise present in the signal.
 
 \begin{table}[H]
-  \begin{tabular}{lcccccccccc}
+  \centering
+  \begin{tabular}{lcccc}
   \toprule
-  Label & TP & FN & FP & TN & Accuracy & TPR & TNR & FPR & FNR & F1 Score \\
+  Label & TP & FN & TPR & FNR \\
   \midrule
-  1080Lines & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  1400Ripples & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Air\_Compressor & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Blip & 20 & 81 & 0 & 0 & 0.20 & 0.20 & 0 & 0 & 0.80 & 0.33 \\
-  Blip\_Low\_Frequency & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Chirp & 0 & 6 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Extremely\_Loud & 96 & 5 & 0 & 0 & 0.95 & 0.95 & 0 & 0 & 0.05 & 0.97 \\
-  Fast\_Scattering & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Helix & 0 & 21 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Koi\_Fish & 65 & 34 & 0 & 0 & 0.66 & 0.66 & 0 & 0 & 0.34 & 0.79 \\
-  Light\_Modulation & 33 & 39 & 0 & 0 & 0.46 & 0.46 & 0 & 0 & 0.54 & 0.63 \\
-  Low\_Frequency\_Burst & 0 & 98 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Low\_Frequency\_Lines & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Paired\_Doves & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Power\_Line & 0 & 100 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Repeating\_Blips & 31 & 70 & 0 & 0 & 0.31 & 0.31 & 0 & 0 & 0.69 & 0.47 \\
-  Scattered\_Light & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Scratchy & 2 & 43 & 0 & 0 & 0.04 & 0.04 & 0 & 0 & 0.96 & 0.09 \\
-  Tomte & 0 & 101 & 0 & 0 & 0.00 & 0.00 & 0 & 0 & 1.00 & 0 \\
-  Violin\_Mode & 6 & 95 & 0 & 0 & 0.06 & 0.06 & 0 & 0 & 0.94 & 0.11 \\
-  Wandering\_Line & 6 & 3 & 0 & 0 & 0.67 & 0.67 & 0 & 0 & 0.33 & 0.80 \\
-  Whistle & 9 & 92 & 0 & 0 & 0.09 & 0.09 & 0 & 0 & 0.91 & 0.16 \\
-  Clean\_Signal & 0 & 0 & 0 & 1824 & 1.00 & 0.00 & 1.00 & 0.00 & 0.00 & 0 \\
+  1080Lines & 0 & 6 & 0.00 & 1.00 \\
+  1400Ripples & 0 & 101 & 0.00 & 1.00 \\
+  Air\_Compressor & 0 & 101 & 0.00 & 1.00 \\
+  Blip & 20 & 81 & 0.20 & 0.80 \\
+  Blip\_Low\_Frequency & 0 & 101 & 0.00 & 1.00 \\
+  Chirp & 0 & 6 & 0.00 & 1.00 \\
+  Extremely\_Loud & 96 & 5 & 0.95 & 0.05 \\
+  Fast\_Scattering & 0 & 101 & 0.00 & 1.00 \\
+  Helix & 0 & 21 & 0.00 & 1.00 \\
+  Koi\_Fish & 65 & 34 & 0.66 & 0.34 \\
+  Light\_Modulation & 33 & 39 & 0.46 & 0.54 \\
+  Low\_Frequency\_Burst & 0 & 98 & 0.00 & 1.00 \\
+  Low\_Frequency\_Lines & 0 & 101 & 0.00 & 1.00 \\
+  Paired\_Doves & 0 & 101 & 0.00 & 1.00 \\
+  Power\_Line & 0 & 100 & 0.00 & 1.00 \\
+  Repeating\_Blips & 31 & 70 & 0.31 & 0.69 \\
+  Scattered\_Light & 0 & 101 & 0.00 & 1.00 \\
+  Scratchy & 2 & 43 & 0.04 & 0.96 \\
+  Tomte & 0 & 101 & 0.00 & 1.00 \\
+  Violin\_Mode & 6 & 95 & 0.06 & 0.94 \\
+  Wandering\_Line & 6 & 3 & 0.67 & 0.33 \\
+  Whistle & 9 & 92 & 0.09 & 0.91 \\
   \bottomrule
   \end{tabular}
   \caption{Anderson-Darling test results for each glitch class at a frequency range of 512 Hz to 1024 Hz.}
@@ -1110,7 +1119,7 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent In this project, we proposed a framework to detect glitches in gravitational wave detector data using statistical tests of Gaussianity on the time-amplitude domain. For our analyses, we utilized data taken from the L1 detector during the O3a run \cite{abbott_gwtc-2_2021}. We studied the effectiveness of three statistical tests of Gaussianity, namely the Shapiro-Wilk \cite{Shapiro1965}, Kolmogorov-Smirnov \cite{Kolmogorov_1951}, and Anderson-Darling \cite{anderson1954test} at a c, in detecting glitches in the time-amplitude domain, as opposed to the frequency-amplitude domain, which is a common approach taken in GW data analysis and glitch studies \cite{chatterji_multiresolution_2004, vazsonyi_identifying_2023}. We developed a preprocessing pipeline to condition the data for the tests, which included obtaining time series data for the clean and glitched data from the GWOSC database, preprocessing and conditioning the data, and applying band pass filters prior to our experiments. We then applied the three statistical tests on the preprocessed data and evaluated their performance in terms of accuracy, true positive rate, false positive rate, and F1 score.
 
 \medskip
-\noindent The results of our experiments has shown that the Shapiro-Wilk test is the most effective at detecting glitches across the full frequency range of 10 Hz to 1024 Hz with an accuracy of 74\% (0.74) and an F1 score of 0.66, followed by the Kolmogorov-Smirnov test at an accuracy of 64\% (0.64) and F1 score of 0.43, and finally, the Anderson-Darling test at an accuracy of 64\% (0.64) and F1 score of 0.42.
+\noindent The results of our experiments has shown that the Shapiro-Wilk test is the most effective at detecting glitches across the full frequency range of 10 Hz to 1024 Hz with an accuracy of 73.86\% (rounded to 0.74 or 74\%) and an F1 score of 0.66, followed by the Kolmogorov-Smirnov test at an accuracy of 64.43\% (rounded to 0.64 or 64\%) and F1 score of 0.43, and finally, the Anderson-Darling test at an accuracy of 63.9\% (rounded to 0.64 or 64\%) and F1 score of 0.42.
 
 \medskip
 \noindent At lower (10 Hz to 512 Hz) and higher (512 Hz to 1024 Hz) frequency bands, the effectiveness of these tests vary, with some glitch types being detected better at higher frequencies, and others better at lower frequencies. This suggests that the success of these tests is highly dependent on the amount of power each glitch type contains at specific frequency bands. In all these cases, the tests consistently showed the same order of effectiveness as on the full frequency range, with the Shapiro-Wilk test having the highest number of glitch detections and a proportionally high number of false positives, followed by the Kolmogorov-Smirnov and Anderson-Darling tests. This hence confirms the findings of the study in \cite{razali2011power}.
@@ -1123,7 +1132,7 @@ We now perform the same analysis as before on the time series data with a band p
 \noindent This research project was conducted with the support of Dr. Sarah Caudill from the University of Massachusetts Dartmouth, and Dr. Melissa Lopez from the National Institute for Subatomic Physics (Nikhef). I am deeply grateful for their constant guidance and feedback, which was invaluable in helping me understand the nuances of not just this project but also the broader field of work I will be involved in as an aspiring PhD student. I also extend my gratitude to the faculty and staff at the University of Massachusetts Dartmouth for providing me with the resources and support to conduct this research.
 
 \medskip
-\noindent This work extensively utilized computing resources from the LIGO Data Grid (LDG) and tools from the Gravitational Wave Open Science Center (\href{https://www.gw-openscience.org}{https://www.gw-openscience.org}), both being services provided by the LIGO Scientific Collaboration (LSC) and the Virgo Collaboration. I would like to thank the LSC and Virgo for making their data publicly available, which made this project possible.
+\noindent This work extensively utilized computing resources from the LIGO Data Grid (LDG) and tools from the Gravitational Wave Open Science Center (\href{https://www.gw-openscience.org}{https://www.gw-openscience.org}), both being services provided by the LIGO Scientific Collaboration (LSC) and the Virgo Collaboration. I would like to thank the LIGO and Virgo Collaborations for making their data publicly available, which made this project possible.
 
 \medskip
 \noindent A special thank you to my family for their constant encouragement and belief in me throughout this journey. I am the person I am today because of them, and I am forever grateful for it. Finally, I appreciate the support of my friends and peers who have been here for me through the ups and downs not only as a student, but also as someone trying to find their place in the world far away from home.
