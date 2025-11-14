@@ -235,12 +235,12 @@ def display_confusion_matrix(data: pd.DataFrame, stat_test: Literal["Shapiro", "
 
     if per_glitch:
         title = f"Confusion Matrix of {stat_test} Test on {data.iloc[0]["label"]} Glitches"
-        filename = f"conf_matrix_{data.iloc[0]['label']}_{stat_test}.pdf"
+        filename = f"conf_matrix_{data.iloc[0]['label']}_{stat_test}.svg"
     else:
         title = f"Confusion Matrix of {stat_test} Test"
-        filename = f"conf_matrix_{stat_test}.pdf"
-    
-    plt.figure(figsize=(10, 6))
+        filename = f"conf_matrix_{stat_test}.svg"
+
+    plt.figure(figsize=(10, 6), dpi=200)
     disp = metrics.ConfusionMatrixDisplay(generate_confusion_matrix(data,stat_test, threshold), display_labels=["Glitch Present", "Glitch Not Present"],)
     disp.plot()
     plt.grid(False)
