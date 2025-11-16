@@ -6,6 +6,7 @@ import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
 from gwpy.timeseries import TimeSeries
+from gwpy import time
 from matplotlib.ticker import ScalarFormatter
 from sklearn import metrics
 from typing import Literal
@@ -57,7 +58,7 @@ def display_sample_plots(data: pd.DataFrame, whitening_tw: int=10, observation_t
 
     timeseries = TimeSeries.read(data['timeseries_file_location'])
     timeseries = timeseries.whiten(4,2)
-    print(type(srate), type(whitening_tw), type(observation_tw))
+    # print(type(srate), type(whitening_tw), type(observation_tw))
     timeseries = timeseries[int(srate * (whitening_tw - (observation_tw/2))):-int(srate * (whitening_tw - (observation_tw/2)))]
     q_scan, time_elapsed = calculate_q_transform(timeseries)
 
@@ -98,7 +99,6 @@ def display_sample_plots(data: pd.DataFrame, whitening_tw: int=10, observation_t
     else:
         fig, ax = plt.subplots(2,1, figsize=(12, 18), sharex=True, constrained_layout=True)
         ax[0].plot(data['t'], data['whitened_y'])
-        ax[0].set_xlabel("Time (s)", fontsize=25)
         ax[0].set_ylabel("Amplitude", fontsize=25)
         ax[0].set_title("Whitened Glitch", fontsize=30)
         ax[0].tick_params(axis='both', which="major", labelsize=25)
@@ -109,7 +109,10 @@ def display_sample_plots(data: pd.DataFrame, whitening_tw: int=10, observation_t
         ax[1].set_yscale('log', base=2)
         ax[1].set_xscale('linear')
         ax[1].set_ylabel('Frequency (Hz)', fontsize=25)
-        ax[1].set_xlabel('Time (s)', fontsize=25)
+        if data['GPStime'] is not None:
+            ax[1].set_xlabel(f"Time (s) from {time.from_gps(data['GPStime'])}", fontsize=25)
+        else:
+            ax[1].set_xlabel("Time (s)", fontsize=25)
         ax[1].images[0].set_clim(0, 25.5)
         ax[1].set_title("Q-Transform", fontsize=30)
         ax[1].tick_params(axis='both', which="major", labelsize=25)
@@ -119,8 +122,12 @@ def display_sample_plots(data: pd.DataFrame, whitening_tw: int=10, observation_t
         cbr.set_label('Normalized energy', fontsize=25)
         cbr.ax.tick_params(labelsize=25)
     
+    # if data['GPStime'] is not None:
+    #     plt.suptitle(f"Glitch at GPS Time: {data['GPStime']}", fontsize=35)
+    # else:
+    #     plt.suptitle(f"Clean Detector Sample", fontsize=35)
     if len(save_path):
-        plt.savefig(save_path, dpi=100)
+        plt.savefig(save_path, dpi=200)
     plt.show()
 
 
