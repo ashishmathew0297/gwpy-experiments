@@ -33,6 +33,7 @@ def find_gaps(df, lower_bound, upper_bound):
     gap_starts = df["end"].iloc[:-1].to_numpy()
     gap_ends = df["start"].iloc[1:].to_numpy()
     gaps = gap_ends - gap_starts
+    print(gaps.min(), gaps.max(), 'gaps')
 
     # Filter gaps based on the given bounds
     valid_mask = (gaps > lower_bound) & (gaps < upper_bound)
@@ -195,14 +196,13 @@ def main(run, ifo):
     Main execution function that orchestrates gap processing.
     """
     start, end = get_o3_segment(run)
-    ifo = "L1"
     hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
     lower_bound, upper_bound = 7, 30
 
     df = read_table(start, end, hoft_channel)
     gaps = find_gaps(df, lower_bound, upper_bound)
     p_values = process_gaps(gaps, scratch=2, plot=False)
-    
+    print(len(df), len(gaps))
     # data = pd.DataFrame(gaps, columns=['start_time', 'end_time'])
     # data['p_values'] = p_values
     # data.to_csv(f'pre_clean_segments_O3a_{ifo}.csv')
