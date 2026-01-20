@@ -1,5 +1,4 @@
 from gwtrigfind import find_trigger_files
-from gwpy.table import (Table, EventTable)
 from gwpy.timeseries import TimeSeries
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,37 +8,56 @@ from scipy.optimize import curve_fit
 import re
 from dq_utils import get_DQ_segments
 import argparse
+import h5py
 
-def read_table(start, end, hoft_channel):
-    trigger_files = find_trigger_files(hoft_channel, 'omicron', start, end)
-    trigger_table = EventTable.read(trigger_files)
-    df = trigger_table.to_pandas()
-    return df
 
-def find_gaps(df, lower_bound, upper_bound):
+def read_tables(start, end, hoft_channel):
     """
-    Find gaps in a dataframe where the difference between 'end_gps' of one row 
-    and 'start_gps' of the next row falls within the given bounds.
+    Reads only the GPS start and end times from multiple HDF5 trigger files.
+    Returns a single sorted numpy array of starts and ends.
+    """
+    file_list = find_trigger_files(hoft_channel, 'omicron', start, end)
+    starts_list, ends_list = [], []
+
+    for file in file_list:
+        with h5py.File(file[7:], "r") as f:
+            triggers = f["triggers"]
+            starts_list.append(triggers["tstart"][:])
+            ends_list.append(triggers["tend"][:])
+
+    # Concatenate all files
+    starts, ends = np.concatenate(starts_list), np.concatenate(ends_list)
+
+    # Sort by start times
+    sort_idx = np.argsort(all_starts)
+    starts, ends = starts[sort_idx], ends[sort_idx]
+
+    return starts, ends
+
+def find_gaps(starts, ends, lower_bound, upper_bound):
+    """
+    Vectorized gap calculation between consecutive triggers.
     
     Parameters:
-    df (pd.DataFrame): A dataframe with 'start' and 'end' columns.
-    lower_bound (float): Minimum gap size.
-    upper_bound (float): Maximum gap size.
+        starts (np.ndarray): start times of triggers
+        ends (np.ndarray): end times of triggers
+        lower_bound (float): min gap in seconds
+        upper_bound (float): max gap in seconds
 
     Returns:
-    list: A list of tuples containing (gap_start, gap_end).
+        np.ndarray: shape (N,2) of valid gaps [gap_start, gap_end]
     """
-    # Compute the differences using vectorized operations
-    gap_starts = df["end"].iloc[:-1].to_numpy()
-    gap_ends = df["start"].iloc[1:].to_numpy()
-    gaps = gap_ends - gap_starts
-    print(gaps.min(), gaps.max(), 'gaps')
+    # Compute gaps vectorized
+    gap_starts = ends[:-1]
+    gap_ends   = starts[1:]
+    gaps       = gap_ends - gap_starts
 
-    # Filter gaps based on the given bounds
+    # Apply bounds
     valid_mask = (gaps > lower_bound) & (gaps < upper_bound)
-    
-    # Extract valid (gap_start, gap_end) tuples
-    return list(zip(gap_starts[valid_mask], gap_ends[valid_mask]))
+
+    # Return array of (gap_start, gap_end)
+    return np.column_stack((gap_starts[valid_mask], gap_ends[valid_mask]))
+
 
 def get_o3_segment(run):
     """
@@ -199,8 +217,8 @@ def main(run, ifo):
     hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
     lower_bound, upper_bound = 7, 30
 
-    df = read_table(start, end, hoft_channel)
-    gaps = find_gaps(df, lower_bound, upper_bound)
+    starts, ends = read_tables(start, end, hoft_channel)
+    gaps = find_gaps(starts, ends, lower_bound, upper_bound)
     p_values = process_gaps(gaps, scratch=2, plot=False)
     print(len(df), len(gaps))
     # data = pd.DataFrame(gaps, columns=['start_time', 'end_time'])
