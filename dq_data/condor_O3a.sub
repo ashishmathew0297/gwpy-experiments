@@ -1,0 +1,17 @@
+universe = vanilla
+executable = /cvmfs/software.igwn.org/conda/envs/igwn/bin/python3
+
+accounting_group = ligo.dev.o4.detchar.bayeswave.gengli
+accounting_group_user = melissa.lopez
+
+output = output.txt
+error  = error.txt
+log    = log.txt
+
+request_memory = 20G
+request_disk   = 20G
+request_cpus   = 1
+
+arguments = /home/melissa.lopez/BayesWave/get_omicron_triggers/get_clean_data.py --run O3a --ifo L1
+
+queue 1

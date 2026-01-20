@@ -8,17 +8,12 @@ import pandas as pd
 from scipy.optimize import curve_fit
 import re
 from dq_utils import get_DQ_segments
-
+import argparse
 
 def read_table(start, end, hoft_channel):
     trigger_files = find_trigger_files(hoft_channel, 'omicron', start, end)
-    trigger_table = EventTable.read(trigger_files,
-                                     tablename='sngl_burst',
-                                     format='ligolw')
+    trigger_table = EventTable.read(trigger_files)
     df = trigger_table.to_pandas()
-    df['peak_gps'] = df["peak_time"] + df["peak_time_ns"]*10**(-9)
-    df['start_gps'] = df["start_time"] + df["start_time_ns"]*10**(-9)
-    df['end_gps'] = df['start_gps'] + df['duration']
     return df
 
 def find_gaps(df, lower_bound, upper_bound):
@@ -27,7 +22,7 @@ def find_gaps(df, lower_bound, upper_bound):
     and 'start_gps' of the next row falls within the given bounds.
     
     Parameters:
-    df (pd.DataFrame): A dataframe with 'start_gps' and 'end_gps' columns.
+    df (pd.DataFrame): A dataframe with 'start' and 'end' columns.
     lower_bound (float): Minimum gap size.
     upper_bound (float): Maximum gap size.
 
@@ -35,8 +30,8 @@ def find_gaps(df, lower_bound, upper_bound):
     list: A list of tuples containing (gap_start, gap_end).
     """
     # Compute the differences using vectorized operations
-    gap_starts = df["end_gps"].iloc[:-1].to_numpy()
-    gap_ends = df["start_gps"].iloc[1:].to_numpy()
+    gap_starts = df["end"].iloc[:-1].to_numpy()
+    gap_ends = df["start"].iloc[1:].to_numpy()
     gaps = gap_ends - gap_starts
 
     # Filter gaps based on the given bounds
@@ -44,6 +39,23 @@ def find_gaps(df, lower_bound, upper_bound):
     
     # Extract valid (gap_start, gap_end) tuples
     return list(zip(gap_starts[valid_mask], gap_ends[valid_mask]))
+
+def get_o3_segment(run):
+    """
+    Return (start, end) GPS times for O3a or O3b.
+    """
+
+    if run == "O3a":
+        start = 1238166018  # O3a start
+        end   = 1253977218  # O3a end
+    elif run == "O3b":
+        start = 1256655618  # O3b start
+        end   = 1269363618  # O3b end
+    else:
+        raise ValueError("run must be 'O3a' or 'O3b'")
+
+    return start, end
+
 
 def _monoLog(x, m, t):
     """
@@ -178,13 +190,11 @@ def process_gaps(gaps, scratch=2, plot=True):
 
 
 # Main function
-def main():
+def main(run, ifo):
     """
     Main execution function that orchestrates gap processing.
     """
-
-    start = 1238166018 #O3a start
-    end = 1253977218 #O3a end
+    start, end = get_o3_segment(run)
     ifo = "L1"
     hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
     lower_bound, upper_bound = 7, 30
@@ -193,19 +203,9 @@ def main():
     gaps = find_gaps(df, lower_bound, upper_bound)
     p_values = process_gaps(gaps, scratch=2, plot=False)
     
-    data = pd.DataFrame(gaps, columns=['start_time', 'end_time'])
-    data['p_values'] = p_values
-    data.to_csv(f'pre_clean_segments_O3a_{ifo}.csv')
-    
-    start = 1238166018 #O3a start
-    end = 1253977218 #O3a end
-    ifo = "L1"
-    hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
-    lower_bound, upper_bound = 7, 30
-
-    df = read_table(start, end, hoft_channel)
-    gaps = find_gaps(df, lower_bound, upper_bound)
-    p_values = process_gaps(gaps, scratch=2, plot=False)
+    # data = pd.DataFrame(gaps, columns=['start_time', 'end_time'])
+    # data['p_values'] = p_values
+    # data.to_csv(f'pre_clean_segments_O3a_{ifo}.csv')
 
     # Create a pandas data frame
     gaps = pd.DataFrame(gaps, columns=['start_time', 'end_time'])
@@ -220,8 +220,14 @@ def main():
     # Filter df2 to get only matching rows
     DQ_gaps = gaps[mask]
 
-    DQ_gaps.to_csv(f'pre_clean_segments_O3a_{ifo}.csv')
+    DQ_gaps.to_csv(f'pre_clean_segments_{run}_{ifo}_new.csv')
 
 # Run the script if executed directly
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Process gaps for O3a / O3b runs")
+
+    parser.add_argument("--run", choices=["O3a", "O3b"], required=True, help="Observing run (O3a or O3b)")
+    parser.add_argument("--ifo", choices=["L1", "H1", "V1"], default="L1", help="Interferometer (default: L1)")
+    args = parser.parse_args()
+
+    main(run=args.run, ifo=args.ifo)
