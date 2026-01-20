@@ -12,6 +12,6 @@ request_memory = 20G
 request_disk   = 20G
 request_cpus   = 1
 
-arguments = /home/melissa.lopez/BayesWave/get_omicron_triggers/get_clean_data.py --run O3a --ifo L1
+arguments = /home/melissa.lopez/gwpy-experiments/dq_data/get_clean_data.py --run O3a --ifo L1
 
 queue 1

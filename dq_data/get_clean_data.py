@@ -29,7 +29,7 @@ def read_tables(start, end, hoft_channel):
     starts, ends = np.concatenate(starts_list), np.concatenate(ends_list)
 
     # Sort by start times
-    sort_idx = np.argsort(all_starts)
+    sort_idx = np.argsort(starts)
     starts, ends = starts[sort_idx], ends[sort_idx]
 
     return starts, ends
