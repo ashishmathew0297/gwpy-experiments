@@ -1,12 +1,12 @@
 universe = vanilla
 executable = /cvmfs/software.igwn.org/conda/envs/igwn/bin/python3
-
+environment = "BEARER_TOKEN_FILE=$$(CondorScratchDir)/.condor_creds/scitokens.use"
 accounting_group = ligo.dev.o4.detchar.bayeswave.gengli
 accounting_group_user = melissa.lopez
 
-output = output.txt
-error  = error.txt
-log    = log.txt
+output = output_o3b.txt
+error  = error_o3b.txt
+log    = log_o3b.txt
 
 request_memory = 20G
 request_disk   = 20G

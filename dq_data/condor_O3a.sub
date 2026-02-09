@@ -1,6 +1,6 @@
 universe = vanilla
 executable = /cvmfs/software.igwn.org/conda/envs/igwn/bin/python3
-
+environment = "BEARER_TOKEN_FILE=$$(CondorScratchDir)/.condor_creds/scitokens.use"
 accounting_group = ligo.dev.o4.detchar.bayeswave.gengli
 accounting_group_user = melissa.lopez
 

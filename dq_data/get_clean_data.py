@@ -59,17 +59,20 @@ def find_gaps(starts, ends, lower_bound, upper_bound):
     return np.column_stack((gap_starts[valid_mask], gap_ends[valid_mask]))
 
 
-def get_o3_segment(run):
+def get_segment(run):
     """
     Return (start, end) GPS times for O3a or O3b.
     """
 
     if run == "O3a":
-        start = 1238166018  # O3a start
-        end   = 1253977218  # O3a end
+        start = 1238166018
+        end   = 1253977218
     elif run == "O3b":
-        start = 1256655618  # O3b start
-        end   = 1269363618  # O3b end
+        start = 1256655618
+        end   = 1269363618
+    elif run == "O4a":
+        start = 1368195220
+        end   = 1389456018
     else:
         raise ValueError("run must be 'O3a' or 'O3b'")
 
@@ -158,7 +161,7 @@ def process_gaps(gaps, scratch=2, plot=True):
 
         # Fetch and whiten data
         try:
-            data = TimeSeries.fetch_open_data('L1', start, end)
+            data = TimeSeries.fetch('L1:DCS-CALIB_STRAIN_C01', start, end, verbose=True)
             data = data.whiten(4, 2)
 
             # Define parameters
@@ -174,8 +177,8 @@ def process_gaps(gaps, scratch=2, plot=True):
             # Fit qgram data and compute p-value
             p_value_str = fit_qgram_data(qgram)
             p_value_str = float(re.search(r"\d+\.\d+", p_value_str).group())
-        except ValueError as e:
-            print(f"ValueError encountered: {e}")
+        except (ValueError, RuntimeError) as e:
+            print(f"Error encountered: {e}")
             p_value_str = 0
             
         p_values.append(p_value_str)
@@ -213,7 +216,7 @@ def main(run, ifo):
     """
     Main execution function that orchestrates gap processing.
     """
-    start, end = get_o3_segment(run)
+    start, end = get_segment(run)
     hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
     lower_bound, upper_bound = 7, 30
 
