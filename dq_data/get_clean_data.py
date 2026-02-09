@@ -247,7 +247,7 @@ def main(run, ifo):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process gaps for O3a / O3b runs")
 
-    parser.add_argument("--run", choices=["O3a", "O3b"], required=True, help="Observing run (O3a or O3b)")
+    parser.add_argument("--run", choices=["O3a", "O3b", "O4a"], required=True, help="Observing run (O3a or O3b or O4a)")
     parser.add_argument("--ifo", choices=["L1", "H1", "V1"], default="L1", help="Interferometer (default: L1)")
     args = parser.parse_args()
 
