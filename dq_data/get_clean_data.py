@@ -138,7 +138,7 @@ def fit_qgram_data(qgram, fit_bins=15, min_bin=2, max_bin=42, p0=(3, 0.5)):
     else:
         return "%.6f" % p_value
     
-def process_gaps(gaps, scratch=2, plot=True):
+def process_gaps(ifo, run, gaps, scratch=2, plot=True):
     """
     Process gaps by fetching and whitening time series data, computing q-grams, 
     calculating p-values, and optionally plotting results.
@@ -161,7 +161,11 @@ def process_gaps(gaps, scratch=2, plot=True):
 
         # Fetch and whiten data
         try:
-            data = TimeSeries.fetch('L1:DCS-CALIB_STRAIN_C01', start, end, verbose=True)
+            if run == 'O3a' or run == 'O3b':
+                channel = f'{ifo}:DCS-CALIB_STRAIN_C01'
+            else:
+                channel = f'{ifo}:GDS-CALIB_STRAIN_CLEAN'
+            data = TimeSeries.fetch(channel, start, end, verbose=True)
             data = data.whiten(4, 2)
 
             # Define parameters
@@ -217,12 +221,15 @@ def main(run, ifo):
     Main execution function that orchestrates gap processing.
     """
     start, end = get_segment(run)
-    hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
+    if run == 'O4a':
+        hoft_channel = f'{ifo}:GDS-CALIB_STRAIN_CLEAN'
+    else:
+        hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
     lower_bound, upper_bound = 7, 30
 
     starts, ends = read_tables(start, end, hoft_channel)
     gaps = find_gaps(starts, ends, lower_bound, upper_bound)
-    p_values = process_gaps(gaps, scratch=2, plot=False)
+    p_values = process_gaps(ifo, run, gaps, scratch=2, plot=False)
     print(len(df), len(gaps))
     # data = pd.DataFrame(gaps, columns=['start_time', 'end_time'])
     # data['p_values'] = p_values
