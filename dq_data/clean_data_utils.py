@@ -9,6 +9,7 @@ import re
 from dq_utils import get_DQ_segments
 import argparse
 import h5py
+import time
 
 
 def read_tables(start, end, hoft_channel):
@@ -154,10 +155,10 @@ def process_gaps(ifo, run, gaps, scratch=2, plot=True):
     cmap = colormaps['viridis']
     p_values = []
 
-    for i in range(len(gaps)):
-        start = gaps[i][0] - scratch
-        end = gaps[i][1] + scratch
-        print(f"Processing gap {i+1}/{len(gaps)}: Duration = {end - start} seconds")
+    for i in range(gaps.shape[1]):
+        start = gaps[0, i] - scratch
+        end = gaps[1, i] + scratch
+        print(f"Processing gap {i+1}/{gaps.shape[1]}: Duration = {end - start} seconds")
 
         # Fetch and whiten data
         try:
@@ -181,6 +182,7 @@ def process_gaps(ifo, run, gaps, scratch=2, plot=True):
             # Fit qgram data and compute p-value
             p_value_str = fit_qgram_data(qgram)
             p_value_str = float(re.search(r"\d+\.\d+", p_value_str).group())
+            print(p_value_str, 'p_value')
         except (ValueError, RuntimeError) as e:
             print(f"Error encountered: {e}")
             p_value_str = 0
@@ -227,7 +229,11 @@ def main(run, ifo):
         hoft_channel = f'{ifo}:GDS-CALIB_STRAIN'
     lower_bound, upper_bound = 7, 30
 
+    stime = time.time()
     starts, ends = read_tables(start, end, hoft_channel)
+    etime = time.time()
+    print("Execution time of read tables:", np.round(etime - stime, 2))
+    
     gaps = find_gaps(starts, ends, lower_bound, upper_bound)
     p_values = process_gaps(ifo, run, gaps, scratch=2, plot=False)
     print(len(df), len(gaps))
