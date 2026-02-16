@@ -2,7 +2,6 @@ condor_clean/
 error.txt
 log.txt
 output.txt
-pre_clean_segments_O3a_L1_new.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
