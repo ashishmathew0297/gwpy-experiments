@@ -21,7 +21,7 @@ def getEventList(file, start, end, margin=300):
     events: all events in interval
     
     """
-    df = pd.read_csv('/home/melissa.lopez/gwpy-experiments/dq_data/event-versions.csv') # O1, O2, O3, O4
+    df = pd.read_csv(file) # O1, O2, O3, O4
     df = df[(df['gps'] > start) & (df['gps'] < end)]
     eventlist = df['gps']
     events =list()
@@ -61,8 +61,7 @@ def getSegments(all_dqf, events):
 def get_DQ_segments(ifo, start, end, run):
     flags = [f'{ifo}_DATA', f'{ifo}_CBC_CAT1', f'{ifo}_CBC_CAT2']
 
-    if run == 'O3a' or run == 'O3b':
-        eventlist = getEventList('/home/melissa.lopez/gwpy-experiments/dq_data/eventlist.txt', start, end) #FIXME: need list for O4
+    eventlist = getEventList('/home/melissa.lopez/gwpy-experiments/dq_data/event-versions.csv', start, end) # O1, O2, O3, O4
     # create a DQF for all confident events and a 4 minute region around them
     event_dqf = ~DataQualityFlag(name='GW Events',
                              known=[(start, end)],
