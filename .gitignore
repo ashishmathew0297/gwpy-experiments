@@ -471,3 +471,6 @@ TSWLatexianTemp*
 
 # xwatermark package
 *.xwm
+
+# Obsidian
+.obsidian
