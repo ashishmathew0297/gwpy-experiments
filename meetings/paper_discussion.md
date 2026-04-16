@@ -112,6 +112,7 @@ $$
 
 - After this, the probability of the whole Q-gram is found using the same Gaussian distribution assumption, taking the mean as the expected number of tiles.
 	- The tile energies are assumed to follow a Poisson process with the same null hypothesis assumption. The probability of at least one tile being greater than a given tile's energy $\epsilon_0$ is based on the number of tiles above the given energy level $\lambda = \tilde{P}(\epsilon > \epsilon_0)$ and the total number of tiles $\tau = N$
+    - (For some reason the original paper does not add the N above which lead to a lot of confusion)
 
 $$
 \begin{align}
