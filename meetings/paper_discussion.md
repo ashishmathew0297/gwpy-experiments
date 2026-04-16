@@ -43,7 +43,7 @@ Here
 
 Link: https://arxiv.org/pdf/2306.09019
 
-This paper presents a statistical test to check for excess non-Gaussian noise in GW data. This is done with the help of Bayesian Statistical Modelling. 
+This paper presents a method to check for excess non-Gaussian noise in GW data. This is done with the help of Bayesian Statistical Modelling. 
 
 ### Inputs to the ~~Statistical Test~~ Bayesian Model
 
