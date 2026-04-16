@@ -103,10 +103,10 @@ To calculate the significance, the p-value for the null hypothesis (given above)
 
 $$
 \begin{align}
-	\tilde{P}(\epsilon > \epsilon_0) &= \int\limits_{\epsilon_0}^{\infty}
-	P(\epsilon')d\epsilon' \notag \\
-    &= \int\limits_{\epsilon_0}^{\infty} \frac{Ae^{-\epsilon't}}{N} d\epsilon' \notag \\
-    &= \frac{Ae^{-\epsilon_0t}}{tN}
+	N \cdot \tilde{P}(\epsilon > \epsilon_0) &= N \cdot \int\limits_{\epsilon_0}^{\infty}
+	P(\epsilon')d\epsilon' \\
+    &= N \int\limits_{\epsilon_0}^{\infty} \frac{Ae^{-\epsilon't}}{N} d\epsilon' \notag \\
+    &= N \frac{Ae^{-\epsilon_0t}}{tN}
 \end{align}
 $$
 
