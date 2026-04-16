@@ -105,8 +105,8 @@ $$
 \begin{align}
 	N \cdot \tilde{P}(\epsilon > \epsilon_0) &= N \cdot \int\limits_{\epsilon_0}^{\infty}
 	P(\epsilon')d\epsilon' \\
-    &= N \int\limits_{\epsilon_0}^{\infty} \frac{Ae^{-\epsilon't}}{N} d\epsilon' \notag \\
-    &= N \frac{Ae^{-\epsilon_0t}}{tN}
+    &= N \cdot \int\limits_{\epsilon_0}^{\infty} \frac{Ae^{-\epsilon't}}{N} d\epsilon' \notag \\
+    &= N \cdot \frac{Ae^{-\epsilon_0t}}{tN}
 \end{align}
 $$
 
